@@ -7,8 +7,9 @@ import {createStore, applyMiddleware, compose} from 'redux'
 import thunk from 'redux-thunk'
 import {Provider} from 'react-redux'
 import combinedReducers from './store/index'
+import {composeWithDevTools} from 'redux-devtools-extension/developmentOnly'
 
-const store = createStore(combinedReducers, {}, compose(applyMiddleware(thunk), window.__REDUX_DEVTOOLS_EXTENSION__ && window.__REDUX_DEVTOOLS_EXTENSION__()))
+const store = createStore(combinedReducers, {}, composeWithDevTools(applyMiddleware(thunk)))
 
 
 ReactDOM.render(
