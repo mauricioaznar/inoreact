@@ -2,10 +2,12 @@ import axios from 'axios'
 import authHeader from '../helpers/authHeader'
 
 
+const url = process.env.NODE_ENV === 'development' ? 'http://inoserver.test/api/' : 'http://206.189.228.240/api/'
+
 export const loginUser = (email, password) => {
   return (dispatch, getState) => {
     dispatch(setIsTokenLoading())
-    return axios.post('http://inoserver.test/api/auth/login', {email, password}).then(result => {
+    return axios.post(url + 'auth/login', {email, password}).then(result => {
       const token = result.data.data.token
       dispatch(setToken(token))
     }).catch(e => {
@@ -19,9 +21,9 @@ export const getApiEntities = () => {
   return (dispatch, getState) => {
     dispatch(setAreEntitiesLoading())
     return axios.all([
-      axios.get('http://inoserver.test/api/stats/productionReport', {headers: {...authHeader()}}),
-      axios.get('http://inoserver.test/api/stats/sales', {headers: {...authHeader()}}),
-      axios.get('http://inoserver.test/api/stats/inventory', {headers: {...authHeader()}})
+      axios.get(url + 'stats/productionReport', {headers: {...authHeader()}}),
+      axios.get(url + 'stats/sales', {headers: {...authHeader()}}),
+      axios.get(url + 'stats/inventory', {headers: {...authHeader()}})
     ]).then(result => {
       const orderProductions = result[0].data.data[0]
       const {sales, requests, requests_products} = result[1].data.data
@@ -37,13 +39,6 @@ export const getApiEntities = () => {
   }
 }
 
-export const getSales = () => {
-  return (dispatch, getState) => {
-    return axios.get('http://inoserver.test/api/branch/list', {headers: {...authHeader()}}).then(result => {
-      console.log(result)
-    })
-  }
-}
 
 export const setOrderProductions = (orderProductions) => {
   return {
