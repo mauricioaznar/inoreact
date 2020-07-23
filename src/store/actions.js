@@ -2,7 +2,7 @@ import axios from 'axios'
 import authHeader from '../helpers/authHeader'
 
 
-const url = process.env.NODE_ENV === 'development' ? 'http://inoserver.test/api/' : 'http://206.189.228.240/api/'
+const url = process.env.NODE_ENV === 'development' ? 'http://inoserver.test/api/' : 'https://inoserver.grupoinopack.com/api/'
 
 export const loginUser = (email, password) => {
   return (dispatch, getState) => {
