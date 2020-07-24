@@ -44,12 +44,21 @@ function Analytics(props) {
       <Grid
         item
         container
-        direction={'row'}
+        direction={'column'}
         className={classes.rowContainer}
       >
         <Grid
           item
           sm
+          xs={12}
+        >
+          <RequestsTable headers={headers} rows={requestsTableRows} />
+
+        </Grid>
+        <Grid
+          item
+          sm
+          xs={12}
         >
           <RequestsTable headers={headers} rows={requestsTableRows} />
 

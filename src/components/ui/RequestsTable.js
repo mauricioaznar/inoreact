@@ -23,8 +23,8 @@ export default function RequestsTable(props) {
   const classes = useStyles();
 
   return (
-      <div style={{display: 'table', tableLayout:'fixed', width:'100%'}}>
-        <Table className={classes.table} aria-label="simple table">
+      <TableContainer className={classes.table}>
+        <Table aria-label="simple table">
           <TableHead>
             <TableRow>
               {props.headers.map(header => {
@@ -42,7 +42,7 @@ export default function RequestsTable(props) {
             ))}
           </TableBody>
         </Table>
-      </div>
+      </TableContainer>
   );
 }
 
