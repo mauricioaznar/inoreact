@@ -21,7 +21,6 @@ export const getApiEntities = () => {
   return (dispatch, getState) => {
     dispatch(setAreEntitiesLoading())
     return axios.all([
-      axios.get(url + 'stats/productionReport', {headers: {...authHeader()}}),
       axios.get(url + 'stats/sales', {headers: {...authHeader()}}),
       axios.get(url + 'stats/inventory', {headers: {...authHeader()}}),
       axios.get(url + 'stats/sales', {headers: {...authHeader()}}),
@@ -31,10 +30,10 @@ export const getApiEntities = () => {
       axios.get(url + 'stats/sales', {headers: {...authHeader()}}),
       axios.get(url + 'stats/sales', {headers: {...authHeader()}}),
     ]).then(result => {
-      const orderProductions = result[0].data.data[0]
-      const {sales, requests, requests_products} = result[1].data.data
-      const inventory = result[2].data.data
-      dispatch(setOrderProductions(orderProductions))
+      // const orderProductions = result[0].data.data[0]
+      const {sales, requests, requests_products} = result[0].data.data
+      const inventory = result[1].data.data
+      // dispatch(setOrderProductions(orderProductions))
       dispatch(setSales(sales))
       dispatch(setRequests(requests))
       dispatch(setRequestsProducts(requests_products))
