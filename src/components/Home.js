@@ -19,7 +19,7 @@ const Home = (props) => {
   useEffect(() => {
     props.getApiEntities()
   }, [counter])
-  if (false) { //props.areEntitiesLoading
+  if (props.areEntitiesLoading) { //props.areEntitiesLoading
     return (
       <div>
         Loading...
