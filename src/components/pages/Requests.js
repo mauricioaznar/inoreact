@@ -22,7 +22,6 @@ function Requests(props) {
     <Grid
       container
       direction={'column'}
-      className={classes.analyticsContainer}
     >
       <Grid
         item
