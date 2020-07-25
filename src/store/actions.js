@@ -23,6 +23,7 @@ export const getApiEntities = () => {
     return axios.all([
       axios.get(url + 'stats/sales', {headers: {...authHeader()}}),
       axios.get(url + 'stats/inventory', {headers: {...authHeader()}}),
+      axios.get(url + 'stats/expenses', {headers: {...authHeader()}}),
       axios.get(url + 'stats/sales', {headers: {...authHeader()}}),
       axios.get(url + 'stats/sales', {headers: {...authHeader()}}),
       axios.get(url + 'stats/sales', {headers: {...authHeader()}}),
