@@ -12,7 +12,7 @@ const useStyles = makeStyles((theme) => {
     },
     rowContainer: {
       paddingLeft: '2em',
-      paddingRight: '2em'
+      paddingRight: '2em',
     }
   }
 })
@@ -44,14 +44,24 @@ function Analytics(props) {
       <Grid
         item
         container
-        direction={'row'}
+        direction={'column'}
         className={classes.rowContainer}
       >
         <Grid
           item
           sm
+          xs={12}
         >
           <RequestsTable headers={headers} rows={requestsTableRows} />
+
+        </Grid>
+        <Grid
+          item
+          sm
+          xs={12}
+        >
+          <RequestsTable headers={headers} rows={requestsTableRows} />
+
         </Grid>
       </Grid>
     </Grid>
