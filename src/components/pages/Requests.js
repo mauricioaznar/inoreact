@@ -7,9 +7,6 @@ import {connect} from 'react-redux'
 
 const useStyles = makeStyles((theme) => {
   return {
-    analyticsContainer: {
-      marginTop: '2em'
-    },
     rowContainer: {
       paddingLeft: '2em',
       paddingRight: '2em',
