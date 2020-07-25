@@ -12,7 +12,7 @@ import PropTypes from 'prop-types'
 const useStyles = makeStyles({
   table: {
     display: 'block',
-    overflowX: 'auto',
+    overflow: 'auto',
   }
 });
 

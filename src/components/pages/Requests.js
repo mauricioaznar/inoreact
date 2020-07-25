@@ -27,15 +27,9 @@ function Requests(props) {
       <Grid
         item
         className={classes.rowContainer}
+        xs={12}
       >
-        <Grid
-          item
-          sm
-          xs={12}
-        >
-          <RequestsTable inventory={props.inventory} requestsProducts={props.requestsProducts} />
-
-        </Grid>
+        <RequestsTable inventory={props.inventory} requestsProducts={props.requestsProducts} />
       </Grid>
     </Grid>
   )
