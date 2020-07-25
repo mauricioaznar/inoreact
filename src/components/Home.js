@@ -3,7 +3,10 @@ import {AppBar, Toolbar, Button, Grid} from '@material-ui/core'
 import {makeStyles} from '@material-ui/core/styles'
 import {connect} from 'react-redux'
 import {getApiEntities, unsetToken} from '../store/actions'
-import Analytics from './pages/Analytics'
+import Requests from './pages/Requests'
+import Equilibrium from './pages/Equilibrium'
+import {Switch, Route} from 'react-router-dom'
+import Navbar from './ui/Navbar'
 
 
 const useStyles = makeStyles((theme) => ({
@@ -16,36 +19,28 @@ const Home = (props) => {
   useEffect(() => {
     props.getApiEntities()
   }, [counter])
-  return (
-    <div>
-      <AppBar position="fixed">
-        <Toolbar>
-          <Grid
-            container
-            justify={"flex-end"}
-          >
-            <Grid
-              item
-            >
-              <Button
-                color="inherit"
-                onClick={(e) => {e.preventDefault(); props.signOutUser()}}
-              >
-                Salir
-              </Button>
-            </Grid>
-          </Grid>
-        </Toolbar>
-      </AppBar>
-      <div className={classes.toolbarMargin}/>
-      {props.areEntitiesLoading ? <div>Loading...!</div> : <Analytics /> }
-    </div>
-  )
+  if (false) { //props.areEntitiesLoading
+    return (
+      <div>
+        Loading...
+      </div>
+    )
+  } else {
+    return (
+      <div>
+       <Navbar />
+        <div className={classes.toolbarMargin}/>
+        <Switch>
+          <Route path={'/requests'} component={() => <Requests />}/>
+          <Route path={'/equilibrium'} component={() => <Equilibrium />}/>
+        </Switch>
+      </div>
+    )
+  }
 }
 
 const mapDispatchToProps = (dispatch, ownProps) => {
   return {
-    signOutUser: () => { dispatch(unsetToken()) },
     getApiEntities: () => {dispatch(getApiEntities())}
   }
 }
