@@ -5,13 +5,7 @@ const validateToken = () => {
 const auth = (state = {
   authenticated: validateToken() !== null,
   token: validateToken() !== null ? validateToken().token : '',
-  isTokenLoading: false,
-  areEntitiesLoading: false,
-  orderProductions: [],
-  sales: [],
-  requests: [],
-  requestsProducts: [],
-  inventory: []
+  isTokenLoading: false
 }, action) => {
   switch (action.type) {
     case 'SET_TOKEN':
@@ -22,20 +16,6 @@ const auth = (state = {
       return {...state, isTokenLoading: true}
     case 'UNSET_IS_TOKEN_LOADING':
       return {...state, isTokenLoading: false}
-    case 'SET_ARE_ENTITIES_LOADING':
-      return {...state, areEntitiesLoading: true}
-    case 'UNSET_ARE_ENTITIES_LOADING':
-      return {...state, areEntitiesLoading: false}
-    case 'SET_ORDER_PRODUCTIONS':
-      return {...state, orderProductions: action.orderProductions}
-    case 'SET_SALES':
-      return {...state, sales: action.sales}
-    case 'SET_REQUESTS_PRODUCTS':
-      return {...state, requestsProducts: action.requestsProducts}
-    case 'SET_REQUESTS':
-      return {...state, requests: action.requests}
-    case 'SET_INVENTORY':
-      return {...state, inventory: action.inventory}
     default:
       return state
   }

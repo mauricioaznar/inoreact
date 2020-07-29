@@ -1,12 +1,12 @@
 import React, {useEffect, useState} from 'react'
-import {AppBar, Toolbar, Button, Grid} from '@material-ui/core'
 import {makeStyles} from '@material-ui/core/styles'
 import {connect} from 'react-redux'
-import {getApiEntities, unsetToken} from '../store/actions'
-import Requests from './pages/Requests'
+import {getApiEntities} from '../store/generalActions'
+import Sales from './pages/Sales'
 import Equilibrium from './pages/Equilibrium'
 import {Switch, Route} from 'react-router-dom'
 import Navbar from './ui/Navbar'
+import Expenses from './pages/Expenses'
 
 
 const useStyles = makeStyles((theme) => ({
@@ -31,8 +31,9 @@ const Home = (props) => {
        <Navbar />
         <div className={classes.toolbarMargin}/>
         <Switch>
-          <Route path={'/requests'} component={() => <Requests />}/>
+          <Route path={'/sales'} component={() => <Sales />}/>
           <Route path={'/equilibrium'} component={() => <Equilibrium />}/>
+          <Route path={'/expenses'} component={() => <Expenses />}/>
         </Switch>
       </div>
     )
@@ -48,7 +49,7 @@ const mapDispatchToProps = (dispatch, ownProps) => {
 
 const mapStateToProps = (state, ownProps) => {
   return {
-    areEntitiesLoading: state.auth.areEntitiesLoading
+    areEntitiesLoading: state.general.areEntitiesLoading
   }
 }
 

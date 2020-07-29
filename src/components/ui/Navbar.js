@@ -2,10 +2,11 @@ import React from 'react'
 import {AppBar, Button, Grid, Toolbar, Tab, Tabs} from '@material-ui/core'
 import {Link} from 'react-router-dom'
 import {connect} from 'react-redux'
-import {getApiEntities, unsetToken} from '../../store/actions'
+import {unsetToken} from '../../store/authActions'
 
 // noinspection SpellCheckingInspection
 function Navbar(props) {
+  const [value, setValue] = React.useState(0)
   return (
     <AppBar position="fixed">
       <Toolbar>
@@ -20,19 +21,26 @@ function Navbar(props) {
           >
             <Tabs
               indicatorColor="primary"
+              value={value}
             >
-              <Tab
-
-                label={'Pedidos'}
-                component={Link}
-                to={'/requests'}
-              />
               <Tab
                 label={'Punto de equilibrio'}
                 component={Link}
                 to={'/equilibrium'}
+                onClick={() => setValue(0)}
               />
-
+              <Tab
+                label={'Ventas'}
+                component={Link}
+                to={'/sales'}
+                onClick={() => setValue(1)}
+              />
+              <Tab
+                label={'Gastos'}
+                component={Link}
+                to={'/expenses'}
+                onClick={() => setValue(2)}
+              />
             </Tabs>
           </Grid>
           <Grid

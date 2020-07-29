@@ -1,4 +1,6 @@
 import React from 'react'
+import {connect} from 'react-redux'
+
 import {makeStyles, useTheme} from '@material-ui/core/styles'
 import Table from '@material-ui/core/Table';
 import TableBody from '@material-ui/core/TableBody';
@@ -17,10 +19,13 @@ const useStyles = makeStyles({
 });
 
 const formatNumber = (x) => {
-  return x.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",")
+  if (x < 0.01 && x > -0.01) {
+    x = 0
+  }
+  return x.toFixed(0).toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",")
 }
 
-export default function RequestsTable(props) {
+function RequestsProductsTable(props) {
   const classes = useStyles();
 
   const headers = ['Codigo', 'Cliente', 'Producto', 'Cantidad solicitada', 'Inventario fisico']
@@ -28,10 +33,13 @@ export default function RequestsTable(props) {
   props.requestsProducts.forEach(requestProduct => {
     if (requestProduct.order_request_status_id === 2) {
       const inventoryProduct = props.inventory.find(inventoryElement => {
-        return inventoryElement.id === requestProduct.product_id
+        return inventoryElement.product_id === requestProduct.product_id
       })
-      const inventoryBalance = inventoryProduct.kilos_cut + inventoryProduct.kilos_adjusted - inventoryProduct.kilos_sold_given
-      rows.push([requestProduct.order_code, requestProduct.client_name, requestProduct.product_description, formatNumber(requestProduct.product_kilos), formatNumber(inventoryBalance)])
+      rows.push([requestProduct.order_code,
+        requestProduct.client_name,
+        requestProduct.product_description,
+        formatNumber(requestProduct.product_kilos),
+        formatNumber(inventoryProduct ? inventoryProduct.kilos_balance : '-')])
     }
   })
 
@@ -59,7 +67,16 @@ export default function RequestsTable(props) {
   );
 }
 
-RequestsTable.propTypes = {
+RequestsProductsTable.propTypes = {
   requestsProducts: PropTypes.array.isRequired,
   inventory: PropTypes.array.isRequired
 }
+
+const mapStateToProps = (state, ownProps) => {
+  return {
+    requests: state.sales.requests,
+    requestsProducts: state.sales.requestsProducts,
+    inventory: state.general.inventory
+  }
+}
+export default connect(mapStateToProps, null)(RequestsProductsTable)

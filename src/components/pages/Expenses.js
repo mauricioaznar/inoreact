@@ -1,16 +1,12 @@
 import React from 'react'
-import {makeStyles} from '@material-ui/core/styles'
 import Grid from '@material-ui/core/Grid'
-
-import ExpensesCategoryTable from '../ui/ExpensesCategoryTable'
 import Typography from '@material-ui/core/Typography'
+import {makeStyles} from '@material-ui/core/styles'
+import ExpensesCategoryTable from '../ui/ExpensesCategoryTable'
 
 
 const useStyles = makeStyles((theme) => {
   return {
-    analyticsContainer: {
-      marginTop: '2em'
-    },
     rowContainer: {
       paddingLeft: '2em',
       paddingRight: '2em',
@@ -18,23 +14,21 @@ const useStyles = makeStyles((theme) => {
   }
 })
 
-
-export default function Equilibrium(props) {
+function Expenses(props) {
   const classes = useStyles()
 
-
+  // console.log(filteredRequestsByProductionStatus)
   return (
     <Grid
       container
       direction={'column'}
     >
-      <Grid
-        item
+      <Grid item
         className={classes.rowContainer}
         style={{marginTop: '4em', marginBottom: '2em'}}
       >
         <Typography variant={'h1'}>
-          Punto de equilibrio
+          Gastos
         </Typography>
       </Grid>
       <Grid
@@ -48,11 +42,14 @@ export default function Equilibrium(props) {
       </Grid>
       <Grid
         item
-        xs={12}
         className={classes.rowContainer}
+        xs={12}
       >
         <ExpensesCategoryTable />
       </Grid>
     </Grid>
   )
 }
+
+
+export default Expenses
