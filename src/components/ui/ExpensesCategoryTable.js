@@ -141,9 +141,6 @@ function ExpenseCategoryTable(props) {
           if (expenSubcategoryFound) {
             expenSubcategoryFound.total += expense.subtotal
           }
-          if (!expenSubcategoryFound) {
-            console.log(expense)
-          }
         }
       })
 

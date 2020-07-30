@@ -35,11 +35,16 @@ function RequestsProductsTable(props) {
       const inventoryProduct = props.inventory.find(inventoryElement => {
         return inventoryElement.product_id === requestProduct.product_id
       })
-      rows.push([requestProduct.order_code,
+      if (!inventoryProduct) {
+        console.log(requestProduct)
+      }
+      rows.push([
+        requestProduct.order_code,
         requestProduct.client_name,
         requestProduct.product_description,
         formatNumber(requestProduct.product_kilos),
-        formatNumber(inventoryProduct ? inventoryProduct.kilos_balance : '-')])
+        inventoryProduct ? formatNumber(inventoryProduct.kilos_balance) : '-'
+      ])
     }
   })
 
