@@ -19,3 +19,10 @@ export const setSales = (sales) => {
     sales: sales
   }
 }
+
+export const setSalesProducts = (salesProducts) => {
+  return {
+    type: 'SET_SALES_PRODUCTS',
+    salesProducts: salesProducts
+  }
+}

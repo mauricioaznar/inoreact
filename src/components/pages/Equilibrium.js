@@ -4,6 +4,7 @@ import Grid from '@material-ui/core/Grid'
 
 import ExpensesCategoryTable from '../ui/ExpensesCategoryTable'
 import Typography from '@material-ui/core/Typography'
+import ProductTypeSalesTable from '../ui/ProductTypeSalesTable'
 
 
 const useStyles = makeStyles((theme) => {
@@ -52,6 +53,22 @@ export default function Equilibrium(props) {
         className={classes.rowContainer}
       >
         <ExpensesCategoryTable />
+      </Grid>
+      <Grid
+        item
+        className={classes.rowContainer}
+        style={{marginTop: '2em', marginBottom: '2em'}}
+      >
+        <Typography variant={'h4'}>
+          Ventas por subtipo de producto
+        </Typography>
+      </Grid>
+      <Grid
+        item
+        xs={12}
+        className={classes.rowContainer}
+      >
+        <ProductTypeSalesTable />
       </Grid>
     </Grid>
   )

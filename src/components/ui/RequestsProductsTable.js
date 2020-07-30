@@ -28,7 +28,7 @@ const formatNumber = (x) => {
 function RequestsProductsTable(props) {
   const classes = useStyles();
 
-  const headers = ['Codigo', 'Cliente', 'Producto', 'Cantidad solicitada', 'Inventario fisico']
+  const headers = ['Folio', 'Cliente', 'Producto', 'Cantidad solicitada', 'Inventario fisico']
   const rows = []
   props.requestsProducts.forEach(requestProduct => {
     if (requestProduct.order_request_status_id === 2) {
@@ -44,8 +44,8 @@ function RequestsProductsTable(props) {
   })
 
   return (
-      <TableContainer className={classes.table}>
-        <Table aria-label="simple table">
+      <TableContainer className={classes.table} style={{maxHeight: 500}}>
+        <Table aria-label="simple table" stickyHeader>
           <TableHead>
             <TableRow>
               {headers.map(header => {

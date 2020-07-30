@@ -4,3 +4,17 @@ export const setOrderProductions = (orderProductions) => {
     orderProductions: orderProductions
   }
 }
+
+export const setMaterials = (materials) => {
+  return {
+    type: 'SET_MATERIALS',
+    materials: materials
+  }
+}
+
+export const setProductTypes = (productTypes) => {
+  return {
+    type: 'SET_PRODUCT_TYPES',
+    productTypes: productTypes
+  }
+}
