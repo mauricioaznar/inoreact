@@ -20,7 +20,7 @@ export const getApiEntities = () => {
       axios.get(apiUrl + 'stats/inventory', {headers: {...authHeader()}}),
       axios.get(apiUrl + 'stats/expenses', {headers: {...authHeader()}}),
       axios.get(apiUrl + 'expenseCategory/list?paginate=false', {headers: {...authHeader()}}),
-      axios.get(apiUrl + 'expenseSubcategory/list?paginate=false', {headers: {...authHeader()}}),
+      axios.get(apiUrl + 'stats/dependentEntities', {headers: {...authHeader()}}),
       axios.get(apiUrl + 'material/list?paginate=false', {headers: {...authHeader()}}),
       axios.get(apiUrl + 'productType/list?paginate=false', {headers: {...authHeader()}})
     ]).then(result => {
@@ -29,7 +29,7 @@ export const getApiEntities = () => {
       const inventory = result[1].data.data
       const expenses = result[2].data.data
       const expenseCategories = result[3].data.data
-      const expenseSubcategories = result[4].data.data
+      const {expense_subcategories: expenseSubcategories} = result[4].data.data
       const materials = result[5].data.data
       const productTypes = result[6].data.data
       // dispatch(setOrderProductions(orderProductions))

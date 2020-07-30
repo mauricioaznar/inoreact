@@ -135,9 +135,15 @@ function ExpenseCategoryTable(props) {
           && datePaidMoment.isBetween(initialMomentDate, endMomentDate, 'days', '[]'))
         {
           expenseCategoryTotal += expense.subtotal
-          expenseSubcategories.find(expenseSubcategory => {
+          let expenSubcategoryFound = expenseSubcategories.find(expenseSubcategory => {
             return expenseSubcategory.expenseSubcategoryId === expense.expense_subcategory_id
-          }).total += expense.subtotal
+          })
+          if (expenSubcategoryFound) {
+            expenSubcategoryFound.total += expense.subtotal
+          }
+          if (!expenSubcategoryFound) {
+            console.log(expense)
+          }
         }
       })
 
