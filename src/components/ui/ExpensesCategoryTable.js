@@ -41,7 +41,6 @@ const dateFormat = 'YYYY-MM-DD'
 function ExpenseCategoryRow(props) {
   const {row} = props;
   const [open, setOpen] = React.useState(false);
-
   return (
     <React.Fragment>
       <TableRow>
@@ -87,8 +86,8 @@ function ExpenseCategoryRow(props) {
                   </TableRow>
                 </TableHead>
                 <TableBody>
-                  {row.expenseSubcategories.map((historyRow) => (
-                    <TableRow>
+                  {row.expenseSubcategories.map((historyRow, index) => (
+                    <TableRow key={historyRow.expenseSubcategoryId}>
                       <TableCell>{historyRow.desc}</TableCell>
                       <TableCell align="right">{historyRow.total}</TableCell>
                     </TableRow>
@@ -104,7 +103,7 @@ function ExpenseCategoryRow(props) {
 }
 
 ExpenseCategoryRow.propTypes = {
-  row: PropTypes.array.isRequired
+  row: PropTypes.object.isRequired
 }
 
 
@@ -145,10 +144,11 @@ function ExpenseCategoryTable(props) {
       })
 
       expenseSubcategories = expenseSubcategories.map(expenseSubcategory => {
-        return {...expenseSubcategory, total: formatNumber(Math.trunc(expenseSubcategory.total))}
+        return {...expenseSubcategory, id: expenseSubcategory.id, total: formatNumber(Math.trunc(expenseSubcategory.total))}
       })
 
       return {
+        id: expenseCategory.id,
         desc: expenseCategory.name,
         total: formatNumber(Math.trunc(expenseCategoryTotal)),
         cost: (Math.random() * 10).toFixed(2),
@@ -163,7 +163,6 @@ function ExpenseCategoryTable(props) {
     <>
       <TableContainer
         component={Paper}
-        style={{maxHeight: 500}}
       >
         <Table
           className={classes.table}
@@ -179,8 +178,8 @@ function ExpenseCategoryTable(props) {
             </TableRow>
           </TableHead>
           <TableBody>
-            {expenseCategoriesRows.map((row) => (
-              <ExpenseCategoryRow row={row} />
+            {expenseCategoriesRows.map((row, index) => (
+              <ExpenseCategoryRow key={row.id} row={row} />
             ))}
           </TableBody>
         </Table>

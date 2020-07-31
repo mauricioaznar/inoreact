@@ -3,6 +3,7 @@ const sales = (state = {
   salesProducts: [],
   requests: [],
   requestsProducts: [],
+  otherIncomes: []
 }, action) => {
   switch (action.type) {
     case 'SET_SALES':
@@ -13,6 +14,8 @@ const sales = (state = {
       return {...state, requestsProducts: action.requestsProducts}
     case 'SET_REQUESTS':
       return {...state, requests: action.requests}
+    case 'SET_OTHER_INCOMES':
+      return {...state, otherIncomes: action.otherIncomes}
     default:
       return state
   }

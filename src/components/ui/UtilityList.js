@@ -1,5 +1,6 @@
 import React from 'react'
 import {connect} from 'react-redux'
+import moment from 'moment'
 
 import {makeStyles} from '@material-ui/core/styles'
 
@@ -15,18 +16,78 @@ import TableRow from '@material-ui/core/TableRow';
 import Paper from '@material-ui/core/Paper';
 
 
+const formatNumber = (x, digits = 2) => {
+  if (x < 0.01 && x > -0.01) {
+    x = 0
+  }
+  return x.toFixed(digits).toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",")
+}
+
+const dateFormat = 'YYYY-MM-DD'
+
 const useStyles = makeStyles({
 
 });
 
+
 function UtilityList(props) {
   const classes = useStyles();
 
-
-  const [utility, setUtility] = React.useState(0)
   const [expensesTotal, setExpensesTotal] = React.useState(0)
   const [salesTotal, setSalesTotal] = React.useState(0)
-  const [commissionsTotal, setCommissionsTotal] = React.useState(0)
+  const [otherIncomesTotal, setOtherIncomesTotal] = React.useState(0)
+  const [taxTotal, setTaxTotal] = React.useState(0)
+
+
+  React.useEffect(() => {
+    let initialMomentDate = moment(props.initialDate, 'YYYY-MM-DD')
+    let endMomentDate = moment(props.endDate, 'YYYY-MM-DD')
+
+    setExpensesTotal(props.expenses.filter(expense => {
+      let expenseMomentDatePaid = moment(expense.date_paid, 'YYYY-MM-DD')
+      return expense.expense_category_id !== 7
+        && expenseMomentDatePaid.isBetween(initialMomentDate, endMomentDate, 'days', '[]')
+    })
+      .reduce((accumulator, expense) => {
+        return accumulator + expense.subtotal
+      }, 0))
+
+    setOtherIncomesTotal(props.otherIncomes
+      .filter(otherIncome => {
+        let momentDate = moment(otherIncome.date, 'YYYY-MM-DD')
+        return momentDate.isBetween(initialMomentDate, endMomentDate, 'days', '[]')
+      })
+      .reduce((accumulator, otherIncome) => {
+      return accumulator + otherIncome.total
+      }, 0)
+    )
+
+    setSalesTotal(props.salesProducts
+      .filter(saleProduct => {
+        let momentDate = moment(saleProduct.date, 'YYYY-MM-DD')
+        return momentDate.isBetween(initialMomentDate, endMomentDate, 'days', '[]')
+      })
+      .reduce((accumulator, saleProduct) => {
+        return accumulator
+          + (saleProduct.order_sale_receipt_type_id === 1 ?
+            (saleProduct.kilos * saleProduct.kilo_price) : (saleProduct.kilos * saleProduct.kilo_price * 1.16))
+      }, 0)
+    )
+
+    setTaxTotal(props.salesProducts
+      .filter(saleProduct => {
+        let momentDate = moment(saleProduct.date, 'YYYY-MM-DD')
+        return momentDate.isBetween(initialMomentDate, endMomentDate, 'days', '[]')
+      })
+      .reduce((accumulator, saleProduct) => {
+        return accumulator
+          + (saleProduct.order_sale_receipt_type_id === 2 ? (saleProduct.kilos * saleProduct.kilo_price * 0.16) : 0)
+      }, 0)
+    )
+
+
+  }, [props.expenses, props.otherIncomes, props.salesProducts])
+
 
   return (
     <TableContainer component={Paper}>
@@ -43,19 +104,23 @@ function UtilityList(props) {
         <TableBody>
           <TableRow>
             <TableCell>Gastos</TableCell>
-            <TableCell align="right">{expensesTotal}</TableCell>
+            <TableCell align="right">{formatNumber(expensesTotal)}</TableCell>
           </TableRow>
           <TableRow>
             <TableCell>Ventas</TableCell>
-            <TableCell align="right">{salesTotal}</TableCell>
+            <TableCell align="right">{formatNumber(salesTotal)}</TableCell>
           </TableRow>
           <TableRow>
-            <TableCell>Comisiones</TableCell>
-            <TableCell align="right">{commissionsTotal}</TableCell>
+            <TableCell>IVA</TableCell>
+            <TableCell align="right">{formatNumber(taxTotal)}</TableCell>
+          </TableRow>
+          <TableRow>
+            <TableCell>Otros ingresos</TableCell>
+            <TableCell align="right">{formatNumber(otherIncomesTotal)}</TableCell>
           </TableRow>
           <TableRow>
             <TableCell>Utilidad</TableCell>
-            <TableCell align="right">{utility}</TableCell>
+            <TableCell align="right">{formatNumber(salesTotal + otherIncomesTotal - expensesTotal - taxTotal)}</TableCell>
           </TableRow>
         </TableBody>
       </Table>
@@ -66,11 +131,11 @@ function UtilityList(props) {
 
 const mapStateToProps = (state, ownProps) => {
   return {
-    sales: state.sales.sales,
+    salesProducts: state.sales.salesProducts,
     expenses: state.expenses.expenses,
-    commissions: [],
+    otherIncomes: state.sales.otherIncomes,
     initialDate: '2020-07-01',
-    endDate: '2020-07-01'
+    endDate: '2020-07-31'
   }
 }
 

@@ -26,3 +26,10 @@ export const setSalesProducts = (salesProducts) => {
     salesProducts: salesProducts
   }
 }
+
+export const setOtherIncomes = (otherIncomes) => {
+  return {
+    type: 'SET_OTHER_INCOMES',
+    otherIncomes: otherIncomes
+  }
+}

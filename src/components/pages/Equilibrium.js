@@ -73,12 +73,17 @@ export default function Equilibrium(props) {
       </Grid>
       <Grid
         item
+        container
+        direction={'row'}
+        justify={'flex-end'}
         className={classes.rowContainer}
         style={{marginTop: '4em', marginBottom: '2em'}}
       >
-        <Typography variant={'h4'}>
-          Utilidad
-        </Typography>
+        <Grid item>
+          <Typography variant={'h4'}>
+            Utilidad
+          </Typography>
+        </Grid>
       </Grid>
       <Grid
         item

@@ -8,10 +8,6 @@ import {connect} from 'react-redux'
 
 function App(props) {
 
-  const url = process.env
-
-  console.log(url)
-
   return (
     <div className="Auth">
       {!props.authenticated ? <LoginForm /> : <Home />}
