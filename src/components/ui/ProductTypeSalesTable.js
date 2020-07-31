@@ -17,8 +17,11 @@ import KeyboardArrowUpIcon from '@material-ui/icons/KeyboardArrowUp'
 import KeyboardArrowDownIcon from '@material-ui/icons/KeyboardArrowDown'
 import Collapse from '@material-ui/core/Collapse'
 import Box from '@material-ui/core/Box'
-import TextField from '@material-ui/core/TextField'
-import Typography from '@material-ui/core/Typography'
+import FormControl from '@material-ui/core/FormControl'
+import InputLabel from '@material-ui/core/InputLabel'
+import MenuItem from '@material-ui/core/MenuItem'
+import Select from '@material-ui/core/Select'
+import Grid from '@material-ui/core/Grid'
 
 
 const useStyles = makeStyles({
@@ -123,7 +126,11 @@ function ProductTypeSalesTable(props) {
   const theme = useTheme()
 
   const [rows, setRows] = React.useState([])
-  const [value, setValue] = React.useState('')
+  const [age, setAge] = React.useState('Notas');
+
+  const handleChange = (event) => {
+    setAge(event.target.value);
+  };
 
   React.useEffect(() => {
 
@@ -133,12 +140,31 @@ function ProductTypeSalesTable(props) {
 
     let productTypeRows = props.productTypes
       .map(productType => {
-        return {id: productType.id, name: productType.name, kilos: 0, notes: 0, invoices: 0, tax: 0}
+        return {
+          id: productType.id,
+          name: productType.name,
+          kilos: 0,
+          kilosNotes: 0,
+          kilosInvoices: 0,
+          notes: 0,
+          invoices: 0,
+          tax: 0
+        }
       })
 
     let materialRows = props.materials
       .map(material => {
-        return {id: material.id, name: material.name, kilos: 0, notes: 0, invoices: 0, tax: 0, productTypeId: material.product_type_id}
+        return {
+          id: material.id,
+          name: material.name,
+          kilos: 0,
+          kilosNotes: 0,
+          kilosInvoices: 0,
+          notes: 0,
+          invoices: 0,
+          tax: 0,
+          productTypeId: material.product_type_id
+        }
       })
 
     props.salesProducts.forEach(saleProduct => {
@@ -154,11 +180,15 @@ function ProductTypeSalesTable(props) {
         productTypeRowFound.kilos += saleProduct.kilos
         if (saleProduct.order_sale_receipt_type_id === 1) {
           materialRowFound.notes += (saleProduct.kilos * saleProduct.kilo_price)
+          materialRowFound.kilosNotes += saleProduct.kilos
           productTypeRowFound.notes += (saleProduct.kilos * saleProduct.kilo_price)
+          productTypeRowFound.kilosNotes += saleProduct.kilos
         }
         if (saleProduct.order_sale_receipt_type_id === 2) {
           materialRowFound.invoices += (saleProduct.kilos * saleProduct.kilo_price * 1.16)
+          materialRowFound.kilosInvoices += saleProduct.kilos
           productTypeRowFound.invoices += (saleProduct.kilos * saleProduct.kilo_price * 1.16)
+          productTypeRowFound.kilosInvoices += saleProduct.kilos
           materialRowFound.tax += (saleProduct.kilos * saleProduct.kilo_price * 0.16)
           productTypeRowFound.tax += (saleProduct.kilos * saleProduct.kilo_price * 0.16)
         }
@@ -213,9 +243,24 @@ function ProductTypeSalesTable(props) {
 
   return (
     <>
+      <Grid container direction={'row'} style={{marginBottom: '1em'}}>
+        <Grid item xs={2}>
+          <FormControl className={classes.formControl} fullWidth>
+            <InputLabel id="demo-simple-select-label">Tipo de venta</InputLabel>
+            <Select
+              labelId="demo-simple-select-label"
+              id="demo-simple-select"
+              value={age}
+              onChange={handleChange}
+            >
+              <MenuItem value={'Notas'}>Notas</MenuItem>
+              <MenuItem value={'Facturas'}>Facturas</MenuItem>
+            </Select>
+          </FormControl>
+        </Grid>
+      </Grid>
       <TableContainer
         component={Paper}
-        style={{maxHeight: 500}}
       >
         <Table
           className={classes.table}
@@ -223,36 +268,6 @@ function ProductTypeSalesTable(props) {
           aria-label="spanning table"
         >
           <TableHead>
-            <TableRow>
-              <TableCell style={{width: '5%'}}/>
-              <TableCell style={{width: '15%'}}>
-                <TextField fullWidth value={value} onChange={(e) => { setValue(e.target.value)}}/>
-              </TableCell>
-              <TableCell style={{width: '10%'}}>
-                <TextField fullWidth value={value} onChange={(e) => { setValue(e.target.value)}}/>
-              </TableCell>
-              <TableCell style={{width: '10%'}}>
-                <TextField fullWidth value={value} onChange={(e) => { setValue(e.target.value)}}/>
-              </TableCell>
-              <TableCell style={{width: '10%'}}>
-                <TextField fullWidth value={value} onChange={(e) => { setValue(e.target.value)}}/>
-              </TableCell>
-              <TableCell style={{width: '10%'}}>
-                <TextField fullWidth value={value} onChange={(e) => { setValue(e.target.value)}}/>
-              </TableCell>
-              <TableCell style={{width: '10%'}}>
-                <TextField fullWidth value={value} onChange={(e) => { setValue(e.target.value)}}/>
-              </TableCell>
-              <TableCell style={{width: '10%'}}>
-                <TextField fullWidth value={value} onChange={(e) => { setValue(e.target.value)}}/>
-              </TableCell>
-              <TableCell style={{width: '10%'}}>
-                <TextField fullWidth value={value} onChange={(e) => { setValue(e.target.value)}}/>
-              </TableCell>
-              <TableCell style={{width: '10%'}}>
-                <TextField fullWidth value={value} onChange={(e) => { setValue(e.target.value)}}/>
-              </TableCell>
-            </TableRow>
             <TableRow>
               <TableCell style={{width: '5%'}} />
               {headers.map((header, index) => {
