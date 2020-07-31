@@ -5,6 +5,7 @@ import Grid from '@material-ui/core/Grid'
 import ExpensesCategoryTable from '../ui/ExpensesCategoryTable'
 import Typography from '@material-ui/core/Typography'
 import ProductTypeSalesTable from '../ui/ProductTypeSalesTable'
+import UtilityList from '../ui/UtilityList'
 
 
 const useStyles = makeStyles((theme) => {
@@ -32,7 +33,7 @@ export default function Equilibrium(props) {
       <Grid
         item
         className={classes.rowContainer}
-        style={{marginTop: '4em', marginBottom: '2em'}}
+        style={{marginTop: '4em'}}
       >
         <Typography variant={'h1'}>
           Punto de equilibrio
@@ -41,7 +42,7 @@ export default function Equilibrium(props) {
       <Grid
         item
         className={classes.rowContainer}
-        style={{marginBottom: '2em'}}
+        style={{marginTop: '4em', marginBottom: '2em'}}
       >
         <Typography variant={'h4'}>
           Gastos por rubro
@@ -57,7 +58,7 @@ export default function Equilibrium(props) {
       <Grid
         item
         className={classes.rowContainer}
-        style={{marginTop: '2em', marginBottom: '2em'}}
+        style={{marginTop: '4em', marginBottom: '2em'}}
       >
         <Typography variant={'h4'}>
           Ventas por subtipo de producto
@@ -69,6 +70,28 @@ export default function Equilibrium(props) {
         className={classes.rowContainer}
       >
         <ProductTypeSalesTable />
+      </Grid>
+      <Grid
+        item
+        className={classes.rowContainer}
+        style={{marginTop: '4em', marginBottom: '2em'}}
+      >
+        <Typography variant={'h4'}>
+          Utilidad
+        </Typography>
+      </Grid>
+      <Grid
+        item
+        container
+        direction={'row'}
+        justify={'flex-end'}
+        xs={12}
+        style={{marginBottom: '2em'}}
+        className={classes.rowContainer}
+      >
+        <Grid item xs={12} sm={6} md={4}>
+          <UtilityList />
+        </Grid>
       </Grid>
     </Grid>
   )

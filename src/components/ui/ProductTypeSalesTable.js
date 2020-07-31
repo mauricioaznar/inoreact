@@ -17,6 +17,7 @@ import KeyboardArrowUpIcon from '@material-ui/icons/KeyboardArrowUp'
 import KeyboardArrowDownIcon from '@material-ui/icons/KeyboardArrowDown'
 import Collapse from '@material-ui/core/Collapse'
 import Box from '@material-ui/core/Box'
+import TextField from '@material-ui/core/TextField'
 import Typography from '@material-ui/core/Typography'
 
 
@@ -122,6 +123,7 @@ function ProductTypeSalesTable(props) {
   const theme = useTheme()
 
   const [rows, setRows] = React.useState([])
+  const [value, setValue] = React.useState('')
 
   React.useEffect(() => {
 
@@ -221,6 +223,36 @@ function ProductTypeSalesTable(props) {
           aria-label="spanning table"
         >
           <TableHead>
+            <TableRow>
+              <TableCell style={{width: '5%'}}/>
+              <TableCell style={{width: '15%'}}>
+                <TextField fullWidth value={value} onChange={(e) => { setValue(e.target.value)}}/>
+              </TableCell>
+              <TableCell style={{width: '10%'}}>
+                <TextField fullWidth value={value} onChange={(e) => { setValue(e.target.value)}}/>
+              </TableCell>
+              <TableCell style={{width: '10%'}}>
+                <TextField fullWidth value={value} onChange={(e) => { setValue(e.target.value)}}/>
+              </TableCell>
+              <TableCell style={{width: '10%'}}>
+                <TextField fullWidth value={value} onChange={(e) => { setValue(e.target.value)}}/>
+              </TableCell>
+              <TableCell style={{width: '10%'}}>
+                <TextField fullWidth value={value} onChange={(e) => { setValue(e.target.value)}}/>
+              </TableCell>
+              <TableCell style={{width: '10%'}}>
+                <TextField fullWidth value={value} onChange={(e) => { setValue(e.target.value)}}/>
+              </TableCell>
+              <TableCell style={{width: '10%'}}>
+                <TextField fullWidth value={value} onChange={(e) => { setValue(e.target.value)}}/>
+              </TableCell>
+              <TableCell style={{width: '10%'}}>
+                <TextField fullWidth value={value} onChange={(e) => { setValue(e.target.value)}}/>
+              </TableCell>
+              <TableCell style={{width: '10%'}}>
+                <TextField fullWidth value={value} onChange={(e) => { setValue(e.target.value)}}/>
+              </TableCell>
+            </TableRow>
             <TableRow>
               <TableCell style={{width: '5%'}} />
               {headers.map((header, index) => {
