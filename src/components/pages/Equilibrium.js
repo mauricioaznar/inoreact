@@ -50,10 +50,18 @@ export default function Equilibrium(props) {
       </Grid>
       <Grid
         item
-        xs={12}
+        container
+        direction={'row'}
+        justify={'flex-end'}
         className={classes.rowContainer}
       >
-        <ExpensesCategoryTable />
+        <Grid
+          item
+          md={8}
+          sm={12}
+        >
+          <ExpensesCategoryTable />
+        </Grid>
       </Grid>
       <Grid
         item
@@ -94,7 +102,12 @@ export default function Equilibrium(props) {
         style={{marginBottom: '2em'}}
         className={classes.rowContainer}
       >
-        <Grid item xs={12} sm={6} md={4}>
+        <Grid
+          item
+          xs={12}
+          sm={6}
+          md={4}
+        >
           <UtilityList />
         </Grid>
       </Grid>

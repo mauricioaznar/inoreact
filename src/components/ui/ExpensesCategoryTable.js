@@ -28,8 +28,11 @@ const useStyles = makeStyles({
 });
 
 
-const formatNumber = (x) => {
-  return x.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",")
+const formatNumber = (x, digits = 2) => {
+  if (x < 0.01 && x > -0.01) {
+    x = 0
+  }
+  return x.toFixed(digits).toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",")
 }
 
 const dateFormat = 'YYYY-MM-DD'
@@ -44,7 +47,7 @@ function ExpenseCategoryRow(props) {
   return (
     <React.Fragment>
       <TableRow>
-        <TableCell>
+        <TableCell style={{width: '5%'}}>
           <IconButton
             aria-label="expand row"
             size="small"
@@ -53,43 +56,31 @@ function ExpenseCategoryRow(props) {
             {open ? <KeyboardArrowUpIcon /> : <KeyboardArrowDownIcon />}
           </IconButton>
         </TableCell>
-        <TableCell align="left">{row.desc}</TableCell>
-        <TableCell align="right">{row.cost}</TableCell>
-        <TableCell align="right">{row.total}</TableCell>
+        <TableCell style={{width: '45%'}} align="center">{row.desc}</TableCell>
+        <TableCell style={{width: '25%'}} align="right">{formatNumber(row.cost)}</TableCell>
+        <TableCell style={{width: '25%'}} align="right">{formatNumber(row.total)}</TableCell>
       </TableRow>
       <TableRow>
         <TableCell
-          style={{paddingBottom: 0, paddingTop: 0}}
-          colSpan={5}
+          style={{paddingBottom: 0, paddingTop: 0, paddingLeft: 0, paddingRight: 0}}
+          colSpan={4}
         >
           <Collapse
             in={open}
             timeout="auto"
             unmountOnExit
           >
-            <Box margin={1}>
-              <Typography
-                variant="h6"
-                gutterBottom
-                component="div"
-              >
-                Gastos
-              </Typography>
+            <Box>
               <Table
-                size="small"
                 aria-label="purchases"
               >
-                <TableHead>
-                  <TableRow>
-                    <TableCell>Fecha</TableCell>
-                    <TableCell align="right">Total</TableCell>
-                  </TableRow>
-                </TableHead>
                 <TableBody>
                   {row.expenseSubcategories.map((historyRow, index) => (
                     <TableRow key={historyRow.expenseSubcategoryId}>
-                      <TableCell>{historyRow.desc}</TableCell>
-                      <TableCell align="right">{historyRow.total}</TableCell>
+                      <TableCell style={{width: '5%'}}>&nbsp;</TableCell>
+                      <TableCell style={{width: '45%'}} align={'center'}>{historyRow.desc}</TableCell>
+                      <TableCell style={{width: '25%'}} align={'right'}>{formatNumber(historyRow.cost)}</TableCell>
+                      <TableCell style={{width: '25%'}} align={'right'}>{formatNumber(historyRow.total)}</TableCell>
                     </TableRow>
                   ))}
                 </TableBody>
@@ -122,10 +113,22 @@ function ExpenseCategoryTable(props) {
       let initialMomentDate = moment(props.initialDate, dateFormat)
       let endMomentDate = moment(props.endDate, dateFormat)
 
+      let kilosTotal = props.salesProducts
+        .filter(saleProduct => {
+          let saleMomentDate = moment(saleProduct.date, dateFormat)
+          return saleMomentDate.isBetween(initialMomentDate, endMomentDate, 'days', '[]')
+            && saleProduct.product_type_id === 1
+
+        })
+        .reduce((accumulator, saleProduct) => {
+        return accumulator + saleProduct.kilos
+      }, 0)
+
+
       let expenseSubcategories = props.expenseSubcategories.filter(expenseSubcategory => {
         return expenseSubcategory.expense_category_id === expenseCategory.id
       }).map(expenseSubcategory => {
-        return {desc: expenseSubcategory.name, expenseSubcategoryId: expenseSubcategory.id, total: 0}
+        return {desc: expenseSubcategory.name, expenseSubcategoryId: expenseSubcategory.id, cost: 0, total: 0}
       })
 
       props.expenses.forEach(expense => {
@@ -144,19 +147,19 @@ function ExpenseCategoryTable(props) {
       })
 
       expenseSubcategories = expenseSubcategories.map(expenseSubcategory => {
-        return {...expenseSubcategory, id: expenseSubcategory.id, total: formatNumber(Math.trunc(expenseSubcategory.total))}
+        return {...expenseSubcategory, id: expenseSubcategory.id, total: expenseSubcategory.total, cost: (expenseSubcategory.total / kilosTotal)}
       })
 
       return {
         id: expenseCategory.id,
         desc: expenseCategory.name,
-        total: formatNumber(Math.trunc(expenseCategoryTotal)),
-        cost: (Math.random() * 10).toFixed(2),
+        total: expenseCategoryTotal,
+        cost: (expenseCategoryTotal / kilosTotal),
         expenseSubcategories: expenseSubcategories
       }
     })
     setExpenseCategoriesRows(rows)
-  }, [props.expenses, props.expenseSubcategories, props.expenseCategories])
+  }, [props.expenses, props.expenseSubcategories, props.expenseCategories, props.salesProducts])
 
 
   return (
@@ -171,10 +174,10 @@ function ExpenseCategoryTable(props) {
         >
           <TableHead>
             <TableRow>
-              <TableCell />
-              <TableCell align="left">Rubro</TableCell>
-              <TableCell align="right">Costo</TableCell>
-              <TableCell align="right">Total</TableCell>
+              <TableCell style={{width: '5%'}}/>
+              <TableCell style={{width: '45%'}} align="center">Rubro</TableCell>
+              <TableCell style={{width: '25%'}} align="center">Costo</TableCell>
+              <TableCell style={{width: '25%'}} align="center">Total</TableCell>
             </TableRow>
           </TableHead>
           <TableBody>
@@ -193,6 +196,7 @@ const mapStateToProps = (state, ownProps) => {
     expenses: state.expenses.expenses,
     expenseCategories: state.expenses.expenseCategories,
     expenseSubcategories: state.expenses.expenseSubcategories,
+    salesProducts: state.sales.salesProducts,
     initialDate: '2020-07-01',
     endDate: '2020-07-31'
   }
