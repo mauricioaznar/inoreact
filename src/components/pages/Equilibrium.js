@@ -38,7 +38,7 @@ export default function Equilibrium(props) {
         className={classes.rowContainer}
         style={{marginTop: '4em'}}
       >
-        <Typography variant={matchesXS ? 'h3' : 'h1'}>
+        <Typography variant={matchesXS ? 'h2' : 'h1'}>
           Punto de equilibrio
         </Typography>
       </Grid>
