@@ -244,7 +244,7 @@ function ProductTypeSalesTable(props) {
   return (
     <>
       <Grid container direction={'row'} style={{marginBottom: '1em'}}>
-        <Grid item xs={2}>
+        <Grid item xs={12} sm={4} md={2}>
           <FormControl className={classes.formControl} fullWidth>
             <InputLabel id="demo-simple-select-label">Tipo de venta</InputLabel>
             <Select
