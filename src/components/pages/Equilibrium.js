@@ -58,7 +58,7 @@ export default function Equilibrium(props) {
         <Grid
           item
           md={8}
-          sm={12}
+          xs={12}
         >
           <ExpensesCategoryTable />
         </Grid>
