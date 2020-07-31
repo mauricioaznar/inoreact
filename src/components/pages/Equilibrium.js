@@ -1,5 +1,5 @@
 import React from 'react'
-import {makeStyles} from '@material-ui/core/styles'
+import {makeStyles, useTheme} from '@material-ui/core/styles'
 import Grid from '@material-ui/core/Grid'
 
 import ExpensesCategoryTable from '../ui/ExpensesCategoryTable'
@@ -23,6 +23,9 @@ const useStyles = makeStyles((theme) => {
 
 export default function Equilibrium(props) {
   const classes = useStyles()
+  const theme = useTheme()
+
+  const matchesXS = theme.breakpoints.down('xs')
 
 
   return (
@@ -35,7 +38,7 @@ export default function Equilibrium(props) {
         className={classes.rowContainer}
         style={{marginTop: '4em'}}
       >
-        <Typography variant={'h1'}>
+        <Typography variant={matchesXS ? 'h3' : 'h1'}>
           Punto de equilibrio
         </Typography>
       </Grid>
