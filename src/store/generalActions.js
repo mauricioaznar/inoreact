@@ -2,7 +2,7 @@ import axios from 'axios'
 import authHeader from '../helpers/authHeader'
 import {setOtherIncomes, setRequests, setRequestsProducts, setSales, setSalesProducts} from './salesActions'
 import {setExpenses, setExpenseCategories, setExpenseSubcategories} from './expensesActions'
-import {setMaterials, setProductTypes} from './productionActions'
+import {setMachines, setMaterials, setProductTypes} from './productionActions'
 import apiUrl from '../helpers/apiUrl'
 
 export const setInventory = (inventory) => {
@@ -29,7 +29,7 @@ export const getApiEntities = () => {
       const inventory = result[1].data.data
       const expenses = result[2].data.data
       const expenseCategories = result[3].data.data
-      const {expense_subcategories: expenseSubcategories} = result[4].data.data
+      const {expense_subcategories: expenseSubcategories, machines: machines} = result[4].data.data
       const materials = result[5].data.data
       const productTypes = result[6].data.data
       // dispatch(setOrderProductions(orderProductions))
@@ -43,6 +43,7 @@ export const getApiEntities = () => {
       dispatch(setExpenseCategories(expenseCategories))
       dispatch(setExpenseSubcategories(expenseSubcategories))
       dispatch(setMaterials(materials))
+      dispatch(setMachines(machines))
       dispatch(setProductTypes(productTypes))
     }).finally(() => {
       dispatch(unsetAreEntitiesLoading())
