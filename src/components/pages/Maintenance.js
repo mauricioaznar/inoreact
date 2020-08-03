@@ -32,7 +32,7 @@ const useFetch = (url) => {
   React.useEffect(() => {
     let unmounted = false
     async function fetchData() {
-      const response = await axios.get(apiUrl + 'analytics/productionEvents?dateGroup=week', {headers: {...authHeader()}});
+      const response = await axios.get(url, {headers: {...authHeader()}});
       if (!unmounted) {
         setData(response.data.data)
       }
@@ -73,7 +73,8 @@ function Maintenance(props) {
 
   const theme = useTheme()
 
-  const results = useFetch()
+  const productionEvents = useFetch(apiUrl + 'analytics/productionEvents?dateGroup=week')
+  const productionByProductType = useFetch(apiUrl + 'analytics/production?dateGroup=week')
 
 
   let machinesIdObject = props.machines.reduce(function(obj, itm) {
@@ -89,13 +90,13 @@ function Maintenance(props) {
     })
 
   let weekRange = getWeekRange(-40, machinesIdObject)
-  if (results) {
-    results.forEach(result => {
+  if (productionEvents) {
+    productionEvents.forEach(result => {
       let weekRangeFound = weekRange.find(range => {
         return result.first_day_of_the_week === range.first_day_of_the_week && result.last_day_of_the_week === range.last_day_of_the_week
       })
       if (weekRangeFound) {
-        weekRangeFound[result.machine_name] += isNaN(result.duration) ? 0 : Number(result.duration)
+        weekRangeFound[result.machine_name] += isNaN(result.duration) ? 0 : (Number(result.duration) / 60 / 24)
       }
     })
   }
