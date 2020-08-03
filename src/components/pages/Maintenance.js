@@ -50,7 +50,8 @@ function getWeekRange(week = 0, content) {
     weeks.push({
       first_day_of_the_week: currentStart.startOf('week').format(dateFormat),
       last_day_of_the_week: currentStart.endOf('week').format(dateFormat),
-      current_week_number: currentStart.week(),
+      current_week_number: '#' + currentStart.week() + ' ' + currentStart.format('YYYY-MM'),
+      week: currentStart.startOf('week').format(dateFormat) + ' ' + currentStart.endOf('week').format(dateFormat),
       date: currentStart.format(dateFormat),
       ...content
     })
@@ -114,7 +115,7 @@ function Maintenance(props) {
           </Typography>
         </Grid>
         <Grid item xs={12} style={{marginBottom: '2em'}}>
-          <ProductionEventChart dataKeys={machineNamesArray} data={weekRange} xDataKey={'first_day_of_the_week'}  />
+          <ProductionEventChart dataKeys={machineNamesArray} data={weekRange} xDataKey={'current_week_number'}  />
         </Grid>
       </Grid>
     </Grid>
