@@ -87,7 +87,7 @@ function Maintenance(props) {
           .map(machine => {
             return machine.name
           }))
-        const weekRangeTemp = getWeekRange(-10, machinesIdObject)
+        const weekRangeTemp = getWeekRange(-40, machinesIdObject)
         results.data.data.forEach(result => {
           let weekRangeFound = weekRangeTemp.find(range => {
           return result.first_day_of_the_week === range.first_day_of_the_week && result.last_day_of_the_week === range.last_day_of_the_week
@@ -113,7 +113,7 @@ function Maintenance(props) {
             Mantenimiento
           </Typography>
         </Grid>
-        <Grid item xs={12}>
+        <Grid item xs={12} style={{marginBottom: '2em'}}>
           <ProductionEventChart dataKeys={machineNamesArray} data={weekRange} xDataKey={'first_day_of_the_week'}  />
         </Grid>
       </Grid>
