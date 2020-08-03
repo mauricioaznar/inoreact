@@ -41,6 +41,12 @@ function Navbar(props) {
                 to={'/expenses'}
                 onClick={() => setValue(2)}
               />
+              <Tab
+                label={'Mantenimiento'}
+                component={Link}
+                to={'/maintenance'}
+                onClick={() => setValue(3)}
+              />
             </Tabs>
           </Grid>
           <Grid

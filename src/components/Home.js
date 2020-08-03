@@ -7,6 +7,7 @@ import Equilibrium from './pages/Equilibrium'
 import {Switch, Route} from 'react-router-dom'
 import Navbar from './ui/Navbar'
 import Expenses from './pages/Expenses'
+import Maintenance from './pages/Maintenance'
 
 
 const useStyles = makeStyles((theme) => ({
@@ -34,6 +35,7 @@ const Home = (props) => {
           <Route path={'/sales'} component={() => <Sales />}/>
           <Route path={'/equilibrium'} component={() => <Equilibrium />}/>
           <Route path={'/expenses'} component={() => <Expenses />}/>
+          <Route path={'/maintenance'} component={() => <Maintenance />}/>
         </Switch>
       </div>
     )
