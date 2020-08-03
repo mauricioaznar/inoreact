@@ -22,7 +22,7 @@ export default class ProductionEventChart extends PureComponent {
             <CartesianGrid strokeDasharray="3 3" />
             <XAxis dataKey={this.props.xDataKey} angle={-45} textAnchor="end" />
             <YAxis />
-            <Legend verticalAlign="top" />
+            <Legend verticalAlign="top" iconType="square" />
             {this.props.dataKeys.map((dataKey, index) => {
               return <Area key={dataKey} type="monotone" dataKey={dataKey} stroke={mdColors[(index - 1) * 20]} fill={mdColors[(index - 1) * 20]} />
             })}
