@@ -30,12 +30,17 @@ const useFetch = (url) => {
 
   // empty array as second argument equivalent to componentDidMount
   React.useEffect(() => {
+    let unmounted = false
     async function fetchData() {
-      const response = await fetch(url);
-      const json = await response.json();
-      setData(json);
+      const response = await axios.get(apiUrl + 'analytics/productionEvents?dateGroup=week', {headers: {...authHeader()}});
+      if (!unmounted) {
+        setData(response.data.data)
+      }
     }
-    fetchData();
+    if (!unmounted) {
+      fetchData();
+    }
+    return () => { unmounted = true };
   }, [url]);
 
   return data;
@@ -68,38 +73,33 @@ function Maintenance(props) {
 
   const theme = useTheme()
 
+  const results = useFetch()
 
 
+  let machinesIdObject = props.machines.reduce(function(obj, itm) {
+    obj[itm.name] = 0;
+    return obj;
+  }, {})
+  let machineNamesArray = props.machines
+    .filter(machine => {
+      return machine.machine_type_id === 1
+    })
+    .map(machine => {
+      return machine.name
+    })
 
-  const [weekRange, setWeekRange] = React.useState([])
-  const [machineNamesArray, setMachineNamesArray] = React.useState([])
-
-  React.useEffect(() => {
-    axios.get(apiUrl + 'analytics/productionEvents?dateGroup=week', {headers: {...authHeader()}})
-      .then(results => {
-        let machinesIdObject = props.machines.reduce(function(obj, itm) {
-          obj[itm.name] = 0;
-          return obj;
-        }, {})
-        setMachineNamesArray(props.machines
-          .filter(machine => {
-            return machine.machine_type_id === 1
-          })
-          .map(machine => {
-            return machine.name
-          }))
-        const weekRangeTemp = getWeekRange(-40, machinesIdObject)
-        results.data.data.forEach(result => {
-          let weekRangeFound = weekRangeTemp.find(range => {
-          return result.first_day_of_the_week === range.first_day_of_the_week && result.last_day_of_the_week === range.last_day_of_the_week
-        })
-        if (weekRangeFound) {
-          weekRangeFound[result.machine_name] += isNaN(result.duration) ? 0 : Number(result.duration)
-        }
-        })
-        setWeekRange(weekRangeTemp)
+  let weekRange = getWeekRange(-40, machinesIdObject)
+  if (results) {
+    results.forEach(result => {
+      let weekRangeFound = weekRange.find(range => {
+        return result.first_day_of_the_week === range.first_day_of_the_week && result.last_day_of_the_week === range.last_day_of_the_week
       })
-  }, [])
+      if (weekRangeFound) {
+        weekRangeFound[result.machine_name] += isNaN(result.duration) ? 0 : Number(result.duration)
+      }
+    })
+  }
+
 
   return (
     <Grid container direction={'column'}>
