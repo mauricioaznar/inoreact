@@ -40,7 +40,7 @@ const formatNumber = (x, digits = 2) => {
 }
 
 const headers = [
-  'Subtipo',
+  'Tipo de producto',
   'Kilos en venta',
   'Notas',
   'Facturas',

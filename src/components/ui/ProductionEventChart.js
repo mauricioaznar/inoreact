@@ -9,18 +9,17 @@ import Area from 'recharts/lib/cartesian/Area'
 export default class ProductionEventChart extends PureComponent {
   render() {
     return (
-      <div style={{ width: '100%', height: 800 }}>
+      <div style={{ width: '100%', height: 400 }}>
         <ResponsiveContainer>
           <AreaChart
-            width={500}
             height={300}
             data={this.props.data}
             margin={{
-              top: 5, right: 30, left: 20, bottom: 80,
+              top: 10, bottom: 20,
             }}
           >
             <CartesianGrid strokeDasharray="3 3" />
-            <XAxis dataKey={this.props.xDataKey} angle={-45} textAnchor="end" interval={0} />
+            <XAxis dataKey={this.props.xDataKey} angle={-45} textAnchor="end" interval={2}/>
             <YAxis />
             <Legend verticalAlign="top" iconType="square" />
             {this.props.dataKeys.map((dataKey, index) => {

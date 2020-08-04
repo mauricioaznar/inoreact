@@ -44,74 +44,64 @@ export default function Equilibrium(props) {
       </Grid>
       <Grid
         item
-        className={classes.rowContainer}
-        style={{marginTop: '4em', marginBottom: '2em'}}
-      >
-        <Typography variant={'h4'}>
-          Gastos por rubro
-        </Typography>
-      </Grid>
-      <Grid
-        item
         container
-        direction={'row'}
-        justify={'flex-end'}
-        className={classes.rowContainer}
-      >
-        <Grid
-          item
-          md={8}
-          xs={12}
-        >
-          <ExpensesCategoryTable />
-        </Grid>
-      </Grid>
-      <Grid
-        item
+        direction={'column'}
         className={classes.rowContainer}
         style={{marginTop: '4em', marginBottom: '2em'}}
       >
-        <Typography variant={'h4'}>
-          Ventas por subtipo de producto
-        </Typography>
-      </Grid>
-      <Grid
-        item
-        xs={12}
-        className={classes.rowContainer}
-      >
-        <ProductTypeSalesTable />
-      </Grid>
-      <Grid
-        item
-        container
-        direction={'row'}
-        justify={'flex-end'}
-        className={classes.rowContainer}
-        style={{marginTop: '4em', marginBottom: '2em'}}
-      >
-        <Grid item>
-          <Typography variant={'h4'}>
-            Utilidad
+
+        <Grid item xs={12}>
+          <Typography variant={'h5'} style={{marginBottom: '0.5em'}}>
+            Ventas por tipo de producto
           </Typography>
         </Grid>
+        <Grid
+          item
+          xs={12}
+        >
+          <ProductTypeSalesTable />
+        </Grid>
       </Grid>
+
       <Grid
         item
         container
         direction={'row'}
-        justify={'flex-end'}
-        xs={12}
-        style={{marginBottom: '2em'}}
         className={classes.rowContainer}
+        style={{marginBottom: '2em'}}
+        justify={'space-between'}
       >
         <Grid
           item
+          container
+          md={7}
           xs={12}
-          sm={6}
-          md={4}
+          direction={'column'}
         >
-          <UtilityList />
+          <Grid item style={{marginBottom: '0.5em'}}>
+            <Typography variant={'h5'}>
+              Gastos por rubro
+            </Typography>
+          </Grid>
+          <Grid item>
+            <ExpensesCategoryTable />
+          </Grid>
+        </Grid>
+        <Grid
+          item
+          container
+          md={4}
+          xs={12}
+          direction={'column'}
+        >
+          <Grid item style={{marginBottom: '0.5em'}}>
+            <Typography variant={'h5'}>
+              Utilidad
+            </Typography>
+          </Grid>
+          <Grid item >
+            <UtilityList />
+          </Grid>
         </Grid>
       </Grid>
     </Grid>

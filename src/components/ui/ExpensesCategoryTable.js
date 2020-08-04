@@ -99,6 +99,15 @@ ExpenseCategoryRow.propTypes = {
 
 
 
+function compare( a, b ) {
+  if ( a.total < b.total ){
+    return 1;
+  }
+  if ( a.total > b.total ){
+    return -1;
+  }
+  return 0;
+}
 
 
 
@@ -149,7 +158,7 @@ function ExpenseCategoryTable(props) {
       expenseSubcategories = expenseSubcategories.map(expenseSubcategory => {
         return {...expenseSubcategory, id: expenseSubcategory.id, total: expenseSubcategory.total, cost: (expenseSubcategory.total / kilosTotal)}
       })
-
+      expenseSubcategories = expenseSubcategories.sort(compare)
       return {
         id: expenseCategory.id,
         desc: expenseCategory.name,
@@ -158,6 +167,7 @@ function ExpenseCategoryTable(props) {
         expenseSubcategories: expenseSubcategories
       }
     })
+    rows = rows.sort(compare)
     setExpenseCategoriesRows(rows)
   }, [props.expenses, props.expenseSubcategories, props.expenseCategories, props.salesProducts])
 
@@ -166,6 +176,7 @@ function ExpenseCategoryTable(props) {
     <>
       <TableContainer
         component={Paper}
+        style={{maxHeight: 450}}
       >
         <Table
           className={classes.table}

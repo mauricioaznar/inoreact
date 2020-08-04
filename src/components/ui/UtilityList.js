@@ -26,7 +26,10 @@ const formatNumber = (x, digits = 2) => {
 const dateFormat = 'YYYY-MM-DD'
 
 const useStyles = makeStyles({
-
+  table: {
+    minWidth: 400,
+    overflow: 'auto'
+  },
 });
 
 
@@ -90,41 +93,44 @@ function UtilityList(props) {
 
 
   return (
-    <TableContainer component={Paper}>
-      <Table
-        className={classes.table}
-        aria-label="simple table"
-      >
-        <TableHead>
-          <TableRow>
-            <TableCell/>
-            <TableCell align="right">Totales</TableCell>
-          </TableRow>
-        </TableHead>
-        <TableBody>
-          <TableRow>
-            <TableCell>Gastos</TableCell>
-            <TableCell align="right">{formatNumber(expensesTotal)}</TableCell>
-          </TableRow>
-          <TableRow>
-            <TableCell>Ventas</TableCell>
-            <TableCell align="right">{formatNumber(salesTotal)}</TableCell>
-          </TableRow>
-          <TableRow>
-            <TableCell>IVA</TableCell>
-            <TableCell align="right">{formatNumber(taxTotal)}</TableCell>
-          </TableRow>
-          <TableRow>
-            <TableCell>Otros ingresos</TableCell>
-            <TableCell align="right">{formatNumber(otherIncomesTotal)}</TableCell>
-          </TableRow>
-          <TableRow>
-            <TableCell>Utilidad</TableCell>
-            <TableCell align="right">{formatNumber(salesTotal + otherIncomesTotal - expensesTotal - taxTotal)}</TableCell>
-          </TableRow>
-        </TableBody>
-      </Table>
-    </TableContainer>
+    <>
+      <TableContainer component={Paper}>
+        <Table
+          className={classes.table}
+          stickyHeader
+          aria-label="simple table"
+        >
+          <TableHead>
+            <TableRow>
+              <TableCell/>
+              <TableCell align="right">Totales</TableCell>
+            </TableRow>
+          </TableHead>
+          <TableBody>
+            <TableRow>
+              <TableCell>Gastos</TableCell>
+              <TableCell align="right">{formatNumber(expensesTotal)}</TableCell>
+            </TableRow>
+            <TableRow>
+              <TableCell>Ventas</TableCell>
+              <TableCell align="right">{formatNumber(salesTotal)}</TableCell>
+            </TableRow>
+            <TableRow>
+              <TableCell>IVA</TableCell>
+              <TableCell align="right">{formatNumber(taxTotal)}</TableCell>
+            </TableRow>
+            <TableRow>
+              <TableCell>Otros ingresos</TableCell>
+              <TableCell align="right">{formatNumber(otherIncomesTotal)}</TableCell>
+            </TableRow>
+            <TableRow>
+              <TableCell>Utilidad</TableCell>
+              <TableCell align="right">{formatNumber(salesTotal + otherIncomesTotal - expensesTotal - taxTotal)}</TableCell>
+            </TableRow>
+          </TableBody>
+        </Table>
+      </TableContainer>
+    </>
   )
 }
 
