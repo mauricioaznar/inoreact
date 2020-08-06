@@ -148,7 +148,7 @@ function ExpenseCategoryRow(props) {
                     <TableCell style={{width: '5%'}}/>
                     <TableCell style={{width: '20%'}} align="center">Rubro</TableCell>
                     <TableCell align="center">Kilos producidos</TableCell>
-                    <TableCell align="center">Proporcion del kilo</TableCell>
+                    <TableCell align="center">Proporcion de {row.expense_subcategory_name.toLowerCase()} en cada kilo</TableCell>
                     <TableCell align="center">Kilos de {row.expense_subcategory_name.toLowerCase()} en la proporcion</TableCell>
                     <TableCell align="center">Costo estimado de {row.expense_subcategory_name.toLowerCase()}</TableCell>
                     <TableCell align="center">Gastos estimados</TableCell>
