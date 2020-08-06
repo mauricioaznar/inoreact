@@ -1,6 +1,3 @@
-const apiUrl = process.env.NODE_ENV === 'development' ?
-  'http://inoserver.test/api/' : 'https://babytester.grupoinopack.com/api/'
-
-console.log(process.env)
+const apiUrl = process.env.REACT_APP_BASE_URL
 
 export default apiUrl
