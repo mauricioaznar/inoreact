@@ -72,7 +72,7 @@ export default function Equilibrium(props) {
         style={{marginTop: '4em'}}
       >
         <Typography variant={matchesXS ? 'h2' : 'h1'}>
-          Punto de equilibrio v2
+          Punto de equilibrio v3
         </Typography>
       </Grid>
       <Grid
