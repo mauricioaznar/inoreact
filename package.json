@@ -25,8 +25,9 @@
     "redux-thunk": "^2.3.0"
   },
   "scripts": {
-    "start": "react-scripts start",
-    "build": "react-scripts build",
+    "start": "set REACT_APP_BASE_URL='http://inoserver.test/api' && react-scripts start",
+    "build": "REACT_APP_BASE_URL='https://inoserver.grupoinopack.com/api/' && react-scripts build",
+    "builddev": "REACT_APP_BASE_URL='https://babytester.grupoinopack.com/api/' && react-scripts build",
     "test": "react-scripts test",
     "eject": "react-scripts eject"
   },
