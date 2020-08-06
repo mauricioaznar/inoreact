@@ -26,7 +26,7 @@
   },
   "scripts": {
     "start": "set REACT_APP_BASE_URL='http://inoserver.test/api' && react-scripts start",
-    "build": "set REACT_APP_BASE_URL='https://inoserver.grupoinopack.com/api/' && react-scripts build",
+    "build": "react-scripts build",
     "builddev": "set REACT_APP_BASE_URL='https://babytester.grupoinopack.com/api/' && react-scripts build",
     "test": "react-scripts test",
     "eject": "react-scripts eject"
