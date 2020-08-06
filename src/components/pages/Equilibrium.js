@@ -1,11 +1,16 @@
 import React from 'react'
+import apiUrl from '../../helpers/apiUrl'
+import authHeader from '../../helpers/authHeader'
+import axios from 'axios'
+
 import {makeStyles, useTheme} from '@material-ui/core/styles'
 import Grid from '@material-ui/core/Grid'
-
 import ExpensesCategoryTable from '../ui/ExpensesCategoryTable'
 import Typography from '@material-ui/core/Typography'
 import ProductTypeSalesTable from '../ui/ProductTypeSalesTable'
 import UtilityList from '../ui/UtilityList'
+import EstimatedExpensesTable from '../ui/EstimatedExpensesTable'
+
 
 
 const useStyles = makeStyles((theme) => {
@@ -21,11 +26,39 @@ const useStyles = makeStyles((theme) => {
 })
 
 
+const useFetch = (url) => {
+  const [data, setData] = React.useState(null);
+
+  // empty array as second argument equivalent to componentDidMount
+  React.useEffect(() => {
+    let unmounted = false
+
+    async function fetchData() {
+      const response = await axios.get(url, {headers: {...authHeader()}});
+      if (!unmounted) {
+        setData(response.data.data)
+      }
+    }
+
+    if (!unmounted) {
+      fetchData();
+    }
+    return () => {
+      unmounted = true
+    };
+  }, [url]);
+
+  return data;
+};
+
+
 export default function Equilibrium(props) {
   const classes = useStyles()
   const theme = useTheme()
 
   const matchesXS = theme.breakpoints.down('xs')
+
+  const expensesEstimation = useFetch(apiUrl + 'analytics/expensesEstimation')
 
 
   return (
@@ -33,6 +66,35 @@ export default function Equilibrium(props) {
       container
       direction={'column'}
     >
+      <Grid
+        item
+        className={classes.rowContainer}
+        style={{marginTop: '4em'}}
+      >
+        <Typography variant={matchesXS ? 'h2' : 'h1'}>
+          Punto de equilibrio v2
+        </Typography>
+      </Grid>
+      <Grid
+        item
+        container
+        direction={'column'}
+        className={classes.rowContainer}
+        style={{marginTop: '4em', marginBottom: '2em'}}
+      >
+
+        <Grid item xs={12}>
+          <Typography variant={'h5'} style={{marginBottom: '0.5em'}}>
+            Gastos estimados
+          </Typography>
+        </Grid>
+        <Grid
+          item
+          xs={12}
+        >
+          <EstimatedExpensesTable expensesEstimation={expensesEstimation}/>
+        </Grid>
+      </Grid>
       <Grid
         item
         className={classes.rowContainer}
