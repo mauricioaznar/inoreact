@@ -60,7 +60,7 @@ export default function Equilibrium(props) {
   const matchesXS = theme.breakpoints.down('xs')
 
   const expensesEstimation = useFetch(apiUrl + 'analytics/expensesEstimation')
-  const sales = useFetch(apiUrl + 'analytics/sales?dateGroup=month&entityGroup=material')
+  const sales = useFetch(apiUrl + 'analytics/salesV?dateGroup=month&entityGroup=material')
 
 
   return (
