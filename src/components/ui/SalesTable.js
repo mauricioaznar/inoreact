@@ -64,10 +64,10 @@ function SalesTable(props) {
           <TableHead>
             <TableRow>
               <TableCell style={{width: '5%'}}>&nbsp;</TableCell>
-              <TableCell style={{width: '20%'}} align="center">Subtipo</TableCell>
+              <TableCell style={{width: '20%'}} align="center">Producto</TableCell>
               <TableCell align="center">Kilos vendidos</TableCell>
               <TableCell align="center">Precio</TableCell>
-              <TableCell align="center">Precio con iva</TableCell>
+              <TableCell align="center">Precio con IVA</TableCell>
               <TableCell align="center">Total</TableCell>
               <TableCell align="center">IVA</TableCell>
             </TableRow>
