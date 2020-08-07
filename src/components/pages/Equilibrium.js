@@ -10,6 +10,7 @@ import Typography from '@material-ui/core/Typography'
 import ProductTypeSalesTable from '../ui/ProductTypeSalesTable'
 import UtilityList from '../ui/UtilityList'
 import EstimatedExpensesTable from '../ui/EstimatedExpensesTable'
+import SalesTable from '../ui/SalesTable'
 
 
 
@@ -59,6 +60,7 @@ export default function Equilibrium(props) {
   const matchesXS = theme.breakpoints.down('xs')
 
   const expensesEstimation = useFetch(apiUrl + 'analytics/expensesEstimation')
+  const sales = useFetch(apiUrl + 'analytics/sales?dateGroup=month&entityGroup=material')
 
 
   return (
@@ -93,6 +95,26 @@ export default function Equilibrium(props) {
           xs={12}
         >
           <EstimatedExpensesTable expensesEstimation={expensesEstimation}/>
+        </Grid>
+      </Grid>
+      <Grid
+        item
+        container
+        direction={'column'}
+        className={classes.rowContainer}
+        style={{marginTop: '4em', marginBottom: '2em'}}
+      >
+
+        <Grid item xs={12}>
+          <Typography variant={'h5'} style={{marginBottom: '0.5em'}}>
+            Ventas
+          </Typography>
+        </Grid>
+        <Grid
+          item
+          xs={12}
+        >
+          <SalesTable sales={sales}/>
         </Grid>
       </Grid>
       <Grid
