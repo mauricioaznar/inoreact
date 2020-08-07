@@ -12,6 +12,13 @@ export const setInventory = (inventory) => {
   }
 }
 
+export const setBranches = (branches) => {
+  return {
+    type: 'SET_BRANCHES',
+    branches: branches
+  }
+}
+
 export const getApiEntities = () => {
   return (dispatch, getState) => {
     dispatch(setAreEntitiesLoading())
@@ -29,7 +36,7 @@ export const getApiEntities = () => {
       const inventory = result[1].data.data
       const expenses = result[2].data.data
       const expenseCategories = result[3].data.data
-      const {expense_subcategories: expenseSubcategories, machines: machines} = result[4].data.data
+      const {expense_subcategories: expenseSubcategories, machines: machines, branches: branches} = result[4].data.data
       const materials = result[5].data.data
       const productTypes = result[6].data.data
       // dispatch(setOrderProductions(orderProductions))
@@ -39,6 +46,7 @@ export const getApiEntities = () => {
       dispatch(setRequestsProducts(requests_products))
       dispatch(setOtherIncomes(other_incomes))
       dispatch(setInventory(inventory))
+      dispatch(setBranches(branches))
       dispatch(setExpenses(expenses))
       dispatch(setExpenseCategories(expenseCategories))
       dispatch(setExpenseSubcategories(expenseSubcategories))

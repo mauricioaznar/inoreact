@@ -1,0 +1,204 @@
+import React from 'react';
+import PropTypes from 'prop-types'
+import {connect} from 'react-redux'
+import moment from 'moment'
+import axios from 'axios'
+
+
+import {makeStyles} from '@material-ui/core/styles';
+import Table from '@material-ui/core/Table';
+import TableBody from '@material-ui/core/TableBody';
+import TableCell from '@material-ui/core/TableCell';
+import TableContainer from '@material-ui/core/TableContainer';
+import TableHead from '@material-ui/core/TableHead';
+import TableRow from '@material-ui/core/TableRow';
+import Collapse from '@material-ui/core/Collapse'
+import Typography from '@material-ui/core/Typography'
+import Box from '@material-ui/core/Box'
+import Paper from '@material-ui/core/Paper';
+import IconButton from '@material-ui/core/IconButton';
+import KeyboardArrowDownIcon from '@material-ui/icons/KeyboardArrowDown';
+import KeyboardArrowUpIcon from '@material-ui/icons/KeyboardArrowUp';
+import apiUrl from '../../helpers/apiUrl'
+import authHeader from '../../helpers/authHeader'
+
+
+const useStyles = makeStyles({
+  table: {
+    minWidth: 400,
+    overflow: 'auto'
+  },
+});
+
+
+const formatNumber = (x, digits = 2) => {
+  if (x < 0.01 && x > -0.01) {
+    x = 0
+  }
+  return x.toFixed(digits).toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",")
+}
+
+const dateFormat = 'YYYY-MM-DD'
+
+
+
+function ExpensesByCatSubBraTable(props) {
+  const classes = useStyles();
+
+  let expenses =  props.expenses
+
+  let rows = []
+
+  if (expenses) {
+
+    rows = props.expenseCategories.map(expenseCategory => {
+      return {
+        expense_category_name: expenseCategory.name,
+        expense_category_id: expenseCategory.id,
+        total: 0,
+        expense_subcategories: props.expenseSubcategories
+          .filter(expenseSubcategory => expenseSubcategory.expense_category_id === expenseCategory.id)
+          .map(expenseSubcategory => {
+            return {
+              expense_subcategory_id: expenseSubcategory.id,
+              expense_subcategory_name: expenseSubcategory.name,
+              total: 0
+            }
+          })
+      }
+    })
+
+    props.expenses.map(expense => {
+      let rowFound = rows.find(expenseCategory => {
+        return expenseCategory.expense_category_id === expense.expense_category_id
+      })
+      let subRowFound = rowFound.expense_subcategories.find(expenseSubcategory => {
+        return expenseSubcategory.expense_subcategory_id === expense.expense_subcategory_id
+      })
+      rowFound.total += expense.total
+      subRowFound.total += expense.total
+    })
+
+    rows = rows
+      .map(expenseCategory => {
+        return {
+          ...expenseCategory,
+          expense_subcategories: expenseCategory.expense_subcategories.sort(compare)
+        }
+      })
+      .sort(compare)
+
+  }
+
+
+  return (
+    <>
+      <TableContainer
+        component={Paper}
+      >
+        <Table
+          className={classes.table}
+          aria-label="spanning table"
+        >
+          <TableHead>
+            <TableRow>
+              <TableCell style={{width: '5%'}}>&nbsp;</TableCell>
+              <TableCell style={{width: '20%'}}>Rubro</TableCell>
+              <TableCell>Total</TableCell>
+            </TableRow>
+          </TableHead>
+          <TableBody>
+            {rows.map((row, index) => (
+              <ExpenseByCatSubBraRow key={row.expense_category_id} row={row} />
+            ))}
+          </TableBody>
+        </Table>
+      </TableContainer>
+    </>
+  );
+}
+
+
+function ExpenseByCatSubBraRow(props) {
+  const {row} = props;
+  const [open, setOpen] = React.useState(false);
+  return (
+    <React.Fragment>
+      <TableRow>
+        <TableCell style={{width: '5%'}}>
+          <IconButton
+            aria-label="expand row"
+            size="small"
+            onClick={() => setOpen(!open)}
+          >
+            {open ? <KeyboardArrowUpIcon /> : <KeyboardArrowDownIcon />}
+          </IconButton>
+        </TableCell>
+        <TableCell style={{width: '20%'}}>{row.expense_category_name}</TableCell>
+        <TableCell align={'right'}>{formatNumber(row.total)}</TableCell>
+      </TableRow>
+      <TableRow>
+        <TableCell
+          style={{paddingBottom: 0, paddingTop: 0, paddingLeft: 0, paddingRight: 0}}
+          colSpan={10}
+        >
+          <Collapse
+            in={open}
+            timeout="auto"
+            unmountOnExit
+          >
+            <Box>
+              <Table
+                aria-label="purchases"
+              >
+                <TableHead>
+                  <TableRow>
+                    <TableCell style={{width: '5%'}}>&nbsp;</TableCell>
+                    <TableCell style={{width: '20%'}}>Rubro</TableCell>
+                    <TableCell>Total</TableCell>
+                  </TableRow>
+                </TableHead>
+                <TableBody>
+                  {row.expense_subcategories.map((expenseSubcategory, index) => (
+                    <TableRow key={expenseSubcategory.expense_subcategory_id}>
+                      <TableCell style={{width: '5%'}}>&nbsp;</TableCell>
+                      <TableCell style={{width: '20%'}}>{expenseSubcategory.expense_subcategory_name}</TableCell>
+                      <TableCell align={'right'}>{formatNumber(expenseSubcategory.total)}</TableCell>
+                    </TableRow>
+                  ))}
+                </TableBody>
+              </Table>
+            </Box>
+          </Collapse>
+        </TableCell>
+      </TableRow>
+    </React.Fragment>
+  );
+}
+
+ExpenseByCatSubBraRow.propTypes = {
+  row: PropTypes.object.isRequired
+}
+
+
+
+function compare( a, b ) {
+  if ( a.total < b.total ){
+    return 1;
+  }
+  if ( a.total > b.total ){
+    return -1;
+  }
+  return 0;
+}
+
+
+const mapStateToProps = (state, ownProps) => {
+  return {
+    branches: state.general.branches,
+    expenseSubcategories: state.expenses.expenseSubcategories,
+    expenseCategories: state.expenses.expenseCategories
+  }
+}
+
+export default connect(mapStateToProps, null)(ExpensesByCatSubBraTable)

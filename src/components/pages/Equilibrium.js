@@ -11,6 +11,7 @@ import ProductTypeSalesTable from '../ui/ProductTypeSalesTable'
 import UtilityList from '../ui/UtilityList'
 import EstimatedExpensesTable from '../ui/EstimatedExpensesTable'
 import SalesTable from '../ui/SalesTable'
+import ExpensesByCatSubBraTable from '../ui/ExpensesByCatSubBraTable'
 
 
 
@@ -60,7 +61,8 @@ export default function Equilibrium(props) {
   const matchesXS = theme.breakpoints.down('xs')
 
   const expensesEstimation = useFetch(apiUrl + 'analytics/expensesEstimation')
-  const sales = useFetch(apiUrl + 'analytics/salesV?dateGroup=month&entityGroup=material')
+  const sales = useFetch(apiUrl + 'analytics/sales?dateGroup=month&entityGroup=material')
+  const expensesByCatSubBra = useFetch(apiUrl + 'analytics/expenses?dateGroup=month&entityGroup=branch|expenseCategory|expenseSubcategory')
 
 
   return (
@@ -82,7 +84,7 @@ export default function Equilibrium(props) {
         container
         direction={'column'}
         className={classes.rowContainer}
-        style={{marginTop: '4em', marginBottom: '2em'}}
+        style={{marginTop: '2em', marginBottom: '2em'}}
       >
 
         <Grid item xs={12}>
@@ -102,7 +104,7 @@ export default function Equilibrium(props) {
         container
         direction={'column'}
         className={classes.rowContainer}
-        style={{marginTop: '4em', marginBottom: '2em'}}
+        style={{marginTop: '2em', marginBottom: '2em'}}
       >
 
         <Grid item xs={12}>
@@ -119,24 +121,34 @@ export default function Equilibrium(props) {
       </Grid>
       <Grid
         item
+        container
+        direction={'column'}
         className={classes.rowContainer}
-        style={{marginTop: '4em'}}
+        style={{marginTop: '2em', marginBottom: '2em'}}
       >
-        <Typography variant={matchesXS ? 'h2' : 'h1'}>
-          Punto de equilibrio
-        </Typography>
+
+        <Grid item xs={12}>
+          <Typography variant={'h5'} style={{marginBottom: '0.5em'}}>
+            Gastos no estimados
+          </Typography>
+        </Grid>
+        <Grid
+          item
+          xs={12}
+        >
+          <ExpensesByCatSubBraTable expenses={expensesByCatSubBra}/>
+        </Grid>
       </Grid>
       <Grid
         item
         container
         direction={'column'}
         className={classes.rowContainer}
-        style={{marginTop: '4em', marginBottom: '2em'}}
+        style={{marginTop: '2em', marginBottom: '2em'}}
       >
-
         <Grid item xs={12}>
           <Typography variant={'h5'} style={{marginBottom: '0.5em'}}>
-            Ventas por tipo de producto
+            Gastos
           </Typography>
         </Grid>
         <Grid

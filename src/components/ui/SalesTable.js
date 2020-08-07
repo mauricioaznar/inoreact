@@ -50,8 +50,6 @@ function SalesTable(props) {
 
   if (props.sales) {
     sales = props.sales.sales
-
-    console.log(sales)
   }
 
   return (
