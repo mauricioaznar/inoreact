@@ -47,11 +47,11 @@ function SalesTable(props) {
 
   let sales =  []
 
-  console.log(sales)
-
 
   if (props.sales) {
     sales = props.sales.sales
+
+    console.log(sales)
   }
 
   return (
