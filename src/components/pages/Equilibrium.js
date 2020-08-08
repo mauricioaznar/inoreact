@@ -12,6 +12,7 @@ import UtilityList from '../ui/UtilityList'
 import EstimatedExpensesTable from '../ui/EstimatedExpensesTable'
 import SalesTable from '../ui/SalesTable'
 import ExpensesByCatSubBraTable from '../ui/ExpensesByCatSubBraTable'
+import ExpensesBySupSubTable from '../ui/ExpensesBySubSupTable'
 
 
 
@@ -63,6 +64,10 @@ export default function Equilibrium(props) {
   const expensesEstimation = useFetch(apiUrl + 'analytics/expensesEstimation')
   const sales = useFetch(apiUrl + 'analytics/sales?dateGroup=month&entityGroup=material')
   const expensesByCatSubBra = useFetch(apiUrl + 'analytics/expenses?dateGroup=month&entityGroup=branch|expenseCategory|expenseSubcategory')
+  const expensesBySupSub = useFetch(apiUrl + 'analytics/expenses?dateGroup=month&entityGroup=supplier|expenseCategory|expenseSubcategory')
+
+
+
 
 
   return (
@@ -137,6 +142,26 @@ export default function Equilibrium(props) {
           xs={12}
         >
           <ExpensesByCatSubBraTable expenses={expensesByCatSubBra}/>
+        </Grid>
+      </Grid>
+      <Grid
+        item
+        container
+        direction={'column'}
+        className={classes.rowContainer}
+        style={{marginTop: '2em', marginBottom: '2em'}}
+      >
+
+        <Grid item xs={12}>
+          <Typography variant={'h5'} style={{marginBottom: '0.5em'}}>
+            Gastos por proveedor
+          </Typography>
+        </Grid>
+        <Grid
+          item
+          xs={12}
+        >
+          <ExpensesBySupSubTable expenses={expensesBySupSub}/>
         </Grid>
       </Grid>
       <Grid
