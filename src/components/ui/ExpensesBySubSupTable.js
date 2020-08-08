@@ -101,6 +101,7 @@ function ExpensesByCatSubBraTable(props) {
             <Table
               className={classes.table}
               aria-label="spanning table"
+              size="small"
             >
               <TableHead>
                 <TableRow>
