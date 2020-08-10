@@ -14,7 +14,7 @@ import SalesByMaterialTable from '../ui/SalesByMaterialTable'
 import ExpensesByCatSubBraTable from '../ui/ExpensesByCatSubBraTable'
 import ExpensesBySupSubTable from '../ui/ExpensesBySubSupTable'
 import InvoicesBySupTable from '../ui/InvoicesBySupTable'
-
+import EquilibriumSummary from '../ui/EquilibriumSummary'
 
 
 const useStyles = makeStyles((theme) => {
@@ -24,7 +24,7 @@ const useStyles = makeStyles((theme) => {
     },
     rowContainer: {
       paddingLeft: '2em',
-      paddingRight: '2em',
+      paddingRight: '2em'
     }
   }
 })
@@ -65,12 +65,9 @@ export default function Equilibrium(props) {
   //check usages with ctl + v
   const expensesEstimation = useFetch(apiUrl + 'analytics/expensesEstimation')
   const sales = useFetch(apiUrl + 'analytics/sales?dateGroup=month&entityGroup=material')
-  const expensesByCatSubBra = useFetch(apiUrl + 'analytics/expenses?dateGroup=month&entityGroup=branch|expenseCategory|expenseSubcategory&noEstimates')
+  const expensesNoEstimatesByCatSubBra = useFetch(apiUrl + 'analytics/expenses?dateGroup=month&entityGroup=branch|expenseCategory|expenseSubcategory&noEstimates')
   const expensesBySupSub = useFetch(apiUrl + 'analytics/expenses?dateGroup=month&entityGroup=supplier|expenseCategory|expenseSubcategory')
   const invoicesBySup = useFetch(apiUrl + 'analytics/invoices?dateGroup=month&entityGroup=supplier')
-
-
-
 
 
   return (
@@ -87,6 +84,7 @@ export default function Equilibrium(props) {
           Punto de equilibrio v3
         </Typography>
       </Grid>
+
       <Grid
         item
         container
@@ -95,8 +93,45 @@ export default function Equilibrium(props) {
         style={{marginTop: '2em'}}
       >
 
-        <Grid item xs={12}>
-          <Typography variant={'h5'} style={{marginBottom: '0.5em'}}>
+        <Grid
+          item
+          xs={12}
+        >
+          <Typography
+            variant={'h5'}
+            style={{marginBottom: '0.5em'}}
+          >
+            Resumen
+          </Typography>
+        </Grid>
+        <Grid
+          item
+          xs={12}
+        >
+          <EquilibriumSummary
+            expensesEstimates={expensesEstimation}
+            expensesNoEstimates={expensesNoEstimatesByCatSubBra}
+            sales={sales}
+            invoices={invoicesBySup}
+          />
+        </Grid>
+      </Grid>
+      <Grid
+        item
+        container
+        direction={'column'}
+        className={classes.rowContainer}
+        style={{marginTop: '2em'}}
+      >
+
+        <Grid
+          item
+          xs={12}
+        >
+          <Typography
+            variant={'h5'}
+            style={{marginBottom: '0.5em'}}
+          >
             Gastos estimados
           </Typography>
         </Grid>
@@ -115,8 +150,14 @@ export default function Equilibrium(props) {
         style={{marginTop: '2em'}}
       >
 
-        <Grid item xs={12}>
-          <Typography variant={'h5'} style={{marginBottom: '0.5em'}}>
+        <Grid
+          item
+          xs={12}
+        >
+          <Typography
+            variant={'h5'}
+            style={{marginBottom: '0.5em'}}
+          >
             Ventas
           </Typography>
         </Grid>
@@ -135,8 +176,14 @@ export default function Equilibrium(props) {
         style={{marginTop: '2em'}}
       >
 
-        <Grid item xs={12}>
-          <Typography variant={'h5'} style={{marginBottom: '0.5em'}}>
+        <Grid
+          item
+          xs={12}
+        >
+          <Typography
+            variant={'h5'}
+            style={{marginBottom: '0.5em'}}
+          >
             Gastos no estimados
           </Typography>
         </Grid>
@@ -144,7 +191,10 @@ export default function Equilibrium(props) {
           item
           xs={12}
         >
-          <ExpensesByCatSubBraTable expenses={expensesByCatSubBra} sales={sales}/>
+          <ExpensesByCatSubBraTable
+            expenses={expensesNoEstimatesByCatSubBra}
+            sales={sales}
+          />
         </Grid>
       </Grid>
       <Grid
@@ -155,8 +205,14 @@ export default function Equilibrium(props) {
         style={{marginTop: '2em'}}
       >
 
-        <Grid item xs={12}>
-          <Typography variant={'h5'} style={{marginBottom: '0.5em'}}>
+        <Grid
+          item
+          xs={12}
+        >
+          <Typography
+            variant={'h5'}
+            style={{marginBottom: '0.5em'}}
+          >
             Gastos por proveedor
           </Typography>
         </Grid>
@@ -175,8 +231,14 @@ export default function Equilibrium(props) {
         style={{marginTop: '2em'}}
       >
 
-        <Grid item xs={12}>
-          <Typography variant={'h5'} style={{marginBottom: '0.5em'}}>
+        <Grid
+          item
+          xs={12}
+        >
+          <Typography
+            variant={'h5'}
+            style={{marginBottom: '0.5em'}}
+          >
             Facturas por proveedor
           </Typography>
         </Grid>
@@ -194,8 +256,14 @@ export default function Equilibrium(props) {
         className={classes.rowContainer}
         style={{marginTop: '2em'}}
       >
-        <Grid item xs={12}>
-          <Typography variant={'h5'} style={{marginBottom: '0.5em'}}>
+        <Grid
+          item
+          xs={12}
+        >
+          <Typography
+            variant={'h5'}
+            style={{marginBottom: '0.5em'}}
+          >
             Gastos
           </Typography>
         </Grid>
@@ -203,7 +271,7 @@ export default function Equilibrium(props) {
           item
           xs={12}
         >
-          <ProductTypeSalesTable />
+          <ProductTypeSalesTable/>
         </Grid>
       </Grid>
 
@@ -222,13 +290,16 @@ export default function Equilibrium(props) {
           xs={12}
           direction={'column'}
         >
-          <Grid item style={{marginBottom: '0.5em'}}>
+          <Grid
+            item
+            style={{marginBottom: '0.5em'}}
+          >
             <Typography variant={'h5'}>
               Gastos por rubro
             </Typography>
           </Grid>
           <Grid item>
-            <ExpensesCategoryTable />
+            <ExpensesCategoryTable/>
           </Grid>
         </Grid>
         <Grid
@@ -238,13 +309,16 @@ export default function Equilibrium(props) {
           xs={12}
           direction={'column'}
         >
-          <Grid item style={{marginBottom: '0.5em'}}>
+          <Grid
+            item
+            style={{marginBottom: '0.5em'}}
+          >
             <Typography variant={'h5'}>
               Utilidad
             </Typography>
           </Grid>
-          <Grid item >
-            <UtilityList />
+          <Grid item>
+            <UtilityList/>
           </Grid>
         </Grid>
       </Grid>

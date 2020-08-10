@@ -64,7 +64,7 @@ function ExpensesByCatSubBraTable(props) {
 
   if (invoices) {
 
-    console.log(invoices)
+    // console.log(invoices)
 
     rows = invoices
       .sort(compare)

@@ -57,8 +57,6 @@ function ExpensesByCatSubBraTable(props) {
       }
     }, 0)
 
-    console.log(salesMainProductTotalKilos)
-
     rows = props.expenseCategories.map(expenseCategory => {
       return {
         expense_category_name: expenseCategory.name,
