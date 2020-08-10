@@ -95,10 +95,12 @@ function ExpensesByCatSubBraTable(props) {
     <>
       <TableContainer
         component={Paper}
+        style={{maxHeight: 550}}
       >
         <Table
           className={classes.table}
           aria-label="spanning table"
+          stickyHeader
         >
           <TableHead>
             <TableRow>

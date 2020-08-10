@@ -66,10 +66,11 @@ function SalesTable(props) {
               <TableCell style={{width: '5%'}}>&nbsp;</TableCell>
               <TableCell style={{width: '20%'}} align="center">Producto</TableCell>
               <TableCell align="center">Kilos vendidos</TableCell>
-              <TableCell align="center">Precio</TableCell>
-              <TableCell align="center">Precio con IVA</TableCell>
-              <TableCell align="center">Total</TableCell>
+              <TableCell align="center">Total ($)</TableCell>
               <TableCell align="center">IVA</TableCell>
+              <TableCell align="center">Total con iva</TableCell>
+              <TableCell align="center">Precio sin iva</TableCell>
+              <TableCell align="center">Precio con IVA</TableCell>
             </TableRow>
           </TableHead>
           <TableBody>
@@ -80,10 +81,11 @@ function SalesTable(props) {
                     <TableCell style={{width: '5%'}}>&nbsp;</TableCell>
                     <TableCell style={{width: '20%'}} align="center">{sale.material_name}</TableCell>
                     <TableCell align="right">{formatNumber(sale.kilos_sold)}</TableCell>
-                    <TableCell align="right">{formatNumber(sale.kilo_price)}</TableCell>
-                    <TableCell align="right">{formatNumber(sale.kilo_price_with_tax)}</TableCell>
                     <TableCell align="right">{formatNumber(sale.total)}</TableCell>
                     <TableCell align="right">{formatNumber(sale.tax)}</TableCell>
+                    <TableCell align="right">{formatNumber(sale.total_with_tax)}</TableCell>
+                    <TableCell align="right">{formatNumber(sale.kilo_price)}</TableCell>
+                    <TableCell align="right">{formatNumber(sale.kilo_price_with_tax)}</TableCell>
                   </TableRow>
                 )
               })

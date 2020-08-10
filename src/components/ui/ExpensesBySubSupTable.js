@@ -75,7 +75,7 @@ function ExpensesByCatSubBraTable(props) {
   return (
     <>
       <Grid container direction={'column'}>
-        <Grid item xs={12} sm={4} md={2}>
+        <Grid item xs={12} sm={4} md={2} style={{marginBottom: '1em'}}>
           <FormControl className={classes.formControl} fullWidth>
             <InputLabel id="demo-simple-select-label">Rubro</InputLabel>
             <Select
@@ -97,11 +97,13 @@ function ExpensesByCatSubBraTable(props) {
         <Grid item xs={12}>
           <TableContainer
             component={Paper}
+            style={{maxHeight: 550}}
           >
             <Table
               className={classes.table}
               aria-label="spanning table"
               size="small"
+              stickyHeader
             >
               <TableHead>
                 <TableRow>

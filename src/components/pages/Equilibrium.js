@@ -91,7 +91,7 @@ export default function Equilibrium(props) {
         container
         direction={'column'}
         className={classes.rowContainer}
-        style={{marginTop: '2em', marginBottom: '2em'}}
+        style={{marginTop: '2em'}}
       >
 
         <Grid item xs={12}>
@@ -111,7 +111,7 @@ export default function Equilibrium(props) {
         container
         direction={'column'}
         className={classes.rowContainer}
-        style={{marginTop: '2em', marginBottom: '2em'}}
+        style={{marginTop: '2em'}}
       >
 
         <Grid item xs={12}>
@@ -131,7 +131,7 @@ export default function Equilibrium(props) {
         container
         direction={'column'}
         className={classes.rowContainer}
-        style={{marginTop: '2em', marginBottom: '2em'}}
+        style={{marginTop: '2em'}}
       >
 
         <Grid item xs={12}>
@@ -144,6 +144,26 @@ export default function Equilibrium(props) {
           xs={12}
         >
           <ExpensesByCatSubBraTable expenses={expensesByCatSubBra}/>
+        </Grid>
+      </Grid>
+      <Grid
+        item
+        container
+        direction={'column'}
+        className={classes.rowContainer}
+        style={{marginTop: '2em'}}
+      >
+
+        <Grid item xs={12}>
+          <Typography variant={'h5'} style={{marginBottom: '0.5em'}}>
+            Gastos por proveedor
+          </Typography>
+        </Grid>
+        <Grid
+          item
+          xs={12}
+        >
+          <ExpensesBySupSubTable expenses={expensesBySupSub}/>
         </Grid>
       </Grid>
       <Grid
@@ -171,27 +191,7 @@ export default function Equilibrium(props) {
         container
         direction={'column'}
         className={classes.rowContainer}
-        style={{marginTop: '2em', marginBottom: '2em'}}
-      >
-
-        <Grid item xs={12}>
-          <Typography variant={'h5'} style={{marginBottom: '0.5em'}}>
-            Gastos por proveedor
-          </Typography>
-        </Grid>
-        <Grid
-          item
-          xs={12}
-        >
-          <ExpensesBySupSubTable expenses={expensesBySupSub}/>
-        </Grid>
-      </Grid>
-      <Grid
-        item
-        container
-        direction={'column'}
-        className={classes.rowContainer}
-        style={{marginTop: '2em', marginBottom: '2em'}}
+        style={{marginTop: '2em'}}
       >
         <Grid item xs={12}>
           <Typography variant={'h5'} style={{marginBottom: '0.5em'}}>

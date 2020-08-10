@@ -16,7 +16,7 @@ const useStyles = makeStyles((theme) => ({
 
 const Home = (props) => {
   const classes = useStyles()
-  const [counter, setCounter] = useState(0)
+  const [counter, setCounter] = useState(null)
   useEffect(() => {
     props.getApiEntities()
   }, [counter])
@@ -32,8 +32,8 @@ const Home = (props) => {
        <Navbar />
         <div className={classes.toolbarMargin}/>
         <Switch>
+          <Route path={'/'} exact component={() => <Equilibrium />}/>
           <Route path={'/sales'} component={() => <Sales />}/>
-          <Route path={'/equilibrium'} component={() => <Equilibrium />}/>
           <Route path={'/expenses'} component={() => <Expenses />}/>
           <Route path={'/maintenance'} component={() => <Maintenance />}/>
         </Switch>

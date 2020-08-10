@@ -75,15 +75,18 @@ function ExpensesByCatSubBraTable(props) {
     <>
       <TableContainer
         component={Paper}
+        style={{maxHeight: 550}}
       >
         <Table
           className={classes.table}
           aria-label="spanning table"
           size="small"
+          stickyHeader
         >
           <TableHead>
             <TableRow>
               <TableCell style={{width: '20%'}}>Proveedor</TableCell>
+              <TableCell style={{width: '15%'}}>Codigos internos</TableCell>
               <TableCell># Facturas</TableCell>
               <TableCell>Total</TableCell>
               <TableCell>ISR</TableCell>
@@ -98,7 +101,8 @@ function ExpensesByCatSubBraTable(props) {
               rows.map(invoice => {
                 return (
                   <TableRow key={invoice.supplier_id}>
-                    <TableCell align={'right'}>{invoice.supplier_name}</TableCell>
+                    <TableCell align={'left'}>{invoice.supplier_name}</TableCell>
+                    <TableCell align={'right'}>{invoice.internal_codes}</TableCell>
                     <TableCell align={'right'}>{invoice.invoices}</TableCell>
                     <TableCell align={'right'}>{formatNumber(invoice.total)}</TableCell>
                     <TableCell align={'right'}>{formatNumber(invoice.isr)}</TableCell>

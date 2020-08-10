@@ -26,7 +26,7 @@ function Navbar(props) {
               <Tab
                 label={'Punto de equilibrio'}
                 component={Link}
-                to={'/equilibrium'}
+                to={'/'}
                 onClick={() => setValue(0)}
               />
               <Tab
