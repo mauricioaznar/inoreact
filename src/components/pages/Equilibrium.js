@@ -10,7 +10,7 @@ import Typography from '@material-ui/core/Typography'
 import ProductTypeSalesTable from '../ui/ProductTypeSalesTable'
 import UtilityList from '../ui/UtilityList'
 import EstimatedExpensesTable from '../ui/EstimatedExpensesTable'
-import SalesTable from '../ui/SalesTable'
+import SalesByMaterialTable from '../ui/SalesByMaterialTable'
 import ExpensesByCatSubBraTable from '../ui/ExpensesByCatSubBraTable'
 import ExpensesBySupSubTable from '../ui/ExpensesBySubSupTable'
 import InvoicesBySupTable from '../ui/InvoicesBySupTable'
@@ -62,9 +62,10 @@ export default function Equilibrium(props) {
 
   const matchesXS = theme.breakpoints.down('xs')
 
+  //check usages with ctl + v
   const expensesEstimation = useFetch(apiUrl + 'analytics/expensesEstimation')
   const sales = useFetch(apiUrl + 'analytics/sales?dateGroup=month&entityGroup=material')
-  const expensesByCatSubBra = useFetch(apiUrl + 'analytics/expenses?dateGroup=month&entityGroup=branch|expenseCategory|expenseSubcategory')
+  const expensesByCatSubBra = useFetch(apiUrl + 'analytics/expenses?dateGroup=month&entityGroup=branch|expenseCategory|expenseSubcategory&noEstimates')
   const expensesBySupSub = useFetch(apiUrl + 'analytics/expenses?dateGroup=month&entityGroup=supplier|expenseCategory|expenseSubcategory')
   const invoicesBySup = useFetch(apiUrl + 'analytics/invoices?dateGroup=month&entityGroup=supplier')
 
@@ -123,7 +124,7 @@ export default function Equilibrium(props) {
           item
           xs={12}
         >
-          <SalesTable sales={sales}/>
+          <SalesByMaterialTable sales={sales}/>
         </Grid>
       </Grid>
       <Grid
@@ -143,7 +144,7 @@ export default function Equilibrium(props) {
           item
           xs={12}
         >
-          <ExpensesByCatSubBraTable expenses={expensesByCatSubBra}/>
+          <ExpensesByCatSubBraTable expenses={expensesByCatSubBra} sales={sales}/>
         </Grid>
       </Grid>
       <Grid

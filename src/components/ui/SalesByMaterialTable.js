@@ -42,7 +42,7 @@ const dateFormat = 'YYYY-MM-DD'
 
 
 
-function SalesTable(props) {
+function SalesByMaterialTable(props) {
   const classes = useStyles();
 
   let sales =  []
@@ -65,6 +65,7 @@ function SalesTable(props) {
             <TableRow>
               <TableCell style={{width: '5%'}}>&nbsp;</TableCell>
               <TableCell style={{width: '20%'}} align="center">Producto</TableCell>
+              <TableCell style={{width: '10%'}} align="center">Tipo de producto</TableCell>
               <TableCell align="center">Kilos vendidos</TableCell>
               <TableCell align="center">Total ($)</TableCell>
               <TableCell align="center">IVA</TableCell>
@@ -77,9 +78,10 @@ function SalesTable(props) {
             {
               sales.map(sale => {
                 return (
-                  <TableRow>
+                  <TableRow key={sale.material_id}>
                     <TableCell style={{width: '5%'}}>&nbsp;</TableCell>
-                    <TableCell style={{width: '20%'}} align="center">{sale.material_name}</TableCell>
+                    <TableCell align="center">{sale.material_name}</TableCell>
+                    <TableCell align="center">{sale.product_type_name}</TableCell>
                     <TableCell align="right">{formatNumber(sale.kilos_sold)}</TableCell>
                     <TableCell align="right">{formatNumber(sale.total)}</TableCell>
                     <TableCell align="right">{formatNumber(sale.tax)}</TableCell>
@@ -97,4 +99,4 @@ function SalesTable(props) {
   );
 }
 
-export default SalesTable
+export default SalesByMaterialTable

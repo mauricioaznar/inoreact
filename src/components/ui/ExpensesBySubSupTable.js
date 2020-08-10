@@ -107,7 +107,7 @@ function ExpensesByCatSubBraTable(props) {
             >
               <TableHead>
                 <TableRow>
-                  <TableCell style={{width: '40%'}}>Rubro</TableCell>
+                  <TableCell style={{width: '40%'}}>Proveedor</TableCell>
                   <TableCell>Rubro</TableCell>
                   <TableCell>Total</TableCell>
                 </TableRow>
@@ -119,7 +119,7 @@ function ExpensesByCatSubBraTable(props) {
                       <TableRow key={expense.supplier_id + '-' + expense.expense_subcategory_id}>
                         <TableCell>{expense.supplier_name}</TableCell>
                         <TableCell>{expense.expense_subcategory_name}</TableCell>
-                        <TableCell>{formatNumber(expense.total)}</TableCell>
+                        <TableCell align={'right'}>{formatNumber(expense.total)}</TableCell>
                       </TableRow>
                     )
                   })
@@ -132,6 +132,7 @@ function ExpensesByCatSubBraTable(props) {
     </>
   );
 }
+
 
 
 

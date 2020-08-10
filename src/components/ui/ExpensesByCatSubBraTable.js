@@ -45,16 +45,25 @@ const dateFormat = 'YYYY-MM-DD'
 function ExpensesByCatSubBraTable(props) {
   const classes = useStyles();
 
-  let expenses =  props.expenses
-
   let rows = []
 
-  if (expenses) {
+  if (props.expenses && props.sales) {
+
+    let salesMainProductTotalKilos = props.sales.sales.reduce((prev, current) => {
+      if (current.product_type_id === 1) {
+        return prev + current.kilos_sold
+      } else {
+        return prev
+      }
+    }, 0)
+
+    console.log(salesMainProductTotalKilos)
 
     rows = props.expenseCategories.map(expenseCategory => {
       return {
         expense_category_name: expenseCategory.name,
         expense_category_id: expenseCategory.id,
+        cost: 0,
         total: 0,
         expense_subcategories: props.expenseSubcategories
           .filter(expenseSubcategory => expenseSubcategory.expense_category_id === expenseCategory.id)
@@ -62,7 +71,8 @@ function ExpensesByCatSubBraTable(props) {
             return {
               expense_subcategory_id: expenseSubcategory.id,
               expense_subcategory_name: expenseSubcategory.name,
-              total: 0
+              total: 0,
+              cost: 0
             }
           })
       }
@@ -83,7 +93,15 @@ function ExpensesByCatSubBraTable(props) {
       .map(expenseCategory => {
         return {
           ...expenseCategory,
-          expense_subcategories: expenseCategory.expense_subcategories.sort(compare)
+          cost: expenseCategory.total / salesMainProductTotalKilos,
+          expense_subcategories: expenseCategory.expense_subcategories
+            .map((expenseSubcategory) => {
+              return {
+                ...expenseSubcategory,
+                cost: expenseSubcategory.total / salesMainProductTotalKilos
+              }
+            })
+            .sort(compare)
         }
       })
       .sort(compare)
@@ -106,6 +124,7 @@ function ExpensesByCatSubBraTable(props) {
             <TableRow>
               <TableCell style={{width: '5%'}}>&nbsp;</TableCell>
               <TableCell style={{width: '20%'}}>Rubro</TableCell>
+              <TableCell>Costo</TableCell>
               <TableCell>Total</TableCell>
             </TableRow>
           </TableHead>
@@ -137,6 +156,7 @@ function ExpenseByCatSubBraRow(props) {
           </IconButton>
         </TableCell>
         <TableCell style={{width: '20%'}}>{row.expense_category_name}</TableCell>
+        <TableCell align={'right'}>{formatNumber(row.cost)}</TableCell>
         <TableCell align={'right'}>{formatNumber(row.total)}</TableCell>
       </TableRow>
       <TableRow>
@@ -157,6 +177,7 @@ function ExpenseByCatSubBraRow(props) {
                   <TableRow>
                     <TableCell style={{width: '5%'}}>&nbsp;</TableCell>
                     <TableCell style={{width: '20%'}}>Rubro</TableCell>
+                    <TableCell>Costo</TableCell>
                     <TableCell>Total</TableCell>
                   </TableRow>
                 </TableHead>
@@ -165,6 +186,7 @@ function ExpenseByCatSubBraRow(props) {
                     <TableRow key={expenseSubcategory.expense_subcategory_id}>
                       <TableCell style={{width: '5%'}}>&nbsp;</TableCell>
                       <TableCell style={{width: '20%'}}>{expenseSubcategory.expense_subcategory_name}</TableCell>
+                      <TableCell align={'right'}>{formatNumber(expenseSubcategory.cost)}</TableCell>
                       <TableCell align={'right'}>{formatNumber(expenseSubcategory.total)}</TableCell>
                     </TableRow>
                   ))}
@@ -198,8 +220,12 @@ function compare( a, b ) {
 const mapStateToProps = (state, ownProps) => {
   return {
     branches: state.general.branches,
-    expenseSubcategories: state.expenses.expenseSubcategories,
-    expenseCategories: state.expenses.expenseCategories
+    expenseSubcategories: state.expenses.expenseSubcategories.filter(expenseSubcategories => {
+      return expenseSubcategories.has_estimate !== 1
+    }),
+    expenseCategories: state.expenses.expenseCategories.filter(expenseCategories => {
+      return expenseCategories.id !== 7
+    })
   }
 }
 
