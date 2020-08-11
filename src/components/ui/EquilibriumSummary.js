@@ -42,6 +42,7 @@ function EquilibriumSummary(props) {
   let salesTax = 0
   let expensesNoEstimatesTotal = 0
   let expensesEstimatesTotal = 0
+  let expensesTotal = 0
   let otherIncomesTotal = 0
   let taxExpenses = 0
   let utility = 0
@@ -96,7 +97,9 @@ function EquilibriumSummary(props) {
       taxExpenses += invoice.tax
     })
 
-    kiloPrice =
+    kiloPrice = salesTotal / kilosMainProduct
+
+    expensesTotal = expensesEstimatesTotal + expensesNoEstimatesTotal
 
     utility = (salesTotal + otherIncomesTotal - salesTax) + (- expensesNoEstimatesTotal - expensesEstimatesTotal + taxExpenses)
 
@@ -119,24 +122,24 @@ function EquilibriumSummary(props) {
           </TableHead>
           <TableBody>
             <TableRow>
-              <TableCell>Gastos no estimados</TableCell>
-              <TableCell align="right">{formatNumber(expensesNoEstimatesTotal)}</TableCell>
-            </TableRow>
-            <TableRow>
-              <TableCell>Gastos estimados</TableCell>
-              <TableCell align="right">{formatNumber(expensesEstimatesTotal)}</TableCell>
+              <TableCell>Gastos</TableCell>
+              <TableCell align="right">{formatNumber(expensesTotal)}</TableCell>
             </TableRow>
             <TableRow>
               <TableCell>IVA en gastos</TableCell>
               <TableCell align="right">{formatNumber(taxExpenses)}</TableCell>
             </TableRow>
             <TableRow>
-              <TableCell>Kilos en ventas</TableCell>
-              <TableCell align="right">{formatNumber(kilosMainProduct)}</TableCell>
+              <TableCell>Ventas ($)</TableCell>
+              <TableCell align="right">{formatNumber(salesTotal)}</TableCell>
             </TableRow>
             <TableRow>
-              <TableCell>Ventas</TableCell>
-              <TableCell align="right">{formatNumber(salesTotal)}</TableCell>
+              <TableCell>Precio de bolsa (sin iva)</TableCell>
+              <TableCell align="right">{formatNumber(kiloPrice)}</TableCell>
+            </TableRow>
+            <TableRow>
+              <TableCell>Kilos de bolsa en ventas</TableCell>
+              <TableCell align="right">{formatNumber(kilosMainProduct)}</TableCell>
             </TableRow>
             <TableRow>
               <TableCell>IVA en ventas</TableCell>

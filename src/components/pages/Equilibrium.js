@@ -112,7 +112,7 @@ export default function Equilibrium(props) {
         container
         direction={matchesXS ? 'column' : 'row'}
         className={classes.rowContainer}
-        style={{marginTop: '4em', marginBottom: '4em'}}
+        style={{marginTop: '4em', marginBottom: '2em'}}
       >
         <Grid
           item
@@ -181,7 +181,7 @@ export default function Equilibrium(props) {
         container
         direction={matchesXS ? 'column' : 'row'}
         className={classes.rowContainer}
-        style={{marginTop: '4em'}}
+        style={{marginTop: '2em'}}
       >
 
         <Grid
