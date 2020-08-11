@@ -113,12 +113,12 @@ function ExpenseCategoryTable(props) {
             <TableRow>
               <TableCell style={{width: '5%'}}>&nbsp;</TableCell>
               <TableCell style={{width: '20%'}} align="center">Rubro</TableCell>
-              {/*<TableCell align="center">Gastos real</TableCell>*/}
-              {/*<TableCell align="center">Gastos real sin kilos</TableCell>*/}
-              {/*<TableCell align="center">Gastos real con kilos</TableCell>*/}
-              {/*<TableCell align="center">Kilos en gastos</TableCell>*/}
-              {/*<TableCell align="center">Precio por kilo</TableCell>*/}
-              {/*<TableCell align="center">Kilos producidos proprocion</TableCell>*/}
+              <TableCell align="center">Gastos real</TableCell>
+              <TableCell align="center">Gastos real sin kilos</TableCell>
+              <TableCell align="center">Gastos real con kilos</TableCell>
+              <TableCell align="center">Kilos en gastos</TableCell>
+              <TableCell align="center">Precio por kilo</TableCell>
+              <TableCell align="center">Kilos producidos proprocion</TableCell>
               <TableCell align="center">Costo</TableCell>
               <TableCell align="center">Total</TableCell>
             </TableRow>
@@ -151,12 +151,12 @@ function ExpenseCategoryRow(props) {
           </IconButton>
         </TableCell>
         <TableCell style={{width: '20%'}} align="center">{row.expense_subcategory_name}</TableCell>
-        {/*<TableCell align="right">{formatNumber(row.real_expense)}</TableCell>*/}
-        {/*<TableCell align="right">{formatNumber(row.real_expense_without_kilos)}</TableCell>*/}
-        {/*<TableCell align="right">{formatNumber(row.real_expense_with_kilos)}</TableCell>*/}
-        {/*<TableCell align="right">{formatNumber(row.kilos_bought)}</TableCell>*/}
-        {/*<TableCell align="right">{formatNumber(row.kilo_price)}</TableCell>*/}
-        {/*<TableCell align="right">{formatNumber(row.kilos_produced_proportion)}</TableCell>*/}
+        <TableCell align="right">{formatNumber(row.real_expense)}</TableCell>
+        <TableCell align="right">{formatNumber(row.real_expense_without_kilos)}</TableCell>
+        <TableCell align="right">{formatNumber(row.real_expense_with_kilos)}</TableCell>
+        <TableCell align="right">{formatNumber(row.kilos_bought)}</TableCell>
+        <TableCell align="right">{formatNumber(row.kilo_price)}</TableCell>
+        <TableCell align="right">{formatNumber(row.kilos_produced_proportion)}</TableCell>
         <TableCell align="right">{formatNumber(row.estimated_kilo_cost)}</TableCell>
         <TableCell align="right">{formatNumber(row.estimated_expense)}</TableCell>
 
