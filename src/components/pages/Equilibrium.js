@@ -360,7 +360,7 @@ export default function Equilibrium(props) {
         container
         direction={'column'}
         className={classes.rowContainer}
-        style={{marginTop: '4em', marginBottom: '4em'}}
+        style={{marginTop: '4em', marginBottom: '2em'}}
       >
 
         <Grid
