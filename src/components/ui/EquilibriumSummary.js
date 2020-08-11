@@ -63,7 +63,7 @@ function EquilibriumSummary(props) {
         return props.month === obj.month && props.year === obj.year
       })
       .filter(sale => {
-        return sale.product_type_id === 1
+        return sale.product_type_id === 1 || sale.product_type_id === 2
       })
       .forEach((sale) => {
         salesTax += sale.tax
