@@ -29,7 +29,7 @@ const useStyles = makeStyles({
   table: {
     minWidth: 400,
     overflow: 'auto'
-  },
+  }
 });
 
 
@@ -42,31 +42,63 @@ function EquilibriumSummary(props) {
   let salesTax = 0
   let expensesNoEstimatesTotal = 0
   let expensesEstimatesTotal = 0
+  let otherIncomesTotal = 0
   let taxExpenses = 0
+  let utility = 0
+  let kiloPrice = 0
 
-  if (props.sales && props.expensesNoEstimates && props.expensesEstimates && props.invoices) {
+  if (props.sales && props.expensesNoEstimates && props.expensesEstimates && props.invoices && props.otherIncomes) {
 
-    props.expensesNoEstimates.forEach((expenseNoEstimate) => {
+    props.expensesNoEstimates
+      .filter(obj => {
+        return props.month === obj.month && props.year === obj.year
+      })
+      .forEach((expenseNoEstimate) => {
       expensesNoEstimatesTotal += expenseNoEstimate.total
     })
 
-    props.sales.sales.forEach((sale) => {
+    props.sales.sales
+      .filter(obj => {
+        return props.month === obj.month && props.year === obj.year
+      })
+      .filter(sale => {
+        return sale.product_type_id === 1
+      })
+      .forEach((sale) => {
       salesTax += sale.tax
       kilosMainProduct += sale.kilos_sold
-      salesTotal +=  sale.total
+      salesTotal += sale.total
     })
 
-    console.log(props.expensesEstimates)
+    props.otherIncomes.other_incomes
+      .filter(obj => {
+        return props.month === obj.month && props.year === obj.year
+      })
+      .forEach((otherIncome) => {
+        otherIncomesTotal += otherIncome.total
+      })
 
-    props.expensesEstimates.expenses_estimation_by_expense_subcategory.forEach((expenseEstimated) => {
+
+    props.expensesEstimates.expenses_estimation_by_expense_subcategory
+      .filter(obj => {
+        return props.month === obj.month && props.year === obj.year
+      })
+      .forEach((expenseEstimated) => {
       expensesEstimatesTotal += expenseEstimated.estimated_expense
     })
 
 
-    props.invoices.forEach((invoice) => {
+    props.invoices
+      .filter(obj => {
+        return props.month === obj.month && props.year === obj.year
+      })
+      .forEach((invoice) => {
       taxExpenses += invoice.tax
     })
 
+    kiloPrice =
+
+    utility = (salesTotal + otherIncomesTotal - salesTax) + (- expensesNoEstimatesTotal - expensesEstimatesTotal + taxExpenses)
 
   }
 
@@ -112,11 +144,11 @@ function EquilibriumSummary(props) {
             </TableRow>
             <TableRow>
               <TableCell>Otros ingresos</TableCell>
-              <TableCell align="right">{formatNumber(props.otherIncomesTotal)}</TableCell>
+              <TableCell align="right">{formatNumber(otherIncomesTotal)}</TableCell>
             </TableRow>
             <TableRow>
               <TableCell>Utilidad</TableCell>
-              <TableCell align="right">{formatNumber(0)}</TableCell>
+              <TableCell align="right">{formatNumber(utility)}</TableCell>
             </TableRow>
           </TableBody>
         </Table>
@@ -126,19 +158,4 @@ function EquilibriumSummary(props) {
 }
 
 
-const mapStateToProps = (state, ownProps) => {
-  return {
-    otherIncomesTotal: state.sales.otherIncomes
-      .filter(otherIncome => {
-        let momentDate = moment(otherIncome.date, 'YYYY-MM-DD')
-        let initialMomentDate = moment('2020-07-01', 'YYYY-MM-DD')
-        let endMomentDate = moment('2020-07-31', 'YYYY-MM-DD')
-        return momentDate.isBetween(initialMomentDate, endMomentDate, 'days', '[]')
-      })
-      .reduce((accumulator, otherIncome) => {
-        return accumulator + otherIncome.total
-      }, 0)
-  }
-}
-
-export default connect(mapStateToProps, null)(EquilibriumSummary)
+export default connect(null, null)(EquilibriumSummary)

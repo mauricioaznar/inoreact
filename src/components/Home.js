@@ -2,12 +2,10 @@ import React, {useEffect, useState} from 'react'
 import {makeStyles} from '@material-ui/core/styles'
 import {connect} from 'react-redux'
 import {getApiEntities} from '../store/generalActions'
-import Sales from './pages/Sales'
 import Equilibrium from './pages/Equilibrium'
 import {Switch, Route} from 'react-router-dom'
 import Navbar from './ui/Navbar'
-import Expenses from './pages/Expenses'
-import Maintenance from './pages/Maintenance'
+import Production from './pages/Production'
 
 
 const useStyles = makeStyles((theme) => ({
@@ -33,9 +31,7 @@ const Home = (props) => {
         <div className={classes.toolbarMargin}/>
         <Switch>
           <Route path={'/'} exact component={() => <Equilibrium />}/>
-          <Route path={'/sales'} component={() => <Sales />}/>
-          <Route path={'/expenses'} component={() => <Expenses />}/>
-          <Route path={'/maintenance'} component={() => <Maintenance />}/>
+          <Route path={'/production'} component={() => <Production />}/>
         </Switch>
       </div>
     )

@@ -60,6 +60,9 @@ function ExpensesByCatSubBraTable(props) {
   if (expenses) {
 
     rows = expenses
+      .filter(obj => {
+        return props.month === obj.month && props.year === obj.year
+      })
       .filter(expense => {
         return expenseCategoryId === null || expense.expense_category_id === expenseCategoryId
       })

@@ -92,7 +92,7 @@ function getDayRange(day = 0, content) {
 
 //Fix call in useEffect that is leaking memory (because is trying to set state in before component mounts?)
 
-function Maintenance(props) {
+function Production(props) {
 
   const classes = useStyles()
 
@@ -253,4 +253,4 @@ const mapStateToProps = (state, ownProps) => {
   }
 }
 
-export default connect(mapStateToProps, null)(Maintenance)
+export default connect(mapStateToProps, null)(Production)

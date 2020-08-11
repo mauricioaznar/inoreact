@@ -31,6 +31,16 @@ const useStyles = makeStyles({
 });
 
 
+function compare( a, b ) {
+  if ( a.total < b.total ){
+    return 1;
+  }
+  if ( a.total > b.total ){
+    return -1;
+  }
+  return 0;
+}
+
 const formatNumber = (x, digits = 2) => {
   if (x < 0.01 && x > -0.01) {
     x = 0
@@ -49,7 +59,11 @@ function ExpensesByCatSubBraTable(props) {
 
   if (props.expenses && props.sales) {
 
-    let salesMainProductTotalKilos = props.sales.sales.reduce((prev, current) => {
+    let salesMainProductTotalKilos = props.sales.sales
+      .filter(obj => {
+        return props.month === obj.month && props.year === obj.year
+      })
+      .reduce((prev, current) => {
       if (current.product_type_id === 1) {
         return prev + current.kilos_sold
       } else {
@@ -57,35 +71,40 @@ function ExpensesByCatSubBraTable(props) {
       }
     }, 0)
 
-    rows = props.expenseCategories.map(expenseCategory => {
-      return {
-        expense_category_name: expenseCategory.name,
-        expense_category_id: expenseCategory.id,
-        cost: 0,
-        total: 0,
-        expense_subcategories: props.expenseSubcategories
-          .filter(expenseSubcategory => expenseSubcategory.expense_category_id === expenseCategory.id)
-          .map(expenseSubcategory => {
-            return {
-              expense_subcategory_id: expenseSubcategory.id,
-              expense_subcategory_name: expenseSubcategory.name,
-              total: 0,
-              cost: 0
-            }
-          })
-      }
-    })
+    rows = props.expenseCategories
+      .map(expenseCategory => {
+        return {
+          expense_category_name: expenseCategory.name,
+          expense_category_id: expenseCategory.id,
+          cost: 0,
+          total: 0,
+          expense_subcategories: props.expenseSubcategories
+            .filter(expenseSubcategory => expenseSubcategory.expense_category_id === expenseCategory.id)
+            .map(expenseSubcategory => {
+              return {
+                expense_subcategory_id: expenseSubcategory.id,
+                expense_subcategory_name: expenseSubcategory.name,
+                total: 0,
+                cost: 0
+              }
+            })
+        }
+      })
 
-    props.expenses.map(expense => {
-      let rowFound = rows.find(expenseCategory => {
-        return expenseCategory.expense_category_id === expense.expense_category_id
+    props.expenses
+      .filter(obj => {
+        return props.month === obj.month && props.year === obj.year
       })
-      let subRowFound = rowFound.expense_subcategories.find(expenseSubcategory => {
-        return expenseSubcategory.expense_subcategory_id === expense.expense_subcategory_id
+      .map(expense => {
+        let rowFound = rows.find(expenseCategory => {
+          return expenseCategory.expense_category_id === expense.expense_category_id
+        })
+        let subRowFound = rowFound.expense_subcategories.find(expenseSubcategory => {
+          return expenseSubcategory.expense_subcategory_id === expense.expense_subcategory_id
+        })
+        rowFound.total += expense.total
+        subRowFound.total += expense.total
       })
-      rowFound.total += expense.total
-      subRowFound.total += expense.total
-    })
 
     rows = rows
       .map(expenseCategory => {
@@ -203,16 +222,6 @@ ExpenseByCatSubBraRow.propTypes = {
 }
 
 
-
-function compare( a, b ) {
-  if ( a.total < b.total ){
-    return 1;
-  }
-  if ( a.total > b.total ){
-    return -1;
-  }
-  return 0;
-}
 
 
 const mapStateToProps = (state, ownProps) => {

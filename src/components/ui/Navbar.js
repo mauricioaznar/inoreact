@@ -30,21 +30,9 @@ function Navbar(props) {
                 onClick={() => setValue(0)}
               />
               <Tab
-                label={'Ventas'}
+                label={'Produccion'}
                 component={Link}
-                to={'/sales'}
-                onClick={() => setValue(1)}
-              />
-              <Tab
-                label={'Gastos'}
-                component={Link}
-                to={'/expenses'}
-                onClick={() => setValue(2)}
-              />
-              <Tab
-                label={'Mantenimiento'}
-                component={Link}
-                to={'/maintenance'}
+                to={'/production'}
                 onClick={() => setValue(3)}
               />
             </Tabs>

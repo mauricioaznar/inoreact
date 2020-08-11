@@ -1,6 +1,7 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
 import './index.css';
+import moment from 'moment'
 import App from './App';
 import * as serviceWorker from './serviceWorker';
 import {createStore, applyMiddleware} from 'redux'
@@ -12,6 +13,8 @@ import {BrowserRouter as Router} from 'react-router-dom'
 
 const store = createStore(combinedReducers, {}, composeWithDevTools(applyMiddleware(thunk)))
 
+
+moment.locale('es')
 
 ReactDOM.render(
   <Provider store={store}>
