@@ -164,7 +164,7 @@ function ExpenseCategoryRow(props) {
       <TableRow>
         <TableCell
           style={{paddingBottom: 0, paddingTop: 0, paddingLeft: 0, paddingRight: 0}}
-          colSpan={4}
+          colSpan={10}
         >
           <Collapse
             in={open}
@@ -190,8 +190,8 @@ function ExpenseCategoryRow(props) {
                     <TableRow key={material.material_id}>
                       <TableCell style={{width: '20%'}} align={'center'}>{material.material_name}</TableCell>
                       <TableCell align={'right'}>{formatNumber(material.kilos_produced)}</TableCell>
-                      <TableCell align={'right'}>{formatNumber(material.kilo_proportion)}</TableCell>
-                      <TableCell align={'right'}>{formatNumber(material.kilos_produced_proportion, 3)}</TableCell>
+                      <TableCell align={'right'}>{formatNumber(material.kilo_proportion, 3)}</TableCell>
+                      <TableCell align={'right'}>{formatNumber(material.kilos_produced_proportion)}</TableCell>
                       <TableCell align={'right'}>{formatNumber(material.estimated_kilo_cost)}</TableCell>
                       <TableCell align={'right'}>{formatNumber(material.total_estimated_expense)}</TableCell>
                     </TableRow>
