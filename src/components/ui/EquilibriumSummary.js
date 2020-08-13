@@ -119,14 +119,6 @@ function EquilibriumSummary(props) {
           </TableHead>
           <TableBody>
             <TableRow>
-              <TableCell>Gastos</TableCell>
-              <TableCell align="right">{formatNumber(expensesTotal)}</TableCell>
-            </TableRow>
-            <TableRow>
-              <TableCell>IVA en gastos</TableCell>
-              <TableCell align="right">{formatNumber(taxExpenses)}</TableCell>
-            </TableRow>
-            <TableRow>
               <TableCell>Ventas con iva ($)</TableCell>
               <TableCell align="right">{formatNumber(salesTotalWithTax)}</TableCell>
             </TableRow>
@@ -141,6 +133,14 @@ function EquilibriumSummary(props) {
             <TableRow>
               <TableCell>IVA en ventas</TableCell>
               <TableCell align="right">{formatNumber(salesTax)}</TableCell>
+            </TableRow>
+            <TableRow>
+              <TableCell>Gastos</TableCell>
+              <TableCell align="right">{formatNumber(expensesTotal)}</TableCell>
+            </TableRow>
+            <TableRow>
+              <TableCell>IVA en gastos</TableCell>
+              <TableCell align="right">{formatNumber(taxExpenses)}</TableCell>
             </TableRow>
             <TableRow>
               <TableCell>Otros ingresos</TableCell>
