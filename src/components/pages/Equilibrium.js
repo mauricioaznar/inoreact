@@ -77,7 +77,7 @@ export default function Equilibrium(props) {
   const sales = useFetch(apiUrl + 'analytics/sales?dateGroup=month&entityGroup=material')
   const expensesNoEstimatesByCatSubBra = useFetch(apiUrl + 'analytics/expenses?dateGroup=month&entityGroup=branch|expenseCategory|expenseSubcategory&noEstimates')
   const expensesBySupSub = useFetch(apiUrl + 'analytics/expenses?dateGroup=month&entityGroup=supplier|expenseCategory|expenseSubcategory')
-  const invoicesBySup = useFetch(apiUrl + 'analytics/invoices?dateGroup=month&entityGroup=supplier')
+  const invoicesBySup = useFetch(apiUrl + 'analytics/invoices?dateGroup=day&entityGroup=supplier')
   const otherIncomes = useFetch(apiUrl + 'analytics/otherIncomes')
 
   const handleYearChange = (e) => {
@@ -402,28 +402,11 @@ export default function Equilibrium(props) {
         className={classes.rowContainer}
         style={{marginTop: '4em', marginBottom: '2em'}}
       >
-
-        <Grid
-          item
-          xs={12}
-        >
-          <Typography
-            variant={'h5'}
-            style={{marginBottom: '0.5em'}}
-          >
-            Facturas por proveedor
-          </Typography>
-        </Grid>
-        <Grid
-          item
-          xs={12}
-        >
-          <InvoicesBySupTable
-            invoices={invoicesBySup}
-            month={month}
-            year={year}
-          />
-        </Grid>
+        <InvoicesBySupTable
+          invoices={invoicesBySup}
+          month={month}
+          year={year}
+        />
       </Grid>
     </Grid>
   )
