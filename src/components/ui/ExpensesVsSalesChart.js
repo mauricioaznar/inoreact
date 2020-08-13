@@ -52,7 +52,7 @@ function ExpensesVsSalesChart (props) {
     .fill({})
     .map((object, index) => {
       return {
-        monthName: moment().month(index).format('MMMM'),
+        monthName: moment().month(index).format('MMM'),
         month: index + 1,
         ...dataKeys
       }
