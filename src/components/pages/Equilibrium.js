@@ -14,6 +14,7 @@ import SalesByMaterialTable from '../ui/SalesByMaterialTable'
 import ExpensesByCatSubBraTable from '../ui/ExpensesByCatSubBraTable'
 import ExpensesBySupSubTable from '../ui/ExpensesBySubSupTable'
 import InvoicesBySupTable from '../ui/InvoicesBySupTable'
+import ExpensesVsSalesChart from '../ui/ExpensesVsSalesChart'
 import EquilibriumSummary from '../ui/EquilibriumSummary'
 import FormControl from '@material-ui/core/FormControl'
 import InputLabel from '@material-ui/core/InputLabel'
@@ -179,7 +180,6 @@ export default function Equilibrium(props) {
       <Grid
         item
         container
-        direction={matchesXS ? 'column' : 'row'}
         className={classes.rowContainer}
         style={{marginTop: '2em'}}
       >
@@ -187,37 +187,77 @@ export default function Equilibrium(props) {
         <Grid
           item
           container
-          xs={12}
-          md={4}
+          direction={matchesXS ? 'column' : 'row'}
+          alignItems={'center'}
+          spacing={8}
         >
           <Grid
             item
             xs={12}
+            sm={12}
+            md={4}
           >
-            <Typography
-              variant={'h5'}
-              style={{marginBottom: '0.5em'}}
-            >
-              Resumen
-            </Typography>
+            <Grid item container direction={'column'}>
+              <Grid
+                item
+                xs={12}
+              >
+                <Typography
+                  variant={'h5'}
+                  style={{marginBottom: '0.5em'}}
+                >
+                  Resumen
+                </Typography>
+              </Grid>
+              <Grid
+                item
+                xs={12}
+              >
+                <EquilibriumSummary
+                  expensesEstimates={expensesEstimation}
+                  expensesNoEstimates={expensesNoEstimatesByCatSubBra}
+                  sales={sales}
+                  otherIncomes={otherIncomes}
+                  invoices={invoicesBySup}
+                  month={month}
+                  year={year}
+                />
+              </Grid>
+            </Grid>
           </Grid>
+
           <Grid
             item
             xs={12}
+            sm={12}
+            md={8}
           >
-            <EquilibriumSummary
-              expensesEstimates={expensesEstimation}
-              expensesNoEstimates={expensesNoEstimatesByCatSubBra}
-              sales={sales}
-              otherIncomes={otherIncomes}
-              invoices={invoicesBySup}
-              month={month}
-              year={year}
-            />
+            <Grid item container direction={'column'}>
+              <Grid
+                item
+                xs={12}
+              >
+                <Typography
+                  variant={'h6'}
+                  align={'center'}
+                  style={{marginBottom: '0.5em'}}
+                >
+                  Ventas vs gastos del año {moment().year(year).format('YYYY')}
+                </Typography>
+              </Grid>
+              <Grid
+                item
+                xs={12}
+              >
+                <ExpensesVsSalesChart
+                  year={year}
+                  sales={sales}
+                  expensesNoEstimates={expensesNoEstimatesByCatSubBra}
+                  expensesEstimates={expensesEstimation}
+                />
+              </Grid>
+            </Grid>
           </Grid>
-        </Grid>
-        <Grid item>
-
         </Grid>
       </Grid>
       <Grid

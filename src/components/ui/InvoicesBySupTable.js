@@ -64,8 +64,6 @@ function ExpensesByCatSubBraTable(props) {
 
   if (invoices) {
 
-    console.log(props)
-
     rows = invoices
       .filter(obj => {
         return props.month === obj.month && props.year === obj.year

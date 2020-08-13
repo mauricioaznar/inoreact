@@ -37,7 +37,7 @@ function EquilibriumSummary(props) {
   const classes = useStyles();
 
 
-  let salesTotal = 0
+  let salesTotalWithTax = 0
   let kilosMainProduct = 0
   let salesTax = 0
   let expensesNoEstimatesTotal = 0
@@ -62,13 +62,10 @@ function EquilibriumSummary(props) {
       .filter(obj => {
         return props.month === obj.month && props.year === obj.year
       })
-      .filter(sale => {
-        return sale.product_type_id === 1
-      })
       .forEach((sale) => {
+      kilosMainProduct += sale.product_type_id === 1 ? sale.kilos_sold : 0
+      salesTotalWithTax += sale.total_with_tax
       salesTax += sale.tax
-      kilosMainProduct += sale.kilos_sold
-      salesTotal += sale.total
     })
 
     props.otherIncomes.other_incomes
@@ -97,11 +94,11 @@ function EquilibriumSummary(props) {
       taxExpenses += invoice.tax
     })
 
-    kiloPrice = salesTotal / kilosMainProduct
+    kiloPrice = salesTotalWithTax / kilosMainProduct
 
     expensesTotal = expensesEstimatesTotal + expensesNoEstimatesTotal
 
-    utility = (salesTotal + otherIncomesTotal - salesTax) + (- expensesNoEstimatesTotal - expensesEstimatesTotal + taxExpenses)
+    utility = (salesTotalWithTax + otherIncomesTotal - salesTax) + (- expensesNoEstimatesTotal - expensesEstimatesTotal + taxExpenses)
 
   }
 
@@ -130,11 +127,11 @@ function EquilibriumSummary(props) {
               <TableCell align="right">{formatNumber(taxExpenses)}</TableCell>
             </TableRow>
             <TableRow>
-              <TableCell>Ventas ($)</TableCell>
-              <TableCell align="right">{formatNumber(salesTotal)}</TableCell>
+              <TableCell>Ventas con iva ($)</TableCell>
+              <TableCell align="right">{formatNumber(salesTotalWithTax)}</TableCell>
             </TableRow>
             <TableRow>
-              <TableCell>Precio de bolsa (sin iva)</TableCell>
+              <TableCell>Precio de bolsa (con iva)</TableCell>
               <TableCell align="right">{formatNumber(kiloPrice)}</TableCell>
             </TableRow>
             <TableRow>
