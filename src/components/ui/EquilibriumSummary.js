@@ -55,18 +55,18 @@ function EquilibriumSummary(props) {
         return props.month === obj.month && props.year === obj.year
       })
       .forEach((expenseNoEstimate) => {
-      expensesNoEstimatesTotal += expenseNoEstimate.total
-    })
+        expensesNoEstimatesTotal += expenseNoEstimate.total
+      })
 
     props.sales.sales
       .filter(obj => {
         return props.month === obj.month && props.year === obj.year
       })
       .forEach((sale) => {
-      kilosMainProduct += sale.product_type_id === 1 ? sale.kilos_sold : 0
-      salesTotalWithTax += sale.total_with_tax
-      salesTax += sale.tax
-    })
+        kilosMainProduct += sale.product_type_id === 1 ? sale.kilos_sold : 0
+        salesTotalWithTax += sale.total_with_tax
+        salesTax += sale.tax
+      })
 
     props.otherIncomes.other_incomes
       .filter(obj => {
@@ -82,8 +82,8 @@ function EquilibriumSummary(props) {
         return props.month === obj.month && props.year === obj.year
       })
       .forEach((expenseEstimated) => {
-      expensesEstimatesTotal += expenseEstimated.estimated_expense
-    })
+        expensesEstimatesTotal += expenseEstimated.estimated_expense
+      })
 
 
     props.invoices
@@ -91,14 +91,14 @@ function EquilibriumSummary(props) {
         return props.month === obj.month && props.year === obj.year
       })
       .forEach((invoice) => {
-      taxExpenses += invoice.tax
-    })
+        taxExpenses += invoice.tax
+      })
 
     kiloPrice = salesTotalWithTax / kilosMainProduct
 
     expensesTotal = expensesEstimatesTotal + expensesNoEstimatesTotal
 
-    utility = (salesTotalWithTax + otherIncomesTotal - salesTax) + (- expensesNoEstimatesTotal - expensesEstimatesTotal + taxExpenses)
+    utility = (salesTotalWithTax + otherIncomesTotal - salesTax) + (-expensesNoEstimatesTotal - expensesEstimatesTotal + taxExpenses)
 
   }
 
@@ -113,42 +113,89 @@ function EquilibriumSummary(props) {
         >
           <TableHead>
             <TableRow>
-              <TableCell/>
-              <TableCell align="right">Totales</TableCell>
+              <TableCell style={{width: '45%'}}>
+                &nbsp;
+              </TableCell>
+              <TableCell style={{width: '45%'}}>
+                &nbsp;
+              </TableCell>
+              <TableCell style={{width: '10%'}}>
+                &nbsp;
+              </TableCell>
             </TableRow>
           </TableHead>
           <TableBody>
             <TableRow>
-              <TableCell>Ventas con iva ($)</TableCell>
-              <TableCell align="right">{formatNumber(salesTotalWithTax)}</TableCell>
+              <TableCell>
+                <b>
+                  Ventas con iva ($)
+                </b>
+              </TableCell>
+              <TableCell>&nbsp;</TableCell>
+              <TableCell align="right">
+                <b>
+                  {formatNumber(salesTotalWithTax)}
+                </b>
+              </TableCell>
             </TableRow>
             <TableRow>
+              <TableCell>&nbsp;</TableCell>
               <TableCell>Precio de bolsa (con iva)</TableCell>
               <TableCell align="right">{formatNumber(kiloPrice)}</TableCell>
             </TableRow>
             <TableRow>
+              <TableCell>&nbsp;</TableCell>
               <TableCell>Kilos de bolsa en ventas</TableCell>
               <TableCell align="right">{formatNumber(kilosMainProduct)}</TableCell>
             </TableRow>
             <TableRow>
+              <TableCell>&nbsp;</TableCell>
               <TableCell>IVA en ventas</TableCell>
               <TableCell align="right">{formatNumber(salesTax)}</TableCell>
             </TableRow>
             <TableRow>
-              <TableCell>Gastos</TableCell>
-              <TableCell align="right">{formatNumber(expensesTotal)}</TableCell>
+              <TableCell>
+                <b>
+                  Gastos
+                </b>
+              </TableCell>
+              <TableCell>&nbsp;</TableCell>
+              <TableCell align="right">
+                <b>
+                  {formatNumber(expensesTotal)}
+                </b>
+              </TableCell>
             </TableRow>
             <TableRow>
+              <TableCell>&nbsp;</TableCell>
               <TableCell>IVA en gastos</TableCell>
               <TableCell align="right">{formatNumber(taxExpenses)}</TableCell>
             </TableRow>
             <TableRow>
-              <TableCell>Otros ingresos</TableCell>
-              <TableCell align="right">{formatNumber(otherIncomesTotal)}</TableCell>
+              <TableCell>
+                <b>
+                  Otros ingresos
+                </b>
+              </TableCell>
+              <TableCell>&nbsp;</TableCell>
+              <TableCell align="right">
+                <b>
+                  {formatNumber(otherIncomesTotal)}
+                </b>
+              </TableCell>
             </TableRow>
             <TableRow>
-              <TableCell>Utilidad</TableCell>
-              <TableCell align="right">{formatNumber(utility)}</TableCell>
+              <TableCell>
+                <b>
+                  Utilidad
+                </b>
+              </TableCell>
+              <TableCell>&nbsp;</TableCell>
+              <TableCell align="right">
+                <b>
+                  {formatNumber(utility)}
+                </b>
+              </TableCell>
             </TableRow>
           </TableBody>
         </Table>
