@@ -120,6 +120,14 @@ function getDayRange(day = 0, content) {
 }
 
 
+const formatNumber = (x, digits = 2) => {
+  if (x < 0.01 && x > -0.01) {
+    x = 0
+  }
+  return x.toFixed(digits).toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",")
+}
+
+
 //Fix call in useEffect that is leaking memory (because is trying to set state in before component mounts?)
 
 function Production(props) {
@@ -147,20 +155,26 @@ function Production(props) {
             pageSizeOptions: [25, 40, 60]
           }}
           columns={[
-            { title: 'Fecha de pago', field: 'date_paid' },
+            { title: 'Fecha de pago',
+              field: 'date_paid',
+              defaultSort: 'desc'
+            },
             {
               title: 'Proveedor',
+              sorting: false,
               render: (rawData) => {
                 return <div>{rawData.supplier.name}</div>
               }
             },
             {
               title: 'Total',
+              sorting: false,
+              type: 'currency',
               render: (rawData) => {
                 let expenseItemsTotal = rawData.expense_items.reduce((a, b) => {
                   return a + b.subtotal
                 }, 0)
-                return <div>{expenseItemsTotal}</div>
+                return <>{formatNumber(expenseItemsTotal)}</>
               }
             }
           ]}
@@ -170,9 +184,11 @@ function Production(props) {
               console.log(query)
               url += 'per_page=' + query.pageSize
               url += '&page=' + (query.page + 1)
+              if (query.orderBy) {
+                url += '&sort=' + query.orderBy.field + '|' + query.orderDirection
+              }
               axios.get(url, {headers: {...authHeader()}})
                 .then(response => {
-                  console.log(response)
                   return response.data
                 })
                 .then(result => {
