@@ -194,7 +194,8 @@ function Production(props) {
 
           options={{
             pageSize: 25,
-            pageSizeOptions: [25, 40, 60]
+            pageSizeOptions: [25, 40, 60],
+            selection: true
           }}
           columns={[
             {
