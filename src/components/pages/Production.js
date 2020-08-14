@@ -167,6 +167,7 @@ function Production(props) {
           data={query =>
             new Promise((resolve, reject) => {
               let url = apiUrl + 'expense/list?'
+              console.log(query)
               url += 'per_page=' + query.pageSize
               url += '&page=' + (query.page + 1)
               axios.get(url, {headers: {...authHeader()}})
