@@ -25,9 +25,6 @@ export default class LineAreaChart extends PureComponent {
             <AreaChart
               height={300}
               data={this.props.data}
-              margin={{
-                top: 10, bottom: 20,
-              }}
             >
               <CartesianGrid strokeDasharray="3 3" />
               <XAxis dataKey={this.props.xDataKey} angle={-45} textAnchor="end" interval={0}/>

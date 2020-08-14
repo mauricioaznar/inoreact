@@ -38,6 +38,7 @@ function EquilibriumSummary(props) {
 
 
   let salesTotalWithTax = 0
+  let salesTotal = 0
   let kilosMainProduct = 0
   let salesTax = 0
   let expensesNoEstimatesTotal = 0
@@ -46,6 +47,7 @@ function EquilibriumSummary(props) {
   let otherIncomesTotal = 0
   let taxExpenses = 0
   let utility = 0
+  let kiloPriceWithTax = 0
   let kiloPrice = 0
 
   if (props.sales && props.expensesNoEstimates && props.expensesEstimates && props.invoices && props.otherIncomes) {
@@ -65,6 +67,7 @@ function EquilibriumSummary(props) {
       .forEach((sale) => {
         kilosMainProduct += sale.product_type_id === 1 ? sale.kilos_sold : 0
         salesTotalWithTax += sale.total_with_tax
+        salesTotal += sale.total
         salesTax += sale.tax
       })
 
@@ -94,7 +97,9 @@ function EquilibriumSummary(props) {
         taxExpenses += invoice.tax
       })
 
-    kiloPrice = salesTotalWithTax / kilosMainProduct
+    kiloPriceWithTax = salesTotalWithTax / kilosMainProduct
+
+    kiloPrice = salesTotal / kilosMainProduct
 
     expensesTotal = expensesEstimatesTotal + expensesNoEstimatesTotal
 
@@ -109,18 +114,23 @@ function EquilibriumSummary(props) {
         <Table
           className={classes.table}
           stickyHeader
+          size={'small'}
           aria-label="simple table"
         >
           <TableHead>
             <TableRow>
-              <TableCell style={{width: '45%'}}>
+              <TableCell style={{width: '35%'}}>
+                <b>
+                  Utilidad
+                </b>
+              </TableCell>
+              <TableCell style={{width: '35%'}}>
                 &nbsp;
               </TableCell>
-              <TableCell style={{width: '45%'}}>
-                &nbsp;
-              </TableCell>
-              <TableCell style={{width: '10%'}}>
-                &nbsp;
+              <TableCell align={'right'} style={{width: '30%'}}>
+                <b>
+                  {formatNumber(utility)}
+                </b>
               </TableCell>
             </TableRow>
           </TableHead>
@@ -128,7 +138,7 @@ function EquilibriumSummary(props) {
             <TableRow>
               <TableCell>
                 <b>
-                  Ventas con iva ($)
+                  Ventas ($) con iva
                 </b>
               </TableCell>
               <TableCell>&nbsp;</TableCell>
@@ -140,7 +150,17 @@ function EquilibriumSummary(props) {
             </TableRow>
             <TableRow>
               <TableCell>&nbsp;</TableCell>
+              <TableCell>Ventas ($) sin iva</TableCell>
+              <TableCell align="right">{formatNumber(salesTotal)}</TableCell>
+            </TableRow>
+            <TableRow>
+              <TableCell>&nbsp;</TableCell>
               <TableCell>Precio de bolsa (con iva)</TableCell>
+              <TableCell align="right">{formatNumber(kiloPriceWithTax)}</TableCell>
+            </TableRow>
+            <TableRow>
+              <TableCell>&nbsp;</TableCell>
+              <TableCell>Precio de bolsa (sin iva)</TableCell>
               <TableCell align="right">{formatNumber(kiloPrice)}</TableCell>
             </TableRow>
             <TableRow>
@@ -168,6 +188,16 @@ function EquilibriumSummary(props) {
             </TableRow>
             <TableRow>
               <TableCell>&nbsp;</TableCell>
+              <TableCell>Gastos reales</TableCell>
+              <TableCell align="right">{formatNumber(expensesNoEstimatesTotal)}</TableCell>
+            </TableRow>
+            <TableRow>
+              <TableCell>&nbsp;</TableCell>
+              <TableCell>Gastos estimados</TableCell>
+              <TableCell align="right">{formatNumber(expensesEstimatesTotal)}</TableCell>
+            </TableRow>
+            <TableRow>
+              <TableCell>&nbsp;</TableCell>
               <TableCell>IVA en gastos</TableCell>
               <TableCell align="right">{formatNumber(taxExpenses)}</TableCell>
             </TableRow>
@@ -181,19 +211,6 @@ function EquilibriumSummary(props) {
               <TableCell align="right">
                 <b>
                   {formatNumber(otherIncomesTotal)}
-                </b>
-              </TableCell>
-            </TableRow>
-            <TableRow>
-              <TableCell>
-                <b>
-                  Utilidad
-                </b>
-              </TableCell>
-              <TableCell>&nbsp;</TableCell>
-              <TableCell align="right">
-                <b>
-                  {formatNumber(utility)}
                 </b>
               </TableCell>
             </TableRow>

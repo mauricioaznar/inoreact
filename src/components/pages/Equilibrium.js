@@ -188,14 +188,14 @@ export default function Equilibrium(props) {
           item
           container
           direction={matchesXS ? 'column' : 'row'}
-          alignItems={'center'}
+          alignItems={'start'}
           spacing={8}
         >
           <Grid
             item
             xs={12}
-            sm={12}
-            md={4}
+            md={12}
+            lg={4}
           >
             <Grid item container direction={'column'}>
               <Grid
@@ -203,8 +203,8 @@ export default function Equilibrium(props) {
                 xs={12}
               >
                 <Typography
-                  variant={'h5'}
-                  style={{marginBottom: '0.5em'}}
+                  variant={'h6'}
+                  style={{marginBottom: '1.5em'}}
                 >
                   Resumen
                 </Typography>
@@ -229,8 +229,8 @@ export default function Equilibrium(props) {
           <Grid
             item
             xs={12}
-            sm={12}
-            md={8}
+            md={12}
+            lg={8}
           >
             <Grid item container direction={'column'}>
               <Grid
@@ -317,7 +317,7 @@ export default function Equilibrium(props) {
                   variant={'h5'}
                   style={{marginBottom: '0.5em'}}
                 >
-                  Gastos no estimados
+                  Gastos reales
                 </Typography>
               </Grid>
               <Grid
