@@ -138,29 +138,29 @@ function EquilibriumSummary(props) {
             <TableRow>
               <TableCell>
                 <b>
-                  Ventas ($) con iva
+                  Ventas ($) sin iva
                 </b>
               </TableCell>
               <TableCell>&nbsp;</TableCell>
               <TableCell align="right">
                 <b>
-                  {formatNumber(salesTotalWithTax)}
+                  {formatNumber(salesTotal)}
                 </b>
               </TableCell>
             </TableRow>
             <TableRow>
               <TableCell>&nbsp;</TableCell>
-              <TableCell>Ventas ($) sin iva</TableCell>
-              <TableCell align="right">{formatNumber(salesTotal)}</TableCell>
+              <TableCell>Ventas ($) con iva</TableCell>
+              <TableCell align="right">{formatNumber(salesTotalWithTax)}</TableCell>
             </TableRow>
             <TableRow>
               <TableCell>&nbsp;</TableCell>
-              <TableCell>Precio de bolsa (con iva)</TableCell>
+              <TableCell>Precio de bolsa con iva</TableCell>
               <TableCell align="right">{formatNumber(kiloPriceWithTax)}</TableCell>
             </TableRow>
             <TableRow>
               <TableCell>&nbsp;</TableCell>
-              <TableCell>Precio de bolsa (sin iva)</TableCell>
+              <TableCell>Precio de bolsa sin iva</TableCell>
               <TableCell align="right">{formatNumber(kiloPrice)}</TableCell>
             </TableRow>
             <TableRow>
