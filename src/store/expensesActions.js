@@ -18,3 +18,11 @@ export const setExpenseSubcategories = (expenseSubcategories) => {
     expenseSubcategories: expenseSubcategories
   }
 }
+
+
+export const setSuppliers = (suppliers) => {
+  return {
+    type: 'SET_SUPPLIERS',
+    suppliers: suppliers
+  }
+}

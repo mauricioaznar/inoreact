@@ -26,6 +26,11 @@ import axios from 'axios'
 import apiUrl from '../../helpers/apiUrl'
 import authHeader from '../../helpers/authHeader'
 import MaterialTable from 'material-table'
+import {
+  KeyboardDatePicker, MuiPickersUtilsProvider,
+} from '@material-ui/pickers'
+import DateFnsUtils from '@date-io/date-fns';
+import TextField from '@material-ui/core/TextField'
 
 const useStyles = makeStyles((theme) => {
   return {
@@ -136,6 +141,8 @@ function Production(props) {
 
   const theme = useTheme()
 
+  console.log(props)
+
   return (
     <Grid
       xs={12}
@@ -150,21 +157,67 @@ function Production(props) {
         <MaterialTable
           icons={tableIcons}
           title="POPIS"
+
+          editable={{
+            onBulkUpdate: changes =>
+              new Promise((resolve, reject) => {
+                setTimeout(() => {
+                  /* setData([...data, newData]); */
+                  console.log('Bulk update')
+                  console.log(changes)
+                  resolve();
+                }, 1000);
+              }),
+            onRowAddCancelled: rowData => console.log('Row adding cancelled'),
+            onRowUpdateCancelled: rowData => console.log('Row editing cancelled'),
+            onRowAdd: newData =>
+              new Promise((resolve, reject) => {
+                setTimeout(() => {
+                  resolve();
+                }, 1000);
+              }),
+            onRowUpdate: (newData, oldData) =>
+              new Promise((resolve, reject) => {
+                console.log(newData)
+                setTimeout(() => {
+                  resolve();
+                }, 1000);
+              }),
+            onRowDelete: oldData =>
+              new Promise((resolve, reject) => {
+
+                setTimeout(() => {
+                  resolve();
+                }, 1000);
+              })
+          }}
+
           options={{
             pageSize: 25,
             pageSizeOptions: [25, 40, 60]
           }}
           columns={[
-            { title: 'Fecha de pago',
+            {
+              title: 'Fecha de pago',
               field: 'date_paid',
-              defaultSort: 'desc'
+              type: 'date',
+              dateSetting: { locale: 'en-ca' },
+              defaultSort: 'desc',
+              editComponent: (props) => {
+                return (
+                  <TextField
+                    id="date"
+                    type="date"
+                    value={props.value}
+                    onChange={e => props.onChange(e.target.value)}
+                  />
+                )
+              }
             },
             {
               title: 'Proveedor',
-              sorting: false,
-              render: (rawData) => {
-                return <div>{rawData.supplier.name}</div>
-              }
+              field: 'supplier_id',
+              lookup: props.suppliers
             },
             {
               title: 'Total',
@@ -209,7 +262,11 @@ function Production(props) {
 const mapStateToProps = (state, ownProps) => {
   return {
     machines: state.production.machines,
-    productTypes: state.production.productTypes
+    productTypes: state.production.productTypes,
+    suppliers: state.expenses.suppliers
+      .reduce((prevObject, supplier)=> {
+        return {...prevObject, [supplier.id]: supplier.name}
+      }, {})
   }
 }
 
