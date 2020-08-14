@@ -1,21 +1,31 @@
-import React from 'react'
+import React, {forwardRef} from 'react'
 import {connect} from 'react-redux'
 
+
+import AddBox from '@material-ui/icons/AddBox';
+import ArrowDownward from '@material-ui/icons/ArrowDownward';
+import Check from '@material-ui/icons/Check';
+import ChevronLeft from '@material-ui/icons/ChevronLeft';
+import ChevronRight from '@material-ui/icons/ChevronRight';
+import Clear from '@material-ui/icons/Clear';
+import DeleteOutline from '@material-ui/icons/DeleteOutline';
+import Edit from '@material-ui/icons/Edit';
+import FilterList from '@material-ui/icons/FilterList';
+import FirstPage from '@material-ui/icons/FirstPage';
+import LastPage from '@material-ui/icons/LastPage';
+import Remove from '@material-ui/icons/Remove';
+import SaveAlt from '@material-ui/icons/SaveAlt';
+import Search from '@material-ui/icons/Search';
+import ViewColumn from '@material-ui/icons/ViewColumn'
 
 import moment from 'moment'
 import Grid from '@material-ui/core/Grid'
 import Typography from '@material-ui/core/Typography'
 import {makeStyles, useTheme} from '@material-ui/core/styles'
-
-import ProductionEventChart from '../ui/ProductionEventChart'
 import axios from 'axios'
 import apiUrl from '../../helpers/apiUrl'
 import authHeader from '../../helpers/authHeader'
-import {isNumber} from 'recharts/lib/util/DataUtils'
-import InputLabel from '@material-ui/core/InputLabel'
-import Select from '@material-ui/core/Select'
-import MenuItem from '@material-ui/core/MenuItem'
-import FormControl from '@material-ui/core/FormControl'
+import MaterialTable from 'material-table'
 
 const useStyles = makeStyles((theme) => {
   return {
@@ -28,6 +38,26 @@ const useStyles = makeStyles((theme) => {
 
 const dateFormat = 'YYYY-MM-DD'
 
+
+const tableIcons = {
+  Add: forwardRef((props, ref) => <AddBox {...props} ref={ref} />),
+  Check: forwardRef((props, ref) => <Check {...props} ref={ref} />),
+  Clear: forwardRef((props, ref) => <Clear {...props} ref={ref} />),
+  Delete: forwardRef((props, ref) => <DeleteOutline {...props} ref={ref} />),
+  DetailPanel: forwardRef((props, ref) => <ChevronRight {...props} ref={ref} />),
+  Edit: forwardRef((props, ref) => <Edit {...props} ref={ref} />),
+  Export: forwardRef((props, ref) => <SaveAlt {...props} ref={ref} />),
+  Filter: forwardRef((props, ref) => <FilterList {...props} ref={ref} />),
+  FirstPage: forwardRef((props, ref) => <FirstPage {...props} ref={ref} />),
+  LastPage: forwardRef((props, ref) => <LastPage {...props} ref={ref} />),
+  NextPage: forwardRef((props, ref) => <ChevronRight {...props} ref={ref} />),
+  PreviousPage: forwardRef((props, ref) => <ChevronLeft {...props} ref={ref} />),
+  ResetSearch: forwardRef((props, ref) => <Clear {...props} ref={ref} />),
+  Search: forwardRef((props, ref) => <Search {...props} ref={ref} />),
+  SortArrow: forwardRef((props, ref) => <ArrowDownward {...props} ref={ref} />),
+  ThirdStateCheck: forwardRef((props, ref) => <Remove {...props} ref={ref} />),
+  ViewColumn: forwardRef((props, ref) => <ViewColumn {...props} ref={ref} />)
+};
 
 const useFetch = (url) => {
   const [data, setData] = React.useState(null);
@@ -97,150 +127,63 @@ function Production(props) {
   const classes = useStyles()
 
   const theme = useTheme()
-  const [machineTypeId, setMachineTypeId] = React.useState(1)
-
-  const productionEvents = useFetch(apiUrl + 'analytics/productionEvents?dateGroup=day')
-  const productionByProductType = useFetch(apiUrl + 'analytics/production?dateGroup=day')
-
-  const handleChange = (event) => {
-    setMachineTypeId(event.target.value);
-  };
-
-
-  let machinesIdObject = props.machines
-    .reduce(function (obj, itm) {
-      obj[itm.name] = 0;
-      return obj;
-    }, {})
-  let machineNamesArray = props.machines
-    .filter(machine => {
-      return machine.machine_type_id === machineTypeId
-    })
-    .map(machine => {
-      return machine.name
-    })
-
-  let dayRangeEvents = getDayRange(-200, machinesIdObject)
-
-  if (productionEvents) {
-    console.log(productionEvents)
-    console.log(dayRangeEvents)
-    productionEvents.forEach(result => {
-      let dayRangeFound = dayRangeEvents.find(range => {
-        return result.start_date === range.date
-      })
-      if (dayRangeFound) {
-        dayRangeFound[result.machine_name] += isNaN(result.duration) ? 0 : Number(result.duration)
-      }
-    })
-  }
-
-  let productTypeObject = props.productTypes.reduce(function (obj, itm) {
-    obj[itm.name] = 0;
-    return obj;
-  }, {})
-  let productTypeNamesArray = props.productTypes.filter(productType => productType.id !== 3)
-    .map(productType => {
-      return productType.name
-    })
-  let dayRangeProduction = getDayRange(-200, productTypeObject)
-  if (productionByProductType) {
-    productionByProductType.forEach(result => {
-      let dayRangeFound = dayRangeProduction.find(range => {
-        return result.start_date === range.date
-      })
-      if (dayRangeFound) {
-        dayRangeFound[result.product_type_name] += Number(result.kilos)
-      }
-    })
-  }
 
   return (
     <Grid
+      xs={12}
       container
       direction={'column'}
     >
-      <Grid container>
-        <Grid
-          item
-          xs={12}
-          className={classes.rowContainer}
-          style={{marginTop: '4em', marginBottom: '4em'}}
-        >
-          <Typography variant={'h2'}>
-            Mantenimiento
-          </Typography>
-        </Grid>
-        <Grid
-          item
-          container
-          direction={'column'}
-          xs={12}
-          className={classes.rowContainer}
-          style={{marginBottom: '2em'}}
-        >
-          <Grid
-            item
-            xs={12}
-          >
-            <Typography variant={'h5'}>
-              Minutos de paro vs maquinas
-            </Typography>
-          </Grid>
-          <Grid
-            item
-            style={{marginTop: '1.5em', marginBottom: '1.5em'}}
-            xs={12}
-            sm={3}
-            md={2}
-          >
-            <FormControl
-              className={classes.formControl}
-              fullWidth
-            >
-              <Select
-                labelId="demo-simple-select-label"
-                id="demo-simple-select"
-                value={machineTypeId}
-                onChange={handleChange}
-              >
-                <MenuItem value={1}>Bolseo</MenuItem>
-                <MenuItem value={2}>Extrusion</MenuItem>
-              </Select>
-            </FormControl>
-          </Grid>
-          <Grid
-            item
-            xs={12}
-          >
-            <ProductionEventChart
-              dataKeys={machineNamesArray}
-              data={dayRangeEvents}
-              xDataKey={'day'}
-            />
-          </Grid>
-        </Grid>
-        <Grid
-          item
-          container
-          xs={12}
-          className={classes.rowContainer}
-          style={{marginBottom: '2em'}}
-        >
-          <Grid item xs={12} style={{marginBottom: '1.5em'}}>
-            <Typography variant={'h5'}>
-              Kilos producidos por tipo de producto
-            </Typography>
-          </Grid>
-
-          <Grid item xs={12}>
-            <ProductionEventChart
-              dataKeys={productTypeNamesArray}
-              data={dayRangeProduction}
-              xDataKey={'day'}
-            />
-          </Grid>
-        </Grid>
+      <Grid
+        item
+        className={classes.rowContainer}
+        style={{marginTop: '2em'}}
+      >
+        <MaterialTable
+          icons={tableIcons}
+          title="POPIS"
+          options={{
+            pageSize: 25,
+            pageSizeOptions: [25, 40, 60]
+          }}
+          columns={[
+            { title: 'Fecha de pago', field: 'date_paid' },
+            {
+              title: 'Proveedor',
+              render: (rawData) => {
+                return <div>{rawData.supplier.name}</div>
+              }
+            },
+            {
+              title: 'Total',
+              render: (rawData) => {
+                let expenseItemsTotal = rawData.expense_items.reduce((a, b) => {
+                  return a + b.subtotal
+                }, 0)
+                return <div>{expenseItemsTotal}</div>
+              }
+            }
+          ]}
+          data={query =>
+            new Promise((resolve, reject) => {
+              let url = apiUrl + 'expense/list?'
+              url += 'per_page=' + query.pageSize
+              url += '&page=' + (query.page + 1)
+              axios.get(url, {headers: {...authHeader()}})
+                .then(response => {
+                  console.log(response)
+                  return response.data
+                })
+                .then(result => {
+                  resolve({
+                    data: result.data,
+                    page: result.links.pagination.current_page - 1,
+                    totalCount: result.links.pagination.total,
+                  })
+                })
+            })
+          }
+        />
       </Grid>
     </Grid>
   )
