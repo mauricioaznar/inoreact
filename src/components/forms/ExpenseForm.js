@@ -94,7 +94,8 @@ const ExpenseForm = (props) => {
   const {register, handleSubmit, reset, watch, control, setValue, getValues} = useForm({
     defaultValues: {
       description: props.expense.description,
-      expense_items: props.expense.expense_items
+      expense_items: props.expense.expense_items,
+      expense_subcategories: initialExpenseSubcategories
     }
   });
 
@@ -106,6 +107,13 @@ const ExpenseForm = (props) => {
     }
   );
 
+  useEffect(() => {
+    register({name: "expense_subcategories"},
+      {
+        required: true,
+        validate: (value) => {return value.length > 0}
+      });
+  }, []);
 
   const classes = useStyles()
 
@@ -126,6 +134,7 @@ const ExpenseForm = (props) => {
   }
 
   const handleAutocompleteChange = (e, data) => {
+    setValue('expense_subcategories', data)
     data.forEach(expenseSubcategory => {
       let foundExpenseItem = props.expense.expense_items.find(expenseItem => {
         return expenseItem.expense_subcategory_id === expenseSubcategory.id
