@@ -109,15 +109,6 @@ const ExpenseForm = (props) => {
 
   const classes = useStyles()
 
-  useEffect(() => {
-    register({name: "expense_items"},
-      {
-        required: true,
-        validate: (value) => {return value.length > 0}
-      });
-  }, []);
-
-
   const buttonClassname = clsx({
     [classes.buttonSuccess]: success
   });
