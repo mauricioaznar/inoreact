@@ -74,17 +74,23 @@ const ExpenseForm = (props) => {
   const [loading, setLoading] = React.useState(false);
   const [success, setSuccess] = React.useState(false);
 
+  const initialExpenseSubcategoriesIds = props.expense.expense_items.map(expenseItem => expenseItem.expense_subcategory_id)
+  const initialExpenseSubcategories = props.expenseSubcategories.filter(expenseSubcategory => {
+    return initialExpenseSubcategoriesIds.includes(expenseSubcategory.id)
+  })
+
+
   const {register, handleSubmit, reset, watch, control, setValue, getValues} = useForm({
     defaultValues: {
       description: props.expense.description,
-      expense_items: []
+      expense_subcategories: initialExpenseSubcategories
     }
   });
 
   const classes = useStyles()
 
   useEffect(() => {
-    register({name: "expense_items"},
+    register({name: "expense_subcategories"},
       {
         required: true,
         validate: (value) => {return value.length > 0}
@@ -109,7 +115,7 @@ const ExpenseForm = (props) => {
   }
 
   const handleAutocompleteChange = (e, data) => {
-    setValue('expense_items', data)
+    setValue('expense_subcategories', data)
   }
 
   return (
@@ -146,14 +152,13 @@ const ExpenseForm = (props) => {
           >
 
             <Autocomplete
-              options={top100Films}
+              options={props.expenseSubcategories}
               multiple
-              getOptionLabel={option => option.title}
-              defaultValue={top100Films
-                .filter((film) => {
-                  return film.year !== 1993
-                }
-              )}
+              getOptionLabel={option => option.name}
+              defaultValue={initialExpenseSubcategories}
+              groupBy={option => {
+                return option.expense_category_id
+              }}
               onChange={handleAutocompleteChange}
               renderInput={params => {
                 return (
@@ -167,32 +172,6 @@ const ExpenseForm = (props) => {
                 );
               }}
             />
-            {/*<Controller*/}
-            {/*  name={'subcategories'}*/}
-            {/*  control={control}*/}
-            {/*  onChange={([, obj]) => getOpObj(obj).id}*/}
-            {/*  defaultValue={props.expenseSubcategories[0]}*/}
-            {/*  as={*/}
-            {/*   <Autocomplete*/}
-            {/*     multiple*/}
-            {/*     options={props.expenseSubcategories}*/}
-            {/*     getOptionLabel={option => option.name}*/}
-            {/*     getOptionSelected={(option, value) => {*/}
-            {/*       return option.id === getOpObj(value).id;*/}
-            {/*     }}*/}
-            {/*     renderInput={params => (*/}
-            {/*       <TextField*/}
-            {/*         {...params}*/}
-            {/*         variant="standard"*/}
-            {/*         label="Multiple values"*/}
-            {/*         placeholder="Favorites"*/}
-            {/*         margin="normal"*/}
-            {/*         fullWidth*/}
-            {/*       />*/}
-            {/*     )}*/}
-            {/*   />*/}
-            {/* }*/}
-            {/*/>*/}
           </FormControl>
         </Grid>
 
@@ -228,7 +207,9 @@ const ExpenseForm = (props) => {
 const mapStateToProps = (state) => {
   return {
     suppliers: state.expenses.suppliers,
-    expenseSubcategories: state.expenses.expenseSubcategories
+    expenseSubcategories: state.expenses.expenseSubcategories.sort((a, b) => {
+      return a.expense_category_id > b.expense_category_id ? 1 : -1
+    })
   }
 }
 
