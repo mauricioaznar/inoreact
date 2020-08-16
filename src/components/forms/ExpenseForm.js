@@ -253,7 +253,7 @@ const ExpenseForm = (props) => {
                         type="number"
                         name={`expense_items[${index}].subtotal`}
                         defaultValue={`${expenseItem.subtotal}`}
-                        inputRef={register({ required: true })}
+                        inputRef={register({ required: true, max: 1000000 })}
                       />
                     </TableCell>
                   </TableRow>
