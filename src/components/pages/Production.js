@@ -172,12 +172,19 @@ function Production(props) {
     console.log(expense)
 
     if (expense.id) {
-      axios.put(apiUrl + 'expense/' + expense.id, {...expense}, {headers: {...authHeader()}})
-        .then((response) => {
-          callback(true)
-          tableRef.current && tableRef.current.onQueryChange()
-          setOpen(false)
-        })
+      let promises = []
+      promises.push(axios.put(apiUrl + 'expense/' + expense.id, {...expense}, {headers: {...authHeader()}}))
+      expense.expense_items.forEach(expenseItem => {
+        if (expenseItem.id) {
+          promises.push(axios.put(apiUrl + 'expenseItem/' + expenseItem.id, {...expenseItem}, {headers: {...authHeader()}}))
+        }
+      })
+      Promise.all(promises).then(results => {
+        console.log(results)
+        callback(true)
+        tableRef.current && tableRef.current.onQueryChange()
+        setOpen(false)
+      })
     }
   }
 

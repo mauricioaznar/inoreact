@@ -4,7 +4,7 @@ import {connect} from 'react-redux'
 
 import clsx from 'clsx';
 import {Input} from "@material-ui/core";
-import {useForm, Controller} from "react-hook-form";
+import {useForm, Controller, useFieldArray} from "react-hook-form";
 import {green} from '@material-ui/core/colors';
 import {makeStyles} from '@material-ui/core/styles'
 import FormControl from '@material-ui/core/FormControl'
@@ -94,16 +94,23 @@ const ExpenseForm = (props) => {
   const {register, handleSubmit, reset, watch, control, setValue, getValues} = useForm({
     defaultValues: {
       description: props.expense.description,
-      expense_subcategories: initialExpenseSubcategories
+      expense_items: props.expense.expense_items
     }
   });
 
+  const { fields, append, prepend, remove, swap, move, insert } = useFieldArray(
+    {
+      control,
+      name: "expense_items",
+      keyName: 'id'
+    }
+  );
+
+
   const classes = useStyles()
 
-  const watchExpenseSubcategories = watch('expense_subcategories')
-
   useEffect(() => {
-    register({name: "expense_subcategories"},
+    register({name: "expense_items"},
       {
         required: true,
         validate: (value) => {return value.length > 0}
@@ -128,7 +135,16 @@ const ExpenseForm = (props) => {
   }
 
   const handleAutocompleteChange = (e, data) => {
-    setValue('expense_subcategories', data)
+    data.forEach(expenseSubcategory => {
+      let foundExpenseItem = props.expense.expense_items.find(expenseItem => {
+        return expenseItem.expense_subcategory_id === expenseSubcategory.id
+      })
+      if (foundExpenseItem) {
+        append(foundExpenseItem)
+      } else {
+        append({expense_subcategory_id: expenseSubcategory.id, subtotal: 0})
+      }
+    })
   }
 
   return (
@@ -200,23 +216,46 @@ const ExpenseForm = (props) => {
             <Table aria-label="simple table" className={classes.table}>
               <TableHead>
                 <TableRow>
+                  <TableCell style={{display: 'none'}}>Id</TableCell>
                   <TableCell>Rubro</TableCell>
-                  <TableCell align="right">Calories</TableCell>
-                  <TableCell align="right">Fat&nbsp;(g)</TableCell>
-                  <TableCell align="right">Carbs&nbsp;(g)</TableCell>
-                  <TableCell align="right">Protein&nbsp;(g)</TableCell>
+                  <TableCell align="right">Subtotal</TableCell>
                 </TableRow>
               </TableHead>
               <TableBody>
-                {watchExpenseSubcategories.map((expenseSubcategory) => (
-                  <TableRow key={expenseSubcategory.name}>
-                    <TableCell component="th" scope="row">
-                      {expenseSubcategory.name}
+                {fields.map((expenseItem, index) => (
+                  <TableRow key={expenseItem.expense_subcategory_id}>
+                    <TableCell style={{display: 'none'}}>
+                      <TextField
+                        id="standard-number"
+                        label="Number"
+                        type="number"
+                        disabled
+                        name={`expense_items[${index}].id`}
+                        defaultValue={`${expenseItem.id}`}
+                        inputRef={register}
+                      />
                     </TableCell>
-                    <TableCell align="right"></TableCell>
-                    <TableCell align="right"></TableCell>
-                    <TableCell align="right"></TableCell>
-                    <TableCell align="right"></TableCell>
+                    <TableCell>
+                      <TextField
+                        id="standard-number"
+                        label="Number"
+                        type="number"
+                        disabled
+                        name={`expense_items[${index}].expense_subcategory_id`}
+                        defaultValue={`${expenseItem.expense_subcategory_id}`}
+                        inputRef={register({ required: true })}
+                      />
+                    </TableCell>
+                    <TableCell align="right">
+                      <TextField
+                        id="standard-number"
+                        label="Number"
+                        type="number"
+                        name={`expense_items[${index}].subtotal`}
+                        defaultValue={`${expenseItem.subtotal}`}
+                        inputRef={register({ required: true })}
+                      />
+                    </TableCell>
                   </TableRow>
                 ))}
               </TableBody>
