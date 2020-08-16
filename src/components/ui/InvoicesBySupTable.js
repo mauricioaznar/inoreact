@@ -1,8 +1,6 @@
 import React from 'react';
-import PropTypes from 'prop-types'
 import {connect} from 'react-redux'
 import moment from 'moment'
-import axios from 'axios'
 import xlsx from 'xlsx'
 import fileSaver from 'file-saver'
 
@@ -42,7 +40,7 @@ const formatCompletion= (x, y) => {
   return x + ' / ' + y
 }
 
-const dateFormat = 'YYYY-MM-DD'
+// const dateFormat = 'YYYY-MM-DD'
 
 
 
@@ -149,18 +147,6 @@ function InvoicesBySupTable(props) {
         </Grid>
     </>
   );
-}
-
-
-
-function compare( a, b ) {
-  if ( a.total < b.total ){
-    return 1;
-  }
-  if ( a.total > b.total ){
-    return -1;
-  }
-  return 0;
 }
 
 

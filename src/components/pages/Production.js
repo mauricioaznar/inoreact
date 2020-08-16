@@ -20,23 +20,13 @@ import ViewColumn from '@material-ui/icons/ViewColumn'
 
 import moment from 'moment'
 import Grid from '@material-ui/core/Grid'
-import Typography from '@material-ui/core/Typography'
 import {makeStyles, useTheme} from '@material-ui/core/styles'
 import axios from 'axios'
 import apiUrl from '../../helpers/apiUrl'
 import authHeader from '../../helpers/authHeader'
 import MaterialTable from 'material-table'
-import {
-  KeyboardDatePicker, MuiPickersUtilsProvider,
-} from '@material-ui/pickers'
-import DateFnsUtils from '@date-io/date-fns';
 import TextField from '@material-ui/core/TextField'
 import Dialog from '@material-ui/core/Dialog'
-import DialogTitle from '@material-ui/core/DialogTitle'
-import DialogContent from '@material-ui/core/DialogContent'
-import DialogContentText from '@material-ui/core/DialogContentText'
-import DialogActions from '@material-ui/core/DialogActions'
-import Button from '@material-ui/core/Button'
 import ExpenseForm from '../forms/ExpenseForm'
 import useMediaQuery from '@material-ui/core/useMediaQuery'
 import Slide from '@material-ui/core/Slide'
@@ -178,6 +168,8 @@ function Production(props) {
   };
 
   const handleOnSubmit = (expense, callback) => {
+
+    console.log(expense)
 
     if (expense.id) {
       axios.put(apiUrl + 'expense/' + expense.id, {...expense}, {headers: {...authHeader()}})

@@ -3,13 +3,12 @@ import React, {useEffect} from "react";
 import {connect} from 'react-redux'
 
 import clsx from 'clsx';
-import {Input, Select, MenuItem} from "@material-ui/core";
+import {Input} from "@material-ui/core";
 import {useForm, Controller} from "react-hook-form";
-import { green } from '@material-ui/core/colors';
+import {green} from '@material-ui/core/colors';
 import {makeStyles} from '@material-ui/core/styles'
 import FormControl from '@material-ui/core/FormControl'
 import CircularProgress from '@material-ui/core/CircularProgress'
-import Button from '@material-ui/core/Button';
 import Fab from '@material-ui/core/Fab';
 import CheckIcon from '@material-ui/icons/Check';
 import SaveIcon from '@material-ui/icons/Save';
@@ -24,23 +23,23 @@ const useStyles = makeStyles((theme) => {
     },
     root: {
       display: 'flex',
-      alignItems: 'center',
+      alignItems: 'center'
     },
     wrapper: {
-      position: 'relative',
+      position: 'relative'
     },
     buttonSuccess: {
       backgroundColor: green[500],
       '&:hover': {
-        backgroundColor: green[700],
-      },
+        backgroundColor: green[700]
+      }
     },
     fabProgress: {
       color: green[500],
       position: 'absolute',
       top: -6,
       left: -6,
-      zIndex: 1,
+      zIndex: 1
     },
     buttonProgress: {
       color: green[500],
@@ -48,24 +47,55 @@ const useStyles = makeStyles((theme) => {
       top: '50%',
       left: '50%',
       marginTop: -12,
-      marginLeft: -12,
-    },
+      marginLeft: -12
+    }
   }
 })
+
+
+const options = [
+  {_id: 1, name: "Country 1"},
+  {_id: 2, name: "Country 2"},
+  {_id: 3, name: "Country 3"}
+];
+
+const top100Films = [
+  {title: "The Shawshank Redemption", year: 1994},
+  {title: "The Godfather", year: 1972},
+  {title: "The Godfather: Part II", year: 1974},
+  {title: "The Dark Knight", year: 2008},
+  {title: "12 Angry Men", year: 1957},
+  {title: "Schindler's List", year: 1993}
+];
+
 
 const ExpenseForm = (props) => {
 
   const [loading, setLoading] = React.useState(false);
   const [success, setSuccess] = React.useState(false);
 
-  const {register, handleSubmit, reset, watch, control} = useForm({defaultValues: {
-      description: props.expense.description
-    }});
+  const {register, handleSubmit, reset, watch, control, setValue, getValues} = useForm({
+    defaultValues: {
+      description: props.expense.description,
+      something: 'something',
+      expenseItems: []
+    }
+  });
 
   const classes = useStyles()
 
+  useEffect(() => {
+    register({name: 'something'})
+    register({name: "expenseItems"},
+      {
+        required: true,
+        validate: (value) => {return value.length > 0}
+      });
+  }, []);
+
+
   const buttonClassname = clsx({
-    [classes.buttonSuccess]: success,
+    [classes.buttonSuccess]: success
   });
 
   const onSubmit = data => {
@@ -80,83 +110,118 @@ const ExpenseForm = (props) => {
     setLoading(false);
   }
 
-  const onTagsChange = (event, values) => {
-
+  const handleAutocompleteChange = (e, data) => {
+    setValue('expenseItems', data)
   }
 
   return (
     <form>
-       <Grid
-         container
-         direction={'column'}
-       >
-         <Grid
-           item
-           xs={12}
-           className={classes.rowContainer}
-           style={{marginTop: '2em'}}
-         >
-           <FormControl
+      <Grid
+        container
+        direction={'column'}
+      >
+        <Grid
+          item
+          xs={12}
+          className={classes.rowContainer}
+          style={{marginTop: '2em'}}
+        >
+          <FormControl
             fullWidth
-           >
-             <Input
-               inputRef={register({required: true})}
-               name="description"
-             />
-           </FormControl>
-         </Grid>
+          >
+            <Input
+              inputRef={register({required: true})}
+              name="description"
+            />
+          </FormControl>
+        </Grid>
 
 
-         <Grid
-           item
-           xs={12}
-           className={classes.rowContainer}
-           style={{marginTop: '2em'}}
-         >
-           <FormControl
+        <Grid
+          item
+          xs={12}
+          className={classes.rowContainer}
+          style={{marginTop: '2em'}}
+        >
+          <FormControl
             fullWidth
-           >
-             <Autocomplete
-               multiple
-               disableCloseOnSelect
-               options={props.expenseSubcategories}
-               getOptionLabel={option => option.name}
-               onChange={onTagsChange}
-               renderInput={params => (
-                 <TextField
-                   {...params}
-                   variant="standard"
-                   label="Multiple values"
-                   placeholder="Favorites"
-                   margin="normal"
-                   fullWidth
-                 />
-               )}
-             />
-           </FormControl>
-         </Grid>
+          >
 
-         <Grid
-           item
-           xs={12}
-           className={classes.rowContainer}
-           style={{marginTop: '2em', marginBottom: '2em'}}
-         >
-           <div className={classes.wrapper}>
-             <Fab
-               aria-label="save"
-               color="primary"
-               className={buttonClassname}
-               onClick={handleSubmit(onSubmit)}
-             >
-               {success ? <CheckIcon /> : <SaveIcon />}
-             </Fab>
-             {loading && <CircularProgress size={68} className={classes.fabProgress} />}
-           </div>
-         </Grid>
+            <Autocomplete
+              options={top100Films}
+              multiple
+              getOptionLabel={option => option.title}
+              defaultValue={top100Films
+                .filter((film) => {
+                  return film.year !== 1993
+                }
+              )}
+              onChange={handleAutocompleteChange}
+              renderInput={params => {
+                return (
+                  <TextField
+                    {...params}
+                    label={"Resolution Code"}
+                    variant="outlined"
+                    name={"resolutionCode"}
+                    fullWidth
+                  />
+                );
+              }}
+            />
+            {/*<Controller*/}
+            {/*  name={'subcategories'}*/}
+            {/*  control={control}*/}
+            {/*  onChange={([, obj]) => getOpObj(obj).id}*/}
+            {/*  defaultValue={props.expenseSubcategories[0]}*/}
+            {/*  as={*/}
+            {/*   <Autocomplete*/}
+            {/*     multiple*/}
+            {/*     options={props.expenseSubcategories}*/}
+            {/*     getOptionLabel={option => option.name}*/}
+            {/*     getOptionSelected={(option, value) => {*/}
+            {/*       return option.id === getOpObj(value).id;*/}
+            {/*     }}*/}
+            {/*     renderInput={params => (*/}
+            {/*       <TextField*/}
+            {/*         {...params}*/}
+            {/*         variant="standard"*/}
+            {/*         label="Multiple values"*/}
+            {/*         placeholder="Favorites"*/}
+            {/*         margin="normal"*/}
+            {/*         fullWidth*/}
+            {/*       />*/}
+            {/*     )}*/}
+            {/*   />*/}
+            {/* }*/}
+            {/*/>*/}
+          </FormControl>
+        </Grid>
+
+        <Grid
+          item
+          xs={12}
+          className={classes.rowContainer}
+          style={{marginTop: '2em', marginBottom: '2em'}}
+        >
+          <div className={classes.wrapper}>
+            <Fab
+              aria-label="save"
+              color="primary"
+              className={buttonClassname}
+              onClick={handleSubmit(onSubmit)}
+            >
+              {success ? <CheckIcon/> : <SaveIcon/>}
+            </Fab>
+            {loading && <CircularProgress
+              size={68}
+              className={classes.fabProgress}
+            />}
+          </div>
+        </Grid>
 
 
-       </Grid>
+      </Grid>
     </form>
   )
 }
