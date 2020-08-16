@@ -38,6 +38,8 @@ import DialogContentText from '@material-ui/core/DialogContentText'
 import DialogActions from '@material-ui/core/DialogActions'
 import Button from '@material-ui/core/Button'
 import ExpenseForm from '../forms/ExpenseForm'
+import useMediaQuery from '@material-ui/core/useMediaQuery'
+import Slide from '@material-ui/core/Slide'
 
 const useStyles = makeStyles((theme) => {
   return {
@@ -49,6 +51,10 @@ const useStyles = makeStyles((theme) => {
 })
 
 const dateFormat = 'YYYY-MM-DD'
+
+const Transition = React.forwardRef(function Transition(props, ref) {
+  return <Slide direction="up" ref={ref} {...props} />;
+});
 
 
 const tableIcons = {
@@ -122,50 +128,6 @@ const tableIcons = {
   />)
 };
 
-const useFetch = (url) => {
-  const [data, setData] = React.useState(null);
-
-  // empty array as second argument equivalent to componentDidMount
-  React.useEffect(() => {
-    let unmounted = false
-
-    async function fetchData() {
-      const response = await axios.get(url, {headers: {...authHeader()}});
-      if (!unmounted) {
-        setData(response.data.data)
-      }
-    }
-
-    if (!unmounted) {
-      fetchData();
-    }
-    return () => {
-      unmounted = true
-    };
-  }, [url]);
-
-  return data;
-};
-
-function getWeekRange(week = 0, content) {
-  let currentStart = moment().add(week, 'weeks').startOf('week');
-  let endWeek = moment().startOf('week')
-  let weeks = []
-
-  while (currentStart.isBefore(endWeek, '[]')) {
-    weeks.push({
-      first_day_of_the_week: currentStart.startOf('week').format(dateFormat),
-      last_day_of_the_week: currentStart.endOf('week').format(dateFormat),
-      current_week_number: '#' + currentStart.week() + ' ' + currentStart.format('YYYY-MM'),
-      week: currentStart.startOf('week').format(dateFormat) + ' ' + currentStart.endOf('week').format(dateFormat),
-      date: currentStart.format(dateFormat),
-      ...content
-    })
-    currentStart = currentStart.add(1, 'week')
-  }
-  return weeks
-}
-
 function getDayRange(day = 0, content) {
   let currentStart = moment().add(day, 'days');
   let endDay = moment()
@@ -201,6 +163,8 @@ function Production(props) {
 
 
   const theme = useTheme()
+
+  const matchesXS = useMediaQuery(theme.breakpoints.down('md'))
 
   const [open, setOpen] = React.useState(false);
   const [rowData, setRowData] = React.useState(null);
@@ -331,9 +295,11 @@ function Production(props) {
         </Grid>
       </Grid>
       <Dialog
-        maxWidth={'lg'}
+        maxWidth={!matchesXS ? 'lg' : null}
+        fullWidth={!matchesXS || null}
         open={open}
-        fullWidth={true}
+        fullScreen={matchesXS}
+        TransitionComponent={Transition}
         onClose={handleClose}
         aria-labelledby="form-dialog-title"
       >
