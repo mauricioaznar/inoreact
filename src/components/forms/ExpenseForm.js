@@ -77,16 +77,14 @@ const ExpenseForm = (props) => {
   const {register, handleSubmit, reset, watch, control, setValue, getValues} = useForm({
     defaultValues: {
       description: props.expense.description,
-      something: 'something',
-      expenseItems: []
+      expense_items: []
     }
   });
 
   const classes = useStyles()
 
   useEffect(() => {
-    register({name: 'something'})
-    register({name: "expenseItems"},
+    register({name: "expense_items"},
       {
         required: true,
         validate: (value) => {return value.length > 0}
@@ -111,7 +109,7 @@ const ExpenseForm = (props) => {
   }
 
   const handleAutocompleteChange = (e, data) => {
-    setValue('expenseItems', data)
+    setValue('expense_items', data)
   }
 
   return (
@@ -162,7 +160,7 @@ const ExpenseForm = (props) => {
                   <TextField
                     {...params}
                     label={"Resolution Code"}
-                    variant="outlined"
+                    variant="standard"
                     name={"resolutionCode"}
                     fullWidth
                   />
