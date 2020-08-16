@@ -31,6 +31,13 @@ import {
 } from '@material-ui/pickers'
 import DateFnsUtils from '@date-io/date-fns';
 import TextField from '@material-ui/core/TextField'
+import Dialog from '@material-ui/core/Dialog'
+import DialogTitle from '@material-ui/core/DialogTitle'
+import DialogContent from '@material-ui/core/DialogContent'
+import DialogContentText from '@material-ui/core/DialogContentText'
+import DialogActions from '@material-ui/core/DialogActions'
+import Button from '@material-ui/core/Button'
+import ExpenseForm from '../forms/ExpenseForm'
 
 const useStyles = makeStyles((theme) => {
   return {
@@ -45,23 +52,74 @@ const dateFormat = 'YYYY-MM-DD'
 
 
 const tableIcons = {
-  Add: forwardRef((props, ref) => <AddBox {...props} ref={ref} color={'action'} fontSize={'small'}/>),
-  Check: forwardRef((props, ref) => <Check {...props} ref={ref} color={'action'} fontSize={'small'}/>),
-  Clear: forwardRef((props, ref) => <Clear {...props} ref={ref} color={'action'} fontSize={'small'}/>),
-  Delete: forwardRef((props, ref) => <DeleteOutline {...props} ref={ref} color={'action'} fontSize={'small'}/>),
-  DetailPanel: forwardRef((props, ref) => <ChevronRight {...props} ref={ref} color={'action'} fontSize={'small'}/>),
-  Edit: forwardRef((props, ref) => <Edit {...props} ref={ref} color={'action'} fontSize={'small'}/>),
-  Export: forwardRef((props, ref) => <SaveAlt {...props} ref={ref} color={'action'} fontSize={'small'}/>),
-  Filter: forwardRef((props, ref) => <FilterList {...props} ref={ref} color={'action'} fontSize={'small'}/>),
-  FirstPage: forwardRef((props, ref) => <FirstPage {...props} ref={ref} color={'action'} fontSize={'small'}/>),
-  LastPage: forwardRef((props, ref) => <LastPage {...props} ref={ref} color={'action'} fontSize={'small'}/>),
-  NextPage: forwardRef((props, ref) => <ChevronRight {...props} ref={ref} color={'action'} fontSize={'small'}/>),
-  PreviousPage: forwardRef((props, ref) => <ChevronLeft {...props} ref={ref} color={'action'} fontSize={'small'}/>),
-  ResetSearch: forwardRef((props, ref) => <Clear {...props} ref={ref} color={'action'} fontSize={'small'}/>),
-  Search: forwardRef((props, ref) => <Search {...props} ref={ref} color={'action'} fontSize={'small'}/>),
-  SortArrow: forwardRef((props, ref) => <ArrowDownward {...props} ref={ref} color={'action'} fontSize={'small'}/>),
-  ThirdStateCheck: forwardRef((props, ref) => <Remove {...props} ref={ref} color={'action'}  fontSize={'small'}/>),
-  ViewColumn: forwardRef((props, ref) => <ViewColumn {...props} ref={ref} color={'action'}  fontSize={'small'}/>)
+  Add: forwardRef((props, ref) => <AddBox {...props} ref={ref}
+                                          color={'action'}
+                                          fontSize={'small'}
+  />),
+  Check: forwardRef((props, ref) => <Check {...props} ref={ref}
+                                           color={'action'}
+                                           fontSize={'small'}
+  />),
+  Clear: forwardRef((props, ref) => <Clear {...props} ref={ref}
+                                           color={'action'}
+                                           fontSize={'small'}
+  />),
+  Delete: forwardRef((props, ref) => <DeleteOutline {...props} ref={ref}
+                                                    color={'action'}
+                                                    fontSize={'small'}
+  />),
+  DetailPanel: forwardRef((props, ref) => <ChevronRight {...props} ref={ref}
+                                                        color={'action'}
+                                                        fontSize={'small'}
+  />),
+  Edit: forwardRef((props, ref) => <Edit {...props} ref={ref}
+                                         color={'action'}
+                                         fontSize={'small'}
+  />),
+  Export: forwardRef((props, ref) => <SaveAlt {...props} ref={ref}
+                                              color={'action'}
+                                              fontSize={'small'}
+  />),
+  Filter: forwardRef((props, ref) => <FilterList {...props} ref={ref}
+                                                 color={'action'}
+                                                 fontSize={'small'}
+  />),
+  FirstPage: forwardRef((props, ref) => <FirstPage {...props} ref={ref}
+                                                   color={'action'}
+                                                   fontSize={'small'}
+  />),
+  LastPage: forwardRef((props, ref) => <LastPage {...props} ref={ref}
+                                                 color={'action'}
+                                                 fontSize={'small'}
+  />),
+  NextPage: forwardRef((props, ref) => <ChevronRight {...props} ref={ref}
+                                                     color={'action'}
+                                                     fontSize={'small'}
+  />),
+  PreviousPage: forwardRef((props, ref) => <ChevronLeft {...props} ref={ref}
+                                                        color={'action'}
+                                                        fontSize={'small'}
+  />),
+  ResetSearch: forwardRef((props, ref) => <Clear {...props} ref={ref}
+                                                 color={'action'}
+                                                 fontSize={'small'}
+  />),
+  Search: forwardRef((props, ref) => <Search {...props} ref={ref}
+                                             color={'action'}
+                                             fontSize={'small'}
+  />),
+  SortArrow: forwardRef((props, ref) => <ArrowDownward {...props} ref={ref}
+                                                       color={'action'}
+                                                       fontSize={'small'}
+  />),
+  ThirdStateCheck: forwardRef((props, ref) => <Remove {...props} ref={ref}
+                                                      color={'action'}
+                                                      fontSize={'small'}
+  />),
+  ViewColumn: forwardRef((props, ref) => <ViewColumn {...props} ref={ref}
+                                                     color={'action'}
+                                                     fontSize={'small'}
+  />)
 };
 
 const useFetch = (url) => {
@@ -139,124 +197,149 @@ function Production(props) {
 
   const classes = useStyles()
 
+  const tableRef = React.createRef();
+
+
   const theme = useTheme()
 
-  console.log(props)
+  const [open, setOpen] = React.useState(false);
+  const [rowData, setRowData] = React.useState(null);
+
+  const handleClickOpen = () => {
+    setOpen(true);
+  };
+
+  const handleClose = () => {
+    setOpen(false);
+  };
+
+  const handleOnSubmit = (expense) => {
+
+    if (expense.id) {
+      axios.put(apiUrl + 'expense/' + expense.id, {...expense}, {headers: {...authHeader()}})
+        .then((response) => {
+          tableRef.current && tableRef.current.onQueryChange()
+          setOpen(false)
+        })
+    }
+  }
 
   return (
-    <Grid
-      xs={12}
-      container
-      direction={'column'}
-    >
+    <>
       <Grid
-        item
-        className={classes.rowContainer}
-        style={{marginTop: '2em'}}
+        xs={12}
+        container
+        direction={'column'}
       >
-        <MaterialTable
-          icons={tableIcons}
-          title="POPIS"
+        <Grid
+          item
+          className={classes.rowContainer}
+          style={{marginTop: '2em'}}
+        >
+          <MaterialTable
+            icons={tableIcons}
+            title="Gastos"
+            tableRef={tableRef}
+            editable={{
+              onRowDelete: oldData =>
+                new Promise((resolve, reject) => {
 
-          editable={{
-            onBulkUpdate: changes =>
-              new Promise((resolve, reject) => {
-                setTimeout(() => {
-                  /* setData([...data, newData]); */
-                  console.log('Bulk update')
-                  console.log(changes)
-                  resolve();
-                }, 1000);
-              }),
-            onRowAddCancelled: rowData => console.log('Row adding cancelled'),
-            onRowUpdateCancelled: rowData => console.log('Row editing cancelled'),
-            onRowAdd: newData =>
-              new Promise((resolve, reject) => {
-                setTimeout(() => {
-                  resolve();
-                }, 1000);
-              }),
-            onRowUpdate: (newData, oldData) =>
-              new Promise((resolve, reject) => {
-                console.log(newData)
-                setTimeout(() => {
-                  resolve();
-                }, 1000);
-              }),
-            onRowDelete: oldData =>
-              new Promise((resolve, reject) => {
-
-                setTimeout(() => {
-                  resolve();
-                }, 1000);
-              })
-          }}
-
-          options={{
-            pageSize: 25,
-            pageSizeOptions: [25, 40, 60],
-            selection: true
-          }}
-          columns={[
-            {
-              title: 'Fecha de pago',
-              field: 'date_paid',
-              type: 'date',
-              dateSetting: { locale: 'en-ca' },
-              defaultSort: 'desc',
-              editComponent: (props) => {
-                return (
-                  <TextField
-                    id="date"
-                    type="date"
-                    value={props.value}
-                    onChange={e => props.onChange(e.target.value)}
-                  />
-                )
-              }
-            },
-            {
-              title: 'Proveedor',
-              field: 'supplier_id',
-              lookup: props.suppliers
-            },
-            {
-              title: 'Total',
-              sorting: false,
-              type: 'currency',
-              render: (rawData) => {
-                let expenseItemsTotal = rawData.expense_items.reduce((a, b) => {
-                  return a + b.subtotal
-                }, 0)
-                return <>{formatNumber(expenseItemsTotal)}</>
-              }
-            }
-          ]}
-          data={query =>
-            new Promise((resolve, reject) => {
-              let url = apiUrl + 'expense/list?'
-              console.log(query)
-              url += 'per_page=' + query.pageSize
-              url += '&page=' + (query.page + 1)
-              if (query.orderBy) {
-                url += '&sort=' + query.orderBy.field + '|' + query.orderDirection
-              }
-              axios.get(url, {headers: {...authHeader()}})
-                .then(response => {
-                  return response.data
+                  setTimeout(() => {
+                    resolve();
+                  }, 1000);
                 })
-                .then(result => {
-                  resolve({
-                    data: result.data,
-                    page: result.links.pagination.current_page - 1,
-                    totalCount: result.links.pagination.total,
+            }}
+            options={{
+              pageSize: 25,
+              pageSizeOptions: [25, 40, 60],
+              selection: true
+            }}
+            actions={[
+              {
+                icon: (props) => <Edit {...props} color={'action'}
+                                       fontSize={'small'}
+                />,
+                position: 'row',
+                tooltip: 'Editar gasto',
+                onClick: (event, rowData) => {
+                  setRowData(rowData)
+                  setOpen(true)
+                }
+              }
+            ]}
+            columns={[
+              {
+                title: 'Fecha de pago',
+                field: 'date_paid',
+                type: 'date',
+                dateSetting: {locale: 'en-ca'},
+                defaultSort: 'desc',
+                editComponent: (props) => {
+                  return (
+                    <TextField
+                      id="date"
+                      type="date"
+                      value={props.value}
+                      onChange={e => props.onChange(e.target.value)}
+                    />
+                  )
+                }
+              },
+              {
+                title: 'Proveedor',
+                field: 'supplier_id',
+                lookup: props.suppliers
+              },
+              {
+                title: 'Descripcion',
+                field: 'description'
+              },
+              {
+                title: 'Total',
+                sorting: false,
+                type: 'currency',
+                render: (rawData) => {
+                  let expenseItemsTotal = rawData.expense_items.reduce((a, b) => {
+                    return a + b.subtotal
+                  }, 0)
+                  return <>{formatNumber(expenseItemsTotal)}</>
+                }
+              }
+            ]}
+            data={query =>
+              new Promise((resolve, reject) => {
+                let url = apiUrl + 'expense/list?'
+                url += 'per_page=' + query.pageSize
+                url += '&page=' + (query.page + 1)
+                if (query.orderBy) {
+                  url += '&sort=' + query.orderBy.field + '|' + query.orderDirection
+                }
+                axios.get(url, {headers: {...authHeader()}})
+                  .then(response => {
+                    return response.data
                   })
-                })
-            })
-          }
-        />
+                  .then(result => {
+                    resolve({
+                      data: result.data,
+                      page: result.links.pagination.current_page - 1,
+                      totalCount: result.links.pagination.total,
+                    })
+                  })
+              })
+            }
+          />
+        </Grid>
       </Grid>
-    </Grid>
+      <Dialog
+        maxWidth={'lg'}
+        open={open}
+        fullWidth={true}
+        onClose={handleClose}
+        aria-labelledby="form-dialog-title"
+      >
+         <ExpenseForm expense={rowData} onSubmit={handleOnSubmit} />
+      </Dialog>
+    </>
   )
 }
 
@@ -265,7 +348,7 @@ const mapStateToProps = (state, ownProps) => {
     machines: state.production.machines,
     productTypes: state.production.productTypes,
     suppliers: state.expenses.suppliers
-      .reduce((prevObject, supplier)=> {
+      .reduce((prevObject, supplier) => {
         return {...prevObject, [supplier.id]: supplier.name}
       }, {})
   }
