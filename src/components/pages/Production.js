@@ -177,11 +177,12 @@ function Production(props) {
     setOpen(false);
   };
 
-  const handleOnSubmit = (expense) => {
+  const handleOnSubmit = (expense, callback) => {
 
     if (expense.id) {
       axios.put(apiUrl + 'expense/' + expense.id, {...expense}, {headers: {...authHeader()}})
         .then((response) => {
+          callback(true)
           tableRef.current && tableRef.current.onQueryChange()
           setOpen(false)
         })
@@ -191,7 +192,6 @@ function Production(props) {
   return (
     <>
       <Grid
-        xs={12}
         container
         direction={'column'}
       >
