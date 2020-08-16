@@ -189,6 +189,7 @@ function Production(props) {
       >
         <Grid
           item
+          xs={12}
           className={classes.rowContainer}
           style={{marginTop: '2em'}}
         >

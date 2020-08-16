@@ -24,13 +24,13 @@ function Navbar(props) {
               value={value}
             >
               <Tab
-                label={'Punto de equilibrio'}
+                label={'P E'}
                 component={Link}
                 to={'/'}
                 onClick={() => setValue(0)}
               />
               <Tab
-                label={'Produccion'}
+                label={'Prod'}
                 component={Link}
                 to={'/production'}
                 onClick={() => setValue(3)}

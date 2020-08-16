@@ -14,9 +14,20 @@ import CheckIcon from '@material-ui/icons/Check';
 import SaveIcon from '@material-ui/icons/Save';
 import Autocomplete from '@material-ui/lab/Autocomplete'
 import TextField from '@material-ui/core/TextField'
+import TableContainer from '@material-ui/core/TableContainer'
+import Paper from '@material-ui/core/Paper'
+import Table from '@material-ui/core/Table'
+import TableHead from '@material-ui/core/TableHead'
+import TableRow from '@material-ui/core/TableRow'
+import TableCell from '@material-ui/core/TableCell'
+import TableBody from '@material-ui/core/TableBody'
 
 const useStyles = makeStyles((theme) => {
   return {
+    table: {
+      minWidth: 400,
+      overflow: 'auto'
+    },
     rowContainer: {
       paddingLeft: '2em',
       paddingRight: '2em'
@@ -88,6 +99,8 @@ const ExpenseForm = (props) => {
   });
 
   const classes = useStyles()
+
+  const watchExpenseSubcategories = watch('expense_subcategories')
 
   useEffect(() => {
     register({name: "expense_subcategories"},
@@ -173,6 +186,42 @@ const ExpenseForm = (props) => {
               }}
             />
           </FormControl>
+        </Grid>
+
+
+        <Grid
+          item
+          xs={12}
+          className={classes.rowContainer}
+          style={{marginTop: '2em'}}
+        >
+
+          <TableContainer component={Paper}>
+            <Table aria-label="simple table" className={classes.table}>
+              <TableHead>
+                <TableRow>
+                  <TableCell>Rubro</TableCell>
+                  <TableCell align="right">Calories</TableCell>
+                  <TableCell align="right">Fat&nbsp;(g)</TableCell>
+                  <TableCell align="right">Carbs&nbsp;(g)</TableCell>
+                  <TableCell align="right">Protein&nbsp;(g)</TableCell>
+                </TableRow>
+              </TableHead>
+              <TableBody>
+                {watchExpenseSubcategories.map((expenseSubcategory) => (
+                  <TableRow key={expenseSubcategory.name}>
+                    <TableCell component="th" scope="row">
+                      {expenseSubcategory.name}
+                    </TableCell>
+                    <TableCell align="right"></TableCell>
+                    <TableCell align="right"></TableCell>
+                    <TableCell align="right"></TableCell>
+                    <TableCell align="right"></TableCell>
+                  </TableRow>
+                ))}
+              </TableBody>
+            </Table>
+          </TableContainer>
         </Grid>
 
         <Grid
