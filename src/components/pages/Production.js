@@ -178,6 +178,7 @@ function Production(props) {
       })
       expense.expense_items.forEach(expenseItem => {
         if (expenseItem.id) {
+          console.log(expenseItem)
           axios.put(apiUrl + 'expenseItem/' + expenseItem.id, {...expenseItem}, {headers: {...authHeader()}}).then(result => {
 
           })
