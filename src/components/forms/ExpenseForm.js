@@ -1,5 +1,7 @@
 import Grid from '@material-ui/core/Grid'
 import React, {useEffect} from "react";
+import {connect} from 'react-redux'
+
 import clsx from 'clsx';
 import {Input, Select, MenuItem} from "@material-ui/core";
 import {useForm, Controller} from "react-hook-form";
@@ -11,6 +13,8 @@ import Button from '@material-ui/core/Button';
 import Fab from '@material-ui/core/Fab';
 import CheckIcon from '@material-ui/icons/Check';
 import SaveIcon from '@material-ui/icons/Save';
+import Autocomplete from '@material-ui/lab/Autocomplete'
+import TextField from '@material-ui/core/TextField'
 
 const useStyles = makeStyles((theme) => {
   return {
@@ -76,6 +80,10 @@ const ExpenseForm = (props) => {
     setLoading(false);
   }
 
+  const onTagsChange = (event, values) => {
+
+  }
+
   return (
     <form>
        <Grid
@@ -94,6 +102,36 @@ const ExpenseForm = (props) => {
              <Input
                inputRef={register({required: true})}
                name="description"
+             />
+           </FormControl>
+         </Grid>
+
+
+         <Grid
+           item
+           xs={12}
+           className={classes.rowContainer}
+           style={{marginTop: '2em'}}
+         >
+           <FormControl
+            fullWidth
+           >
+             <Autocomplete
+               multiple
+               disableCloseOnSelect
+               options={props.expenseSubcategories}
+               getOptionLabel={option => option.name}
+               onChange={onTagsChange}
+               renderInput={params => (
+                 <TextField
+                   {...params}
+                   variant="standard"
+                   label="Multiple values"
+                   placeholder="Favorites"
+                   margin="normal"
+                   fullWidth
+                 />
+               )}
              />
            </FormControl>
          </Grid>
@@ -123,4 +161,12 @@ const ExpenseForm = (props) => {
   )
 }
 
-export default ExpenseForm
+
+const mapStateToProps = (state) => {
+  return {
+    suppliers: state.expenses.suppliers,
+    expenseSubcategories: state.expenses.expenseSubcategories
+  }
+}
+
+export default connect(mapStateToProps, null)(ExpenseForm)
