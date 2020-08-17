@@ -21,6 +21,8 @@ import TableHead from '@material-ui/core/TableHead'
 import TableRow from '@material-ui/core/TableRow'
 import TableCell from '@material-ui/core/TableCell'
 import TableBody from '@material-ui/core/TableBody'
+import Select from '@material-ui/core/Select'
+import MenuItem from '@material-ui/core/MenuItem'
 
 const useStyles = makeStyles((theme) => {
   return {
@@ -80,6 +82,8 @@ const top100Films = [
 ];
 
 
+
+
 const ExpenseForm = (props) => {
 
   const [loading, setLoading] = React.useState(false);
@@ -106,6 +110,12 @@ const ExpenseForm = (props) => {
       keyName: 'id'
     }
   );
+
+  const getOpObj = option => {
+    if (!option._id) option = options.find(op => op._id === option);
+    return option;
+  };
+
 
   useEffect(() => {
     register({name: "expense_subcategories"},
@@ -236,15 +246,37 @@ const ExpenseForm = (props) => {
                       />
                     </TableCell>
                     <TableCell>
-                      <TextField
-                        id="standard-number"
-                        label="Number"
-                        type="number"
-                        disabled
-                        name={`expense_items[${index}].expense_subcategory_id`}
-                        defaultValue={`${expenseItem.expense_subcategory_id}`}
-                        inputRef={register({ required: true })}
-                      />
+
+                       <FormControl fullWidth>
+
+                         <Controller
+                           as={
+                             <Select>
+                               {props.expenseSubcategories.map(expenseSubcategory => {
+                                 return (
+                                   <MenuItem key={expenseSubcategory.id} value={expenseSubcategory.id}>
+                                     {expenseSubcategory.name}
+                                   </MenuItem>
+                                 )
+                               })}
+                             </Select>
+                           }
+                           name={`expense_items[${index}].expense_subcategory_id`}
+                           rules={{ required: "this is required" }}
+                           control={control}
+                           defaultValue={`${expenseItem.expense_subcategory_id}`}
+                         />
+                       </FormControl>
+
+                      {/*<TextField*/}
+                      {/*  id="standard-number"*/}
+                      {/*  label="Number"*/}
+                      {/*  type="number"*/}
+                      {/*  disabled*/}
+                      {/*  name={`expense_items[${index}].expense_subcategory_id`}*/}
+                      {/*  defaultValue={`${expenseItem.expense_subcategory_id}`}*/}
+                      {/*  inputRef={register({ required: true })}*/}
+                      {/*/>*/}
                     </TableCell>
                     <TableCell align="right">
                       <TextField
