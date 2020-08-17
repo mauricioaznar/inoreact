@@ -168,24 +168,35 @@ function Production(props) {
   };
 
   const handleOnSubmit = (expense, callback) => {
-
-    console.log(expense)
-
+    let promises = []
+    let expensePromise
     if (expense.id) {
-      let promises = []
-      promises.push(axios.put(apiUrl + 'expense/' + expense.id, {...expense}, {headers: {...authHeader()}}))
+      expensePromise = axios.put(apiUrl + 'expense/' + expense.id, {...expense}, {headers: {...authHeader()}})
+    } else {
+      expensePromise = axios.post(apiUrl + 'expense', {...expense}, {headers: {...authHeader()}})
+    }
+    expensePromise.then(result => {
+      let expenseId = result.data.data.id
+      let deletedExpenseItems = expense.defaultValues.expense_items
       expense.expense_items.forEach(expenseItem => {
-        if (expenseItem.id) {
-          axios.put(apiUrl + 'expenseItem/' + expenseItem.id, {...expenseItem}, {headers: {...authHeader()}})
+        if (expenseItem.id !== '') {
+          promises.push(axios.put(apiUrl + 'expenseItem/' + expenseItem.id, {...expenseItem}, {headers: {...authHeader()}}))
+          deletedExpenseItems = deletedExpenseItems.filter(initialExpenseItem => {
+            return String(initialExpenseItem.id) !== expenseItem.id
+          })
+        } else {
+          promises.push(axios.post(apiUrl + 'expenseItem', {...expenseItem, expense_id: expenseId}, {headers: {...authHeader()}}))
         }
       })
-      Promise.all(promises).then(results => {
-        console.log(results)
-        callback(true)
-        tableRef.current && tableRef.current.onQueryChange()
-        setOpen(false)
+      deletedExpenseItems.forEach(expenseItem => {
+        promises.push(axios.put(apiUrl + 'expenseItem/' + expenseItem.id, {active: -1}, {headers: {...authHeader()}}))
       })
-    }
+      return Promise.all(promises)
+    }).then(results => {
+      callback(true)
+      tableRef.current && tableRef.current.onQueryChange()
+      setOpen(false)
+    })
   }
 
   return (

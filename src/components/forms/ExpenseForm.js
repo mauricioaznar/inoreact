@@ -23,6 +23,8 @@ import TableCell from '@material-ui/core/TableCell'
 import TableBody from '@material-ui/core/TableBody'
 import Select from '@material-ui/core/Select'
 import MenuItem from '@material-ui/core/MenuItem'
+import ButtonGroup from '@material-ui/core/ButtonGroup'
+import Button from '@material-ui/core/Button'
 
 const useStyles = makeStyles((theme) => {
   return {
@@ -66,64 +68,43 @@ const useStyles = makeStyles((theme) => {
 })
 
 
-const options = [
-  {_id: 1, name: "Country 1"},
-  {_id: 2, name: "Country 2"},
-  {_id: 3, name: "Country 3"}
-];
-
-const top100Films = [
-  {title: "The Shawshank Redemption", year: 1994},
-  {title: "The Godfather", year: 1972},
-  {title: "The Godfather: Part II", year: 1974},
-  {title: "The Dark Knight", year: 2008},
-  {title: "12 Angry Men", year: 1957},
-  {title: "Schindler's List", year: 1993}
-];
-
-
-
 
 const ExpenseForm = (props) => {
 
   const [loading, setLoading] = React.useState(false);
   const [success, setSuccess] = React.useState(false);
 
-  const initialExpenseSubcategoriesIds = props.expense.expense_items.map(expenseItem => expenseItem.expense_subcategory_id)
-  const initialExpenseSubcategories = props.expenseSubcategories.filter(expenseSubcategory => {
-    return initialExpenseSubcategoriesIds.includes(expenseSubcategory.id)
-  })
+  // const initialExpenseSubcategoriesIds = props.expense.expense_items.map(expenseItem => expenseItem.expense_subcategory_id)
+  // const initialExpenseSubcategories = props.expenseSubcategories.filter(expenseSubcategory => {
+  //   return initialExpenseSubcategoriesIds.includes(expenseSubcategory.id)
+  // })
 
+  const defaultValues = {
+    description: props.expense.description,
+    expense_items: props.expense.expense_items,
+    // expense_subcategories: initialExpenseSubcategories
+  }
 
   const {register, handleSubmit, reset, watch, control, setValue, getValues} = useForm({
-    defaultValues: {
-      description: props.expense.description,
-      expense_items: props.expense.expense_items,
-      expense_subcategories: initialExpenseSubcategories
-    }
+    defaultValues
   });
 
   const { fields, append, prepend, remove, swap, move, insert } = useFieldArray(
     {
       control,
-      name: "expense_items",
-      keyName: 'id'
+      name: "expense_items"
     }
   );
 
-  const getOpObj = option => {
-    if (!option._id) option = options.find(op => op._id === option);
-    return option;
-  };
 
 
-  useEffect(() => {
-    register({name: "expense_subcategories"},
-      {
-        required: true,
-        validate: (value) => {return value.length > 0}
-      });
-  }, []);
+  // useEffect(() => {
+  //   register({name: "expense_subcategories"},
+  //     {
+  //       required: true,
+  //       validate: (value) => {return value.length > 0}
+  //     });
+  // }, []);
 
   const classes = useStyles()
 
@@ -135,7 +116,7 @@ const ExpenseForm = (props) => {
     let id = props.expense.id
     setSuccess(false);
     setLoading(true);
-    props.onSubmit({...data, id}, onSubmitCallback)
+    props.onSubmit({...data, id, defaultValues}, onSubmitCallback)
   };
 
   const onSubmitCallback = (isValid) => {
@@ -143,19 +124,27 @@ const ExpenseForm = (props) => {
     setLoading(false);
   }
 
-  const handleAutocompleteChange = (e, data) => {
-    setValue('expense_subcategories', data)
-    data.forEach(expenseSubcategory => {
-      let foundExpenseItem = props.expense.expense_items.find(expenseItem => {
-        return expenseItem.expense_subcategory_id === expenseSubcategory.id
-      })
-      if (foundExpenseItem) {
-        append(foundExpenseItem)
-      } else {
-        append({expense_subcategory_id: expenseSubcategory.id, subtotal: 0})
-      }
-    })
+  const handleAddExpenseItem = () => {
+    append({expense_subcategory_id: '', subtotal: 0})
   }
+
+  const handleRemoveExpenseItem = () => {
+    remove(fields.length - 1)
+  }
+
+  // const handleAutocompleteChange = (e, data) => {
+  //   setValue('expense_subcategories', data)
+  //   data.forEach(expenseSubcategory => {
+  //     let foundExpenseItem = props.expense.expense_items.find(expenseItem => {
+  //       return expenseItem.expense_subcategory_id === expenseSubcategory.id
+  //     })
+  //     if (foundExpenseItem) {
+  //       append(foundExpenseItem)
+  //     } else {
+  //       append({expense_subcategory_id: expenseSubcategory.id, subtotal: 0})
+  //     }
+  //   })
+  // }
 
   return (
     <form>
@@ -180,124 +169,138 @@ const ExpenseForm = (props) => {
         </Grid>
 
 
+        {/*<Grid*/}
+        {/*  item*/}
+        {/*  xs={12}*/}
+        {/*  className={classes.rowContainer}*/}
+        {/*  style={{marginTop: '2em'}}*/}
+        {/*>*/}
+        {/*  <FormControl*/}
+        {/*    fullWidth*/}
+        {/*  >*/}
+
+        {/*    <Autocomplete*/}
+        {/*      options={props.expenseSubcategories}*/}
+        {/*      multiple*/}
+        {/*      getOptionLabel={option => option.name}*/}
+        {/*      defaultValue={initialExpenseSubcategories}*/}
+        {/*      groupBy={option => {*/}
+        {/*        return option.expense_category_id*/}
+        {/*      }}*/}
+        {/*      onChange={handleAutocompleteChange}*/}
+        {/*      renderInput={params => {*/}
+        {/*        return (*/}
+        {/*          <TextField*/}
+        {/*            {...params}*/}
+        {/*            label={"Resolution Code"}*/}
+        {/*            variant="standard"*/}
+        {/*            name={"resolutionCode"}*/}
+        {/*            fullWidth*/}
+        {/*          />*/}
+        {/*        );*/}
+        {/*      }}*/}
+        {/*    />*/}
+        {/*  </FormControl>*/}
+        {/*</Grid>*/}
+
+
         <Grid
           item
           xs={12}
           className={classes.rowContainer}
           style={{marginTop: '2em'}}
         >
-          <FormControl
-            fullWidth
+
+          <Grid container
+            direction={'column'}
           >
+            <Grid item xs={12}>
+              <ButtonGroup variant="contained" color="primary" aria-label="contained primary button group">
+                <Button onClick={() => {handleRemoveExpenseItem()}}>Remover</Button>
+                <Button onClick={() => {handleAddExpenseItem()}}>Agregar</Button>
+              </ButtonGroup>
+            </Grid>
 
-            <Autocomplete
-              options={props.expenseSubcategories}
-              multiple
-              getOptionLabel={option => option.name}
-              defaultValue={initialExpenseSubcategories}
-              groupBy={option => {
-                return option.expense_category_id
-              }}
-              onChange={handleAutocompleteChange}
-              renderInput={params => {
-                return (
-                  <TextField
-                    {...params}
-                    label={"Resolution Code"}
-                    variant="standard"
-                    name={"resolutionCode"}
-                    fullWidth
-                  />
-                );
-              }}
-            />
-          </FormControl>
-        </Grid>
+            <Grid item xs={12}>
+              <TableContainer component={Paper}>
+                <Table aria-label="simple table" className={classes.table}>
+                  <TableHead>
+                    <TableRow>
+                      <TableCell style={{display: 'none'}}>Id</TableCell>
+                      <TableCell style={{width: '50%'}}>Rubro</TableCell>
+                      <TableCell align="right">Subtotal</TableCell>
+                    </TableRow>
+                  </TableHead>
+                  <TableBody>
+                    {fields.map((expenseItem, index) => (
+                      <TableRow key={expenseItem.expense_subcategory_id}>
+                        <TableCell style={{display: 'none'}}>
+                          <TextField
+                            id="standard-number"
+                            label="Number"
+                            type="number"
+                            name={`expense_items[${index}].id`}
+                            defaultValue={`${expenseItem.id}`}
+                            inputRef={register()}
+                          />
+                        </TableCell>
+                        <TableCell>
 
+                          <FormControl fullWidth>
 
-        <Grid
-          item
-          xs={12}
-          className={classes.rowContainer}
-          style={{marginTop: '2em'}}
-        >
+                            <Controller
+                              as={
+                                <Select>
+                                  {props.expenseSubcategories.map(expenseSubcategory => {
+                                    return (
+                                      <MenuItem key={expenseSubcategory.id} value={expenseSubcategory.id}>
+                                        {expenseSubcategory.name}
+                                      </MenuItem>
+                                    )
+                                  })}
+                                </Select>
+                              }
+                              name={`expense_items[${index}].expense_subcategory_id`}
+                              rules={{ required: "this is required" }}
+                              control={control}
+                              defaultValue={`${expenseItem.expense_subcategory_id}`}
+                            />
+                          </FormControl>
 
-          <TableContainer component={Paper}>
-            <Table aria-label="simple table" className={classes.table}>
-              <TableHead>
-                <TableRow>
-                  <TableCell style={{display: 'none'}}>Id</TableCell>
-                  <TableCell>Rubro</TableCell>
-                  <TableCell align="right">Subtotal</TableCell>
-                </TableRow>
-              </TableHead>
-              <TableBody>
-                {fields.map((expenseItem, index) => (
-                  <TableRow key={expenseItem.expense_subcategory_id}>
-                    <TableCell style={{display: 'none'}}>
-                      <TextField
-                        id="standard-number"
-                        label="Number"
-                        type="number"
-                        disabled
-                        name={`expense_items[${index}].id`}
-                        defaultValue={`${expenseItem.id}`}
-                        inputRef={register}
-                      />
-                    </TableCell>
-                    <TableCell>
-
-                       <FormControl fullWidth>
-
-                         <Controller
-                           as={
-                             <Select>
-                               {props.expenseSubcategories.map(expenseSubcategory => {
-                                 return (
-                                   <MenuItem key={expenseSubcategory.id} value={expenseSubcategory.id}>
-                                     {expenseSubcategory.name}
-                                   </MenuItem>
-                                 )
-                               })}
-                             </Select>
-                           }
-                           name={`expense_items[${index}].expense_subcategory_id`}
-                           rules={{ required: "this is required" }}
-                           control={control}
-                           defaultValue={`${expenseItem.expense_subcategory_id}`}
-                         />
-                       </FormControl>
-
-                      {/*<TextField*/}
-                      {/*  id="standard-number"*/}
-                      {/*  label="Number"*/}
-                      {/*  type="number"*/}
-                      {/*  disabled*/}
-                      {/*  name={`expense_items[${index}].expense_subcategory_id`}*/}
-                      {/*  defaultValue={`${expenseItem.expense_subcategory_id}`}*/}
-                      {/*  inputRef={register({ required: true })}*/}
-                      {/*/>*/}
-                    </TableCell>
-                    <TableCell align="right">
-                      <TextField
-                        id="standard-number"
-                        label="Number"
-                        type="number"
-                        name={`expense_items[${index}].subtotal`}
-                        defaultValue={`${expenseItem.subtotal}`}
-                        inputRef={register({ required: true, max: 10000000 })}
-                      />
-                    </TableCell>
-                  </TableRow>
-                ))}
-              </TableBody>
-            </Table>
-          </TableContainer>
+                          {/*<TextField*/}
+                          {/*  id="standard-number"*/}
+                          {/*  label="Number"*/}
+                          {/*  type="number"*/}
+                          {/*  disabled*/}
+                          {/*  name={`expense_items[${index}].expense_subcategory_id`}*/}
+                          {/*  defaultValue={`${expenseItem.expense_subcategory_id}`}*/}
+                          {/*  inputRef={register({ required: true })}*/}
+                          {/*/>*/}
+                        </TableCell>
+                        <TableCell align="right">
+                          <TextField
+                            id="standard-number"
+                            label="Number"
+                            type="number"
+                            name={`expense_items[${index}].subtotal`}
+                            defaultValue={`${expenseItem.subtotal}`}
+                            inputRef={register({ required: true, max: 10000000 })}
+                          />
+                        </TableCell>
+                      </TableRow>
+                    ))}
+                  </TableBody>
+                </Table>
+              </TableContainer>
+            </Grid>
+          </Grid>
         </Grid>
 
         <Grid
           item
+          container
           xs={12}
+          justify={'flex-end'}
           className={classes.rowContainer}
           style={{marginTop: '2em', marginBottom: '2em'}}
         >
