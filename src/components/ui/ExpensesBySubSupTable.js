@@ -39,7 +39,7 @@ const formatNumber = (x, digits = 2) => {
 function ExpensesByCatSubBraTable(props) {
   const classes = useStyles();
 
-  const [expenseCategoryId, setExpenseCategoryId] = React.useState(null);
+  const [expenseCategoryId, setExpenseCategoryId] = React.useState(0);
 
   let expenses =  props.expenses
 
@@ -52,7 +52,7 @@ function ExpensesByCatSubBraTable(props) {
         return props.month === obj.month && props.year === obj.year
       })
       .filter(expense => {
-        return expenseCategoryId === null || expense.expense_category_id === expenseCategoryId
+        return expenseCategoryId === 0 || expense.expense_category_id === expenseCategoryId
       })
       .sort(compare)
 

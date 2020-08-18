@@ -1,12 +1,15 @@
 import React from 'react'
 import {AppBar, Button, Grid, Toolbar, Tab, Tabs} from '@material-ui/core'
-import {Link} from 'react-router-dom'
+import {Link, useLocation} from 'react-router-dom'
 import {connect} from 'react-redux'
 import {unsetToken} from '../../store/authActions'
 
 // noinspection SpellCheckingInspection
 function Navbar(props) {
   const [value, setValue] = React.useState(0)
+
+  const location = useLocation()
+
   return (
     <AppBar position="fixed">
       <Toolbar>
@@ -21,19 +24,19 @@ function Navbar(props) {
           >
             <Tabs
               indicatorColor="primary"
-              value={value}
+              value={location.pathname}
             >
               <Tab
                 label={'P E'}
                 component={Link}
                 to={'/'}
-                onClick={() => setValue(0)}
+                value={'/'}
               />
               <Tab
                 label={'Prod'}
                 component={Link}
                 to={'/production'}
-                onClick={() => setValue(3)}
+                value={'/production'}
               />
             </Tabs>
           </Grid>

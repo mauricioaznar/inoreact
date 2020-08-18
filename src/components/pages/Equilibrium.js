@@ -188,7 +188,7 @@ export default function Equilibrium(props) {
           item
           container
           direction={matchesXS ? 'column' : 'row'}
-          alignItems={'start'}
+          alignItems={'flex-start'}
           spacing={8}
         >
           <Grid
