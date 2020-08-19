@@ -14,7 +14,7 @@ function MauDatePicker (props) {
   }, [props.register])
 
   const handleDateChange = (value) => {
-    props.setValue(props.name, value.format('YYYY-MM-DD'))
+    props.setValue(props.name, value !== null ? value.format('YYYY-MM-DD') : '0000-00-00')
     handleSelectedDate(value)
   }
 
@@ -27,6 +27,10 @@ function MauDatePicker (props) {
         format={'YYYY-MM-DD'}
         onChange={handleDateChange}
         animateYearScrolling
+        PopoverProps={{
+          anchorOrigin: { horizontal: "left", vertical: "bottom" },
+          transformOrigin: { horizontal: "left"}
+        }}
       />
     </MuiPickersUtilsProvider>
   )
