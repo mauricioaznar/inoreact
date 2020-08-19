@@ -167,6 +167,10 @@ const ExpenseForm = (props) => {
       }, onSubmitCallback)
   };
 
+  const onError = data => {
+    console.log(data)
+  }
+
   const onSubmitCallback = (isValid) => {
     setSuccess(true);
     setLoading(false);
@@ -557,7 +561,7 @@ const ExpenseForm = (props) => {
               aria-label="save"
               color="primary"
               className={buttonClassname}
-              onClick={handleSubmit(onSubmit)}
+              onClick={handleSubmit(onSubmit, onError)}
             >
               {success ? <CheckIcon /> : <SaveIcon />}
             </Fab>
