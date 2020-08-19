@@ -127,6 +127,7 @@ const ExpenseForm = (props) => {
   });
 
   const onSubmit = data => {
+    console.log(data)
     let id = props.expense.id
     setSuccess(false);
     setLoading(true);
@@ -180,6 +181,7 @@ const ExpenseForm = (props) => {
               register={register}
               setValue={setValue}
               name="date_paid"
+              defaultValue={props.expense.date_paid}
               label="Fecha de pago"
             />
           </FormControl>
