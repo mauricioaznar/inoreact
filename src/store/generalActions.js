@@ -32,7 +32,7 @@ export const getApiEntities = () => {
       // const orderProductions = result[0].data.data[0]
       const inventory = result[0].data.data
       const expenseCategories = result[1].data.data
-      const {expense_subcategories: expenseSubcategories, machines: machines, branches: branches} = result[2].data.data
+      const {expense_subcategories: expenseSubcategories, machines, branches} = result[2].data.data
       const materials = result[3].data.data
       const productTypes = result[4].data.data
       const suppliers = result[5].data.data

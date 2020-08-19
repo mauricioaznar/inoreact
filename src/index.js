@@ -11,6 +11,7 @@ import combinedReducers from './store/index'
 import {composeWithDevTools} from 'redux-devtools-extension/developmentOnly'
 import {BrowserRouter as Router} from 'react-router-dom'
 
+
 const store = createStore(combinedReducers, {}, composeWithDevTools(applyMiddleware(thunk)))
 
 

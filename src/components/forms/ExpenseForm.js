@@ -25,6 +25,11 @@ import Select from '@material-ui/core/Select'
 import MenuItem from '@material-ui/core/MenuItem'
 import ButtonGroup from '@material-ui/core/ButtonGroup'
 import Button from '@material-ui/core/Button'
+import {
+  KeyboardDatePicker
+} from '@material-ui/pickers';
+import MauDatePicker from '../inputs/MauDatePicker'
+
 
 const useStyles = makeStyles((theme) => {
   return {
@@ -68,7 +73,6 @@ const useStyles = makeStyles((theme) => {
 })
 
 
-
 const ExpenseForm = (props) => {
 
   const [loading, setLoading] = React.useState(false);
@@ -82,6 +86,9 @@ const ExpenseForm = (props) => {
   const defaultValues = {
     description: props.expense.description,
     expense_items: props.expense.expense_items,
+    tax: props.expense.tax,
+    supplier_id: props.expense.supplier_id,
+    date_paid: props.expense.date_paid
     // expense_subcategories: initialExpenseSubcategories
   }
 
@@ -89,13 +96,20 @@ const ExpenseForm = (props) => {
     defaultValues
   });
 
-  const { fields, append, prepend, remove, swap, move, insert } = useFieldArray(
+
+  const watchExpenseItems = watch('expense_items')
+
+  let total = watchExpenseItems.reduce((acc, expenseItem) => {
+    return expenseItem.subtotal !== '' ? acc + Number(expenseItem.subtotal) : acc
+  }, 0)
+
+
+  const {fields, append, prepend, remove, swap, move, insert} = useFieldArray(
     {
       control,
       name: "expense_items"
     }
   );
-
 
 
   // useEffect(() => {
@@ -158,12 +172,66 @@ const ExpenseForm = (props) => {
           className={classes.rowContainer}
           style={{marginTop: '2em'}}
         >
+
+          <FormControl
+            fullWidth
+          >
+            <MauDatePicker
+              register={register}
+              setValue={setValue}
+              name="date_paid"
+              label="Fecha de pago"
+            />
+          </FormControl>
+        </Grid>
+
+        <Grid
+          item
+          xs={12}
+          className={classes.rowContainer}
+          style={{marginTop: '2em'}}
+        >
           <FormControl
             fullWidth
           >
             <Input
               inputRef={register({required: true})}
               name="description"
+            />
+          </FormControl>
+        </Grid>
+
+        <Grid
+          item
+          xs={12}
+          className={classes.rowContainer}
+          style={{marginTop: '2em'}}
+        >
+          <FormControl fullWidth>
+            <Controller
+              as={
+                <Select>
+                  <MenuItem
+                    key={0}
+                    value={'null'}
+                  >
+                  </MenuItem>
+                  {props.suppliers.map(supplier => {
+                    return (
+                      <MenuItem
+                        key={supplier.id}
+                        value={supplier.id}
+                      >
+                        {supplier.name}
+                      </MenuItem>
+                    )
+                  })}
+                </Select>
+              }
+              name={`supplier_id`}
+              rules={{required: "this is required"}}
+              control={control}
+              defaultValue={`${props.expense.supplier_id}`}
             />
           </FormControl>
         </Grid>
@@ -211,19 +279,41 @@ const ExpenseForm = (props) => {
           style={{marginTop: '2em'}}
         >
 
-          <Grid container
+          <Grid
+            container
             direction={'column'}
           >
-            <Grid item xs={12}>
-              <ButtonGroup variant="contained" color="primary" aria-label="contained primary button group">
-                <Button onClick={() => {handleRemoveExpenseItem()}}>Remover</Button>
-                <Button onClick={() => {handleAddExpenseItem()}}>Agregar</Button>
+            <Grid
+              item
+              xs={12}
+            >
+              <ButtonGroup
+                variant="contained"
+                color="primary"
+                aria-label="contained primary button group"
+              >
+                <Button
+                  onClick={() => {
+                    handleRemoveExpenseItem()
+                  }}
+                >Remover</Button>
+                <Button
+                  onClick={() => {
+                    handleAddExpenseItem()
+                  }}
+                >Agregar</Button>
               </ButtonGroup>
             </Grid>
 
-            <Grid item xs={12}>
+            <Grid
+              item
+              xs={12}
+            >
               <TableContainer component={Paper}>
-                <Table aria-label="simple table" className={classes.table}>
+                <Table
+                  aria-label="simple table"
+                  className={classes.table}
+                >
                   <TableHead>
                     <TableRow>
                       <TableCell style={{display: 'none'}}>Id</TableCell>
@@ -233,7 +323,7 @@ const ExpenseForm = (props) => {
                   </TableHead>
                   <TableBody>
                     {fields.map((expenseItem, index) => (
-                      <TableRow key={expenseItem.expense_subcategory_id}>
+                      <TableRow key={index + '' + expenseItem.expense_subcategory_id}>
                         <TableCell style={{display: 'none'}}>
                           <TextField
                             id="standard-number"
@@ -253,7 +343,10 @@ const ExpenseForm = (props) => {
                                 <Select>
                                   {props.expenseSubcategories.map(expenseSubcategory => {
                                     return (
-                                      <MenuItem key={expenseSubcategory.id} value={expenseSubcategory.id}>
+                                      <MenuItem
+                                        key={expenseSubcategory.id}
+                                        value={expenseSubcategory.id}
+                                      >
                                         {expenseSubcategory.name}
                                       </MenuItem>
                                     )
@@ -261,7 +354,7 @@ const ExpenseForm = (props) => {
                                 </Select>
                               }
                               name={`expense_items[${index}].expense_subcategory_id`}
-                              rules={{ required: "this is required" }}
+                              rules={{required: "this is required"}}
                               control={control}
                               defaultValue={`${expenseItem.expense_subcategory_id}`}
                             />
@@ -284,7 +377,7 @@ const ExpenseForm = (props) => {
                             type="number"
                             name={`expense_items[${index}].subtotal`}
                             defaultValue={`${expenseItem.subtotal}`}
-                            inputRef={register({ required: true, max: 10000000 })}
+                            inputRef={register({required: true, max: 10000000})}
                           />
                         </TableCell>
                       </TableRow>
@@ -294,6 +387,27 @@ const ExpenseForm = (props) => {
               </TableContainer>
             </Grid>
           </Grid>
+        </Grid>
+
+        <Grid
+          item
+          xs={12}
+          className={classes.rowContainer}
+          style={{marginTop: '2em'}}
+        >
+          <FormControl
+            fullWidth
+          >
+            <TextField
+              inputRef={register({
+                required: true, validate: (value) => {
+                  return Number(value) === total
+                }
+              })}
+              type="number"
+              name="tax"
+            />
+          </FormControl>
         </Grid>
 
         <Grid
@@ -329,7 +443,9 @@ const ExpenseForm = (props) => {
 
 const mapStateToProps = (state) => {
   return {
-    suppliers: state.expenses.suppliers,
+    suppliers: state.expenses.suppliers.sort((a, b) => {
+      return a.name > b.name ? 1 : -1
+    }),
     expenseSubcategories: state.expenses.expenseSubcategories.sort((a, b) => {
       return a.expense_category_id > b.expense_category_id ? 1 : -1
     })
