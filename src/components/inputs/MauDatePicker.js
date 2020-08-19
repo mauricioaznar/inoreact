@@ -21,7 +21,7 @@ function MauDatePicker (props) {
   return (
     <MuiPickersUtilsProvider utils={DateMomentUtils}>
       <KeyboardDatePicker
-        label="Basic example"
+        label={props.label}
         value={selectedDate}
         variant={'inline'}
         format={'YYYY-MM-DD'}
@@ -29,7 +29,7 @@ function MauDatePicker (props) {
         animateYearScrolling
         PopoverProps={{
           anchorOrigin: { horizontal: "left", vertical: "bottom" },
-          transformOrigin: { horizontal: "left"}
+          transformOrigin: { horizontal: "left", vertical: "top"}
         }}
       />
     </MuiPickersUtilsProvider>

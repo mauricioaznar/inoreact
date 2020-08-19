@@ -6,7 +6,7 @@ import clsx from 'clsx';
 import {Input} from "@material-ui/core";
 import {useForm, Controller, useFieldArray} from "react-hook-form";
 import {green} from '@material-ui/core/colors';
-import {makeStyles} from '@material-ui/core/styles'
+import {makeStyles, useTheme} from '@material-ui/core/styles'
 import FormControl from '@material-ui/core/FormControl'
 import CircularProgress from '@material-ui/core/CircularProgress'
 import Fab from '@material-ui/core/Fab';
@@ -15,6 +15,7 @@ import SaveIcon from '@material-ui/icons/Save';
 import Autocomplete from '@material-ui/lab/Autocomplete'
 import TextField from '@material-ui/core/TextField'
 import TableContainer from '@material-ui/core/TableContainer'
+import useMediaQuery from '@material-ui/core/useMediaQuery'
 import Paper from '@material-ui/core/Paper'
 import Table from '@material-ui/core/Table'
 import TableHead from '@material-ui/core/TableHead'
@@ -25,10 +26,12 @@ import Select from '@material-ui/core/Select'
 import MenuItem from '@material-ui/core/MenuItem'
 import ButtonGroup from '@material-ui/core/ButtonGroup'
 import Button from '@material-ui/core/Button'
-import {
-  KeyboardDatePicker
-} from '@material-ui/pickers';
 import MauDatePicker from '../inputs/MauDatePicker'
+import InputLabel from '@material-ui/core/InputLabel'
+import RadioGroup from '@material-ui/core/RadioGroup'
+import FormControlLabel from '@material-ui/core/FormControlLabel'
+import Radio from '@material-ui/core/Radio'
+import FormLabel from '@material-ui/core/FormLabel'
 
 
 const useStyles = makeStyles((theme) => {
@@ -78,6 +81,11 @@ const ExpenseForm = (props) => {
   const [loading, setLoading] = React.useState(false);
   const [success, setSuccess] = React.useState(false);
 
+  // const theme = useTheme()
+
+  // const matchesXS = useMediaQuery(theme.breakpoints.down('xs'))
+
+
   // const initialExpenseSubcategoriesIds = props.expense.expense_items.map(expenseItem => expenseItem.expense_subcategory_id)
   // const initialExpenseSubcategories = props.expenseSubcategories.filter(expenseSubcategory => {
   //   return initialExpenseSubcategoriesIds.includes(expenseSubcategory.id)
@@ -87,8 +95,11 @@ const ExpenseForm = (props) => {
     description: props.expense.description,
     expense_items: props.expense.expense_items,
     tax: props.expense.tax,
-    supplier_id: props.expense.supplier_id,
-    date_paid: props.expense.date_paid
+    supplier_id: String(props.expense.supplier_id),
+    date_paid: props.expense.date_paid,
+    invoice_code: props.expense.invoice_code,
+    internal_code: props.expense.internal_code,
+    expense_type_id: String(props.expense.expense_type_id)
     // expense_subcategories: initialExpenseSubcategories
   }
 
@@ -98,11 +109,23 @@ const ExpenseForm = (props) => {
 
 
   const watchExpenseItems = watch('expense_items')
+  const watchExpenseType = watch('expense_type_id')
 
   let total = watchExpenseItems.reduce((acc, expenseItem) => {
     return expenseItem.subtotal !== '' ? acc + Number(expenseItem.subtotal) : acc
   }, 0)
 
+
+  let isInvoice = false
+  let isNote = false
+
+  if (watchExpenseType === "1") {
+    isNote = true
+  }
+
+  if (watchExpenseType === "2") {
+    isInvoice = true
+  }
 
   const {fields, append, prepend, remove, swap, move, insert} = useFieldArray(
     {
@@ -131,7 +154,13 @@ const ExpenseForm = (props) => {
     let id = props.expense.id
     setSuccess(false);
     setLoading(true);
-    props.onSubmit({...data, id, defaultValues}, onSubmitCallback)
+    props.onSubmit(
+      {...data,
+        tax: isInvoice ? data.tax : "0",
+        invoice_code: isInvoice ? data.invoice_code : "",
+        id,
+        defaultValues
+    }, onSubmitCallback)
   };
 
   const onSubmitCallback = (isValid) => {
@@ -145,6 +174,10 @@ const ExpenseForm = (props) => {
 
   const handleRemoveExpenseItem = () => {
     remove(fields.length - 1)
+  }
+
+  const handleSubtotalChange = (e) => {
+    if (isInvoice) setValue('tax', total * 0.16)
   }
 
   // const handleAutocompleteChange = (e, data) => {
@@ -167,6 +200,35 @@ const ExpenseForm = (props) => {
         container
         direction={'column'}
       >
+
+        <Grid
+          item
+          xs={12}
+          className={classes.rowContainer}
+          style={{marginTop: '2em'}}
+        >
+        <InputLabel>Tipo de gasto</InputLabel>
+         <Controller
+           as={
+             <RadioGroup aria-label="gender" row>
+               {props.expenseTypes.map(expenseType => {
+                 return (
+                   <FormControlLabel
+                     key={expenseType.id}
+                     value={String(expenseType.id)}
+                     control={<Radio />}
+                     label={expenseType.name}
+                   />
+                 )
+               })}
+              </RadioGroup>
+           }
+           name="expense_type_id"
+           control={control}
+         />
+        </Grid>
+
+
         <Grid
           item
           xs={12}
@@ -196,9 +258,10 @@ const ExpenseForm = (props) => {
           <FormControl
             fullWidth
           >
-            <Input
+            <TextField
               inputRef={register({required: true})}
               name="description"
+              label="Descripcion"
             />
           </FormControl>
         </Grid>
@@ -209,14 +272,61 @@ const ExpenseForm = (props) => {
           className={classes.rowContainer}
           style={{marginTop: '2em'}}
         >
+          <FormControl
+            fullWidth
+          >
+            <TextField
+              inputRef={register({
+                required: true
+              })}
+              type="number"
+              name="internal_code"
+              label="Codigo interno"
+            />
+          </FormControl>
+        </Grid>
+
+        {
+          isInvoice ?
+            <Grid
+              item
+              xs={12}
+              className={classes.rowContainer}
+              style={{marginTop: '2em'}}
+            >
+              <FormControl
+                fullWidth
+              >
+                <TextField
+                  inputRef={register({
+                    required: true
+                  })}
+                  name="invoice_code"
+                  label="Codigo de la factura"
+                />
+              </FormControl>
+            </Grid> :
+            null
+        }
+
+        <Grid
+          item
+          xs={12}
+          className={classes.rowContainer}
+          style={{marginTop: '2em'}}
+        >
           <FormControl fullWidth>
+            <InputLabel id="supplierLabel">Proveedor</InputLabel>
             <Controller
               as={
-                <Select>
+                <Select
+                  labelId={'supplierLabel'}
+                >
                   <MenuItem
                     key={0}
                     value={'null'}
                   >
+                    &nbsp;
                   </MenuItem>
                   {props.suppliers.map(supplier => {
                     return (
@@ -380,6 +490,7 @@ const ExpenseForm = (props) => {
                             name={`expense_items[${index}].subtotal`}
                             defaultValue={`${expenseItem.subtotal}`}
                             inputRef={register({required: true, max: 10000000})}
+                            onChange={(e) => {handleSubtotalChange(e)}}
                           />
                         </TableCell>
                       </TableRow>
@@ -391,26 +502,31 @@ const ExpenseForm = (props) => {
           </Grid>
         </Grid>
 
-        <Grid
-          item
-          xs={12}
-          className={classes.rowContainer}
-          style={{marginTop: '2em'}}
-        >
-          <FormControl
-            fullWidth
-          >
-            <TextField
-              inputRef={register({
-                required: true, validate: (value) => {
-                  return Number(value) === total
-                }
-              })}
-              type="number"
-              name="tax"
-            />
-          </FormControl>
-        </Grid>
+
+        {
+            isInvoice ?
+              <Grid
+                item
+                xs={12}
+                className={classes.rowContainer}
+                style={{marginTop: '2em'}}
+              >
+                <FormControl
+                  fullWidth
+                >
+                  <TextField
+                    inputRef={register({
+                      required: true
+                    })}
+                    type="number"
+                    name="tax"
+                    label="IVA"
+                  />
+                </FormControl>
+              </Grid> :
+              null
+        }
+
 
         <Grid
           item
@@ -450,7 +566,8 @@ const mapStateToProps = (state) => {
     }),
     expenseSubcategories: state.expenses.expenseSubcategories.sort((a, b) => {
       return a.expense_category_id > b.expense_category_id ? 1 : -1
-    })
+    }),
+    expenseTypes: state.expenses.expenseTypes
   }
 }
 
