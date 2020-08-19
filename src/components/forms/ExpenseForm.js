@@ -103,13 +103,16 @@ const ExpenseForm = (props) => {
     // expense_subcategories: initialExpenseSubcategories
   }
 
-  const {register, handleSubmit, reset, watch, control, setValue, getValues} = useForm({
+  const {register, handleSubmit, reset, watch, control, setValue, getValues, errors} = useForm({
     defaultValues
   });
 
 
   const watchExpenseItems = watch('expense_items')
   const watchExpenseType = watch('expense_type_id')
+  const watchDatePaid = watch('date_paid')
+
+  console.log(watchDatePaid)
 
   let total = watchExpenseItems.reduce((acc, expenseItem) => {
     return expenseItem.subtotal !== '' ? acc + Number(expenseItem.subtotal) : acc
@@ -126,6 +129,7 @@ const ExpenseForm = (props) => {
   if (watchExpenseType === "2") {
     isInvoice = true
   }
+
 
   const {fields, append, prepend, remove, swap, move, insert} = useFieldArray(
     {
@@ -150,17 +154,17 @@ const ExpenseForm = (props) => {
   });
 
   const onSubmit = data => {
-    console.log(data)
     let id = props.expense.id
     setSuccess(false);
     setLoading(true);
     props.onSubmit(
-      {...data,
+      {
+        ...data,
         tax: isInvoice ? data.tax : "0",
         invoice_code: isInvoice ? data.invoice_code : "",
         id,
         defaultValues
-    }, onSubmitCallback)
+      }, onSubmitCallback)
   };
 
   const onSubmitCallback = (isValid) => {
@@ -210,7 +214,10 @@ const ExpenseForm = (props) => {
         <InputLabel>Tipo de gasto</InputLabel>
          <Controller
            as={
-             <RadioGroup aria-label="gender" row>
+             <RadioGroup
+               aria-label="gender"
+               row
+             >
                {props.expenseTypes.map(expenseType => {
                  return (
                    <FormControlLabel
@@ -242,6 +249,8 @@ const ExpenseForm = (props) => {
             <MauDatePicker
               register={register}
               setValue={setValue}
+              error={!!errors.date_paid}
+              helperText={errors.date_paid && errors.date_paid.message}
               name="date_paid"
               defaultValue={props.expense.date_paid}
               label="Fecha de pago"
@@ -262,6 +271,7 @@ const ExpenseForm = (props) => {
               inputRef={register({required: true})}
               name="description"
               label="Descripcion"
+              error={!!errors.description}
             />
           </FormControl>
         </Grid>
@@ -276,9 +286,7 @@ const ExpenseForm = (props) => {
             fullWidth
           >
             <TextField
-              inputRef={register({
-                required: true
-              })}
+              inputRef={register()}
               type="number"
               name="internal_code"
               label="Codigo interno"
@@ -315,7 +323,10 @@ const ExpenseForm = (props) => {
           className={classes.rowContainer}
           style={{marginTop: '2em'}}
         >
-          <FormControl fullWidth>
+          <FormControl
+            fullWidth
+            error={!!errors.supplier_id}
+          >
             <InputLabel id="supplierLabel">Proveedor</InputLabel>
             <Controller
               as={
@@ -341,13 +352,19 @@ const ExpenseForm = (props) => {
                 </Select>
               }
               name={`supplier_id`}
-              rules={{required: "this is required"}}
+              rules={
+                {
+                  required: "this is required",
+                  validate: (value) => {
+                    return value !== 'null'
+                  }
+                }
+              }
               control={control}
               defaultValue={`${props.expense.supplier_id}`}
             />
           </FormControl>
         </Grid>
-
 
         {/*<Grid*/}
         {/*  item*/}
@@ -382,7 +399,6 @@ const ExpenseForm = (props) => {
         {/*    />*/}
         {/*  </FormControl>*/}
         {/*</Grid>*/}
-
 
         <Grid
           item
@@ -490,7 +506,9 @@ const ExpenseForm = (props) => {
                             name={`expense_items[${index}].subtotal`}
                             defaultValue={`${expenseItem.subtotal}`}
                             inputRef={register({required: true, max: 10000000})}
-                            onChange={(e) => {handleSubtotalChange(e)}}
+                            onChange={(e) => {
+                              handleSubtotalChange(e)
+                            }}
                           />
                         </TableCell>
                       </TableRow>
@@ -502,15 +520,14 @@ const ExpenseForm = (props) => {
           </Grid>
         </Grid>
 
-
         {
-            isInvoice ?
-              <Grid
-                item
-                xs={12}
-                className={classes.rowContainer}
-                style={{marginTop: '2em'}}
-              >
+          isInvoice ?
+            <Grid
+              item
+              xs={12}
+              className={classes.rowContainer}
+              style={{marginTop: '2em'}}
+            >
                 <FormControl
                   fullWidth
                 >
@@ -524,9 +541,8 @@ const ExpenseForm = (props) => {
                   />
                 </FormControl>
               </Grid> :
-              null
+            null
         }
-
 
         <Grid
           item
@@ -543,7 +559,7 @@ const ExpenseForm = (props) => {
               className={buttonClassname}
               onClick={handleSubmit(onSubmit)}
             >
-              {success ? <CheckIcon/> : <SaveIcon/>}
+              {success ? <CheckIcon /> : <SaveIcon />}
             </Fab>
             {loading && <CircularProgress
               size={68}

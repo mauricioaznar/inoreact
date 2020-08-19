@@ -7,15 +7,23 @@ import {
 } from '@material-ui/pickers';
 
 function MauDatePicker (props) {
-  const [selectedDate, handleSelectedDate] = useState(props.defaultValue || null);
+  const [selectedDate, handleSelectedDate] = useState(props.defaultValue && props.defaultValue !== '0000-00-00' ?
+    props.defaultValue : null);
 
   useEffect(() => {
-    props.register({name: props.name}, {required: true})
+    props.register({name: props.name},
+      {
+        required: true,
+        validate: (value) => {
+          return value !== '0000-00-00'
+        }
+      }
+    )
   }, [props.register])
 
-  const handleDateChange = (value) => {
-    props.setValue(props.name, value !== null ? value.format('YYYY-MM-DD') : '0000-00-00')
-    handleSelectedDate(value)
+  const handleDateChange = (momentDate) => {
+    props.setValue(props.name, momentDate !== null && momentDate.isValid()? momentDate.format('YYYY-MM-DD') : '0000-00-00', { shouldValidate: true })
+    handleSelectedDate(momentDate)
   }
 
   return (
@@ -25,6 +33,8 @@ function MauDatePicker (props) {
         value={selectedDate}
         variant={'inline'}
         format={'YYYY-MM-DD'}
+        error={props.error}
+        helperText={props.helperText}
         onChange={handleDateChange}
         animateYearScrolling
         PopoverProps={{

@@ -261,6 +261,11 @@ function Production(props) {
                 }
               },
               {
+                title: 'Tipo de gasto',
+                field: 'expense_type_id',
+                lookup: props.expenseTypes
+              },
+              {
                 title: 'Proveedor',
                 field: 'supplier_id',
                 lookup: props.suppliers
@@ -324,6 +329,9 @@ const mapStateToProps = (state, ownProps) => {
   return {
     machines: state.production.machines,
     productTypes: state.production.productTypes,
+    expenseTypes: state.expenses.expenseTypes.reduce((acc, expenseType) => {
+      return {...acc, [expenseType.id]: expenseType.name}
+    }, {}),
     suppliers: state.expenses.suppliers
       .reduce((prevObject, supplier) => {
         return {...prevObject, [supplier.id]: supplier.name}
