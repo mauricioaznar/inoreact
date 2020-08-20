@@ -3,12 +3,18 @@ import {AppBar, Button, Grid, Toolbar, Tab, Tabs} from '@material-ui/core'
 import {Link, useLocation} from 'react-router-dom'
 import {connect} from 'react-redux'
 import {unsetToken} from '../../store/authActions'
+import ListAlt from '@material-ui/icons/ListAlt'
+import {setInventoryDrawerOpen} from '../../store/generalActions'
 
 // noinspection SpellCheckingInspection
 function Navbar(props) {
   const [value, setValue] = React.useState(0)
 
   const location = useLocation()
+
+  const handleChange = (event, newValue) => {
+    setValue(newValue);
+  };
 
   return (
     <AppBar position="fixed">
@@ -43,15 +49,29 @@ function Navbar(props) {
           <Grid
             item
           >
-            <Button
-              color="inherit"
-              onClick={(e) => {
-                e.preventDefault();
-                props.signOutUser()
-              }}
+
+            <Tabs
+              indicatorColor="primary"
+              onChange={handleChange}
+              value={value}
             >
-              Salir
-            </Button>
+              <Tab
+                icon={<ListAlt />}
+                value={value}
+                onClick={(e) => {
+                  e.preventDefault();
+                  props.setOpenDrawer()
+                }}
+              />
+              <Tab
+                label={'Salir'}
+                value={value}
+                onClick={(e) => {
+                  e.preventDefault();
+                  props.signOutUser()
+                }}
+              />
+            </Tabs>
           </Grid>
         </Grid>
       </Toolbar>
@@ -63,6 +83,9 @@ const mapDispatchToProps = (dispatch, ownProps) => {
   return {
     signOutUser: () => {
       dispatch(unsetToken())
+    },
+    setOpenDrawer: () => {
+      dispatch(setInventoryDrawerOpen(true))
     }
   }
 }

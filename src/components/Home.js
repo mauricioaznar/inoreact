@@ -2,10 +2,11 @@ import React, {useEffect, useState} from 'react'
 import {makeStyles} from '@material-ui/core/styles'
 import {connect} from 'react-redux'
 import {getApiEntities} from '../store/generalActions'
-import Equilibrium from './pages/Equilibrium'
 import {Switch, Route} from 'react-router-dom'
 import Navbar from './ui/Navbar'
+import Equilibrium from './pages/Equilibrium'
 import Production from './pages/Production'
+import InventoryDrawer from './ui/InventoryDrawer'
 
 
 const useStyles = makeStyles((theme) => ({
@@ -14,10 +15,11 @@ const useStyles = makeStyles((theme) => ({
 
 const Home = (props) => {
   const classes = useStyles()
-  const [counter, setCounter] = useState(null)
+
   useEffect(() => {
     props.getApiEntities()
-  }, [counter])
+  }, [])
+
   if (props.areEntitiesLoading) { //props.areEntitiesLoading
     return (
       <div>
@@ -27,12 +29,13 @@ const Home = (props) => {
   } else {
     return (
       <div>
-       <Navbar />
+        <Navbar/>
         <div className={classes.toolbarMargin}/>
         <Switch>
           <Route path={'/'} exact component={() => <Equilibrium />}/>
           <Route path={'/production'} component={() => <Production />}/>
         </Switch>
+        <InventoryDrawer/>
       </div>
     )
   }

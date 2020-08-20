@@ -11,6 +11,13 @@ export const setInventory = (inventory) => {
   }
 }
 
+export const setInventoryDrawerOpen = (inventoryDrawerOpen) => {
+  return {
+    type: 'SET_INVENTORY_DRAWER_OPEN',
+    inventoryDrawerOpen: inventoryDrawerOpen
+  }
+}
+
 export const setBranches = (branches) => {
   return {
     type: 'SET_BRANCHES',
