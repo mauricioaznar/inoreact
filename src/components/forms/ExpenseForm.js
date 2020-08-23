@@ -540,8 +540,8 @@ const ExpenseForm = (props) => {
                       <TableCell style={{display: 'none'}}>Id</TableCell>
                       <TableCell style={{width: '40%'}}>Rubro</TableCell>
                       <TableCell style={{width: '20%'}}>Sucursal</TableCell>
-                      <TableCell style={{width: '15'}} align="right">Total</TableCell>
-                      <TableCell style={{width: '15'}} align="right">Cantidad</TableCell>
+                      <TableCell style={{width: '15'}}>Total</TableCell>
+                      <TableCell style={{width: '15'}}>Cantidad</TableCell>
                       <TableCell style={{width: '10%'}}>&nbsp;</TableCell>
                     </TableRow>
                   </TableHead>
@@ -604,7 +604,7 @@ const ExpenseForm = (props) => {
                           />
 
                         </TableCell>
-                        <TableCell align="right">
+                        <TableCell>
                           <TextField
                             id="standard-number"
                             label="Number"
@@ -617,7 +617,7 @@ const ExpenseForm = (props) => {
                             }}
                           />
                         </TableCell>
-                        <TableCell align="right">
+                        <TableCell>
                           <TextField
                             style={{display: !isQuantityRequired(index) ? 'none' : 'inherit'}}
                             id="standard-number"
