@@ -6,6 +6,10 @@ import MenuItem from '@material-ui/core/MenuItem'
 import FormControl from '@material-ui/core/FormControl'
 
 export default function MauObjectSelect (props) {
+
+
+  let displayName = props.displayName || 'name'
+
   return (
     <FormControl
       fullWidth
@@ -29,7 +33,7 @@ export default function MauObjectSelect (props) {
                   key={option.id}
                   value={String(option.id)}
                 >
-                  {option.name}
+                  {option[displayName]}
                 </MenuItem>
               )
             })}

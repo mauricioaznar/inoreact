@@ -2,7 +2,8 @@ const production = (state = {
   orderProductions: [],
   materials: [],
   productTypes: [],
-  machines: []
+  machines: [],
+  products: []
 }, action) => {
   switch (action.type) {
     case 'SET_ORDER_PRODUCTIONS':
@@ -13,6 +14,8 @@ const production = (state = {
       return {...state, productTypes: action.productTypes}
     case 'SET_MACHINES':
       return {...state, machines: action.machines}
+    case 'SET_PRODUCTS':
+      return {...state, products: action.products}
     default:
       return state
   }

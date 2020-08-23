@@ -7,7 +7,12 @@ import {
   setExpenseTypes,
   setExpenseInvoicePaymentMethods
 } from './expensesActions'
-import {setMachines, setMaterials, setProductTypes} from './productionActions'
+import {
+  setMachines,
+  setMaterials,
+  setProducts,
+  setProductTypes
+} from './productionActions'
 import apiUrl from '../helpers/apiUrl'
 
 export const setInventory = (inventory) => {
@@ -49,7 +54,8 @@ export const getApiEntities = () => {
         suppliers,
         product_type: productTypes,
         materials,
-        expense_invoice_payment_methods
+        expense_invoice_payment_methods,
+        products
       } = result[1].data.data
       // dispatch(setOrderProductions(orderProductions))
       dispatch(setInventory(inventory))
@@ -62,6 +68,7 @@ export const getApiEntities = () => {
       dispatch(setProductTypes(productTypes))
       dispatch(setSuppliers(suppliers))
       dispatch(setExpenseTypes(expenseTypes))
+      dispatch(setProducts(products))
     }).finally(() => {
       dispatch(unsetAreEntitiesLoading())
     })

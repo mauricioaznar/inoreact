@@ -128,7 +128,8 @@ const ExpenseForm = (props) => {
     invoice_code: props.expense.invoice_code,
     internal_code: props.expense.internal_code,
     expense_type_id: String(props.expense.expense_type_id),
-    expense_invoice_payment_method_id: String(props.expense.expense_invoice_payment_method_id)
+    expense_invoice_payment_method_id: String(props.expense.expense_invoice_payment_method_id),
+    expense_products: props.expense.expense_products
     // expense_subcategories: initialExpenseSubcategories
   }
 
@@ -148,6 +149,13 @@ const ExpenseForm = (props) => {
     {
       control,
       name: "expense_invoice_complements"
+    }
+  );
+
+  const expenseProducts = useFieldArray(
+    {
+      control,
+      name: "expense_products"
     }
   );
 
@@ -207,6 +215,7 @@ const ExpenseForm = (props) => {
       invoice_code: isInvoice ? data.invoice_code : "",
       date_paid: isDatePaidRequired ? data.date_paid : '0000-00-00',
       expense_invoice_complements: complements,
+      expense_products: isExpenseProductsRequired() ? data.expense_products : [],
       id,
       defaultValues
     }
@@ -224,7 +233,7 @@ const ExpenseForm = (props) => {
   }
 
   const handleAddExpenseItem = () => {
-    expenseItems.append({expense_subcategory_id: '', subtotal: 0, branch_id: ''})
+    expenseItems.append({expense_subcategory_id: '', subtotal: "0", branch_id: ''})
   }
 
   const handleRemoveExpenseItem = (index) => {
@@ -240,6 +249,14 @@ const ExpenseForm = (props) => {
     complements.remove(index)
   }
 
+  const handleAddExpenseProduct = () => {
+    expenseProducts.append({product_id: false, kilos: "0"})
+  }
+
+  const handleRemoveExpenseProduct = (index) => {
+    expenseProducts.remove(index)
+  }
+
   const handleSubtotalChange = (e) => {
     if (isInvoice) setValue('tax', total * 0.16)
   }
@@ -253,6 +270,10 @@ const ExpenseForm = (props) => {
       expenseItem.expense_subcategory_id === '13' ||
       expenseItem.expense_subcategory_id === '39' ||
       expenseItem.expense_subcategory_id === '54')
+  }
+
+  const isExpenseProductsRequired = () => {
+    return true
   }
 
   // const handleAutocompleteChange = (e, data) => {
@@ -746,6 +767,110 @@ const ExpenseForm = (props) => {
         </Grid>
 
 
+        <Grid
+          item
+          xs={12}
+          className={classes.rowContainer}
+          style={{marginTop: '2em', display: !isExpenseProductsRequired() ? 'none' : 'inherit'}}
+        >
+          <Grid
+            container
+            direction={'column'}
+          >
+            <Grid
+              item
+              xs={12}
+            >
+              <Toolbar>
+                <Typography className={classes.tableTitle} variant="h6" id="tableTitle" component="div">
+                  Productos
+                </Typography>
+                <Tooltip title="Filter list">
+                  <IconButton aria-label="filter list" onClick={() => {handleAddExpenseProduct()}}>
+                    <AddIcon />
+                  </IconButton>
+                </Tooltip>
+              </Toolbar>
+              <TableContainer component={Paper}>
+                <Table
+                  aria-label="complements table"
+                  className={classes.table}
+                >
+                  <TableHead>
+                    <TableRow>
+                      <TableCell style={{display: 'none'}}>Id</TableCell>
+                      <TableCell style={{width: '60%'}}>Producto</TableCell>
+                      <TableCell style={{width: '30%'}}>Kilos</TableCell>
+                      <TableCell style={{width: '10%'}}>&nbsp;</TableCell>
+                    </TableRow>
+                  </TableHead>
+                  <TableBody>
+                    {expenseProducts.fields.map((expenseProduct, index) => (
+                      <TableRow key={index}>
+                        <TableCell>
+                          <TableCell style={{display: 'none'}}>
+                            <TextField
+                              id="standard-number"
+                              label="Number"
+                              type="number"
+                              name={`expense_products[${index}].id`}
+                              defaultValue={`${expenseProduct.id}`}
+                              inputRef={register()}
+                            />
+                          </TableCell>
+                          <MauObjectSelect
+                            error={!!errors.expense_products && !!errors.expense_products[index]}
+                            label={'Producto'}
+                            id={'productLabel'}
+                            options={props.products}
+                            displayName={'description'}
+                            name={`expense_products[${index}].product_id`}
+                            rules={
+                              {
+                                required: "this is required",
+                                validate: (value) => {
+                                  return value !== 'null'
+                                }
+                              }
+                            }
+                            control={control}
+                            defaultValue={`${expenseProduct.product_id}`}
+                          />
+
+                        </TableCell>
+                        <TableCell>
+                          <TextField
+                            id="standard-number"
+                            label="Number"
+                            type="number"
+                            name={`expense_products[${index}].kilos`}
+                            defaultValue={`${expenseProduct.kilos}`}
+                            inputRef={register({required: true, max: 10000000})}
+                            onChange={(e) => {
+                              handleSubtotalChange(e)
+                            }}
+                          />
+                        </TableCell>
+                        <TableCell>
+                          {
+                            index !== 0 ?
+                              <IconButton onClick={() => {handleRemoveExpenseProduct(index)}}>
+                                <DeleteIcon />
+                              </IconButton> : ' '
+                          }
+                        </TableCell>
+                      </TableRow>
+
+                    ))}
+                  </TableBody>
+                </Table>
+              </TableContainer>
+            </Grid>
+          </Grid>
+        </Grid>
+
+
+
         {
           isInvoice ?
             <Grid
@@ -859,7 +984,8 @@ const mapStateToProps = (state) => {
     expenseCategories: state.expenses.expenseCategories,
     expenseTypes: state.expenses.expenseTypes,
     branches: state.general.branches,
-    paymentMethods: state.expenses.paymentMethods
+    paymentMethods: state.expenses.paymentMethods,
+    products: state.production.products.filter((product) => product.product_type_id === 4)
   }
 }
 
