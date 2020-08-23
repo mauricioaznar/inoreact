@@ -273,7 +273,9 @@ const ExpenseForm = (props) => {
   }
 
   const isExpenseProductsRequired = () => {
-    return true
+    return watchExpenseItems.reduce((acc, expenseItem) => {
+      return expenseItem.expense_subcategory_id === "55"
+    }, false)
   }
 
   // const handleAutocompleteChange = (e, data) => {
