@@ -625,7 +625,7 @@ const ExpenseForm = (props) => {
                             type="number"
                             name={`expense_items[${index}].quantity`}
                             defaultValue={`${expenseItem.quantity}`}
-                            inputRef={register({required: true, max: 10000000})}
+                            inputRef={register({required: isQuantityRequired(index), max: 10000000})}
                           />
                         </TableCell>
                         <TableCell>
