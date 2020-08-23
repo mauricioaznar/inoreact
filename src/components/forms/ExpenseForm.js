@@ -224,7 +224,7 @@ const ExpenseForm = (props) => {
   }
 
   const handleAddExpenseItem = () => {
-    expenseItems.append({expense_subcategory_id: '', subtotal: 0})
+    expenseItems.append({expense_subcategory_id: '', subtotal: 0, branch_id: ''})
   }
 
   const handleRemoveExpenseItem = (index) => {
@@ -246,7 +246,9 @@ const ExpenseForm = (props) => {
 
   const isQuantityRequired = (index) => {
     let expenseItem = watchExpenseItems[index]
-    // console.log(expenseItem)
+    if (!expenseItem) {
+      return false
+    }
     return (expenseItem.expense_subcategory_id === '12' ||
       expenseItem.expense_subcategory_id === '13' ||
       expenseItem.expense_subcategory_id === '39' ||
