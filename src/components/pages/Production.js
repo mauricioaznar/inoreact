@@ -191,6 +191,20 @@ function Production(props) {
       deletedExpenseItems.forEach(expenseItem => {
         promises.push(axios.put(apiUrl + 'expenseItem/' + expenseItem.id, {active: -1}, {headers: {...authHeader()}}))
       })
+      let deletedExpenseComplements = expense.defaultValues.expense_invoice_complements
+      expense.expense_invoice_complements.forEach(complement => {
+        if (complement.id !== '') {
+          promises.push(axios.put(apiUrl + 'expenseInvoiceComplement/' + complement.id, {...complement}, {headers: {...authHeader()}}))
+          deletedExpenseComplements = deletedExpenseComplements.filter(initialComplement => {
+            return String(initialComplement.id) !== complement.id
+          })
+        } else {
+          promises.push(axios.post(apiUrl + 'expenseInvoiceComplement', {...complement, expense_id: expenseId}, {headers: {...authHeader()}}))
+        }
+      })
+      deletedExpenseComplements.forEach(complement => {
+        promises.push(axios.put(apiUrl + 'expenseInvoiceComplement/' + complement.id, {active: -1}, {headers: {...authHeader()}}))
+      })
       return Promise.all(promises)
     }).then(results => {
       callback(true)

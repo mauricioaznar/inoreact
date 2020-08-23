@@ -1,6 +1,12 @@
 import axios from 'axios'
 import authHeader from '../helpers/authHeader'
-import {setExpenseCategories, setExpenseSubcategories, setSuppliers, setExpenseTypes} from './expensesActions'
+import {
+  setExpenseCategories,
+  setExpenseSubcategories,
+  setSuppliers,
+  setExpenseTypes,
+  setExpenseInvoicePaymentMethods
+} from './expensesActions'
 import {setMachines, setMaterials, setProductTypes} from './productionActions'
 import apiUrl from '../helpers/apiUrl'
 
@@ -42,12 +48,14 @@ export const getApiEntities = () => {
         expense_categories: expenseCategories,
         suppliers,
         product_type: productTypes,
-        materials
+        materials,
+        expense_invoice_payment_methods
       } = result[1].data.data
       // dispatch(setOrderProductions(orderProductions))
       dispatch(setInventory(inventory))
       dispatch(setBranches(branches))
       dispatch(setExpenseCategories(expenseCategories))
+      dispatch(setExpenseInvoicePaymentMethods(expense_invoice_payment_methods))
       dispatch(setExpenseSubcategories(expenseSubcategories))
       dispatch(setMaterials(materials))
       dispatch(setMachines(machines))

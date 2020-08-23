@@ -27,3 +27,9 @@ export const setExpenseTypes = (expenseTypes) => {
   }
 }
 
+export const setExpenseInvoicePaymentMethods = (paymentMethods) => {
+  return {
+    type: 'SET_EXPENSE_INVOICE_PAYMENT_METHODS',
+    paymentMethods
+  }
+}

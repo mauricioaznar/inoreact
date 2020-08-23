@@ -3,7 +3,8 @@ const expenses = (state = {
   expenseCategories: [],
   expenseSubcategories: [],
   expenseTypes: [],
-  suppliers: []
+  suppliers: [],
+  paymentMethods: []
 }, action) => {
   switch (action.type) {
     case 'SET_EXPENSES':
@@ -16,6 +17,8 @@ const expenses = (state = {
       return {...state, suppliers: action.suppliers}
     case 'SET_EXPENSE_TYPES':
       return {...state, expenseTypes: action.expenseTypes}
+    case 'SET_EXPENSE_INVOICE_PAYMENT_METHODS':
+      return {...state, paymentMethods: action.paymentMethods}
     default:
       return state
   }

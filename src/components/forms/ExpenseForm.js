@@ -12,6 +12,8 @@ import CircularProgress from '@material-ui/core/CircularProgress'
 import Fab from '@material-ui/core/Fab';
 import CheckIcon from '@material-ui/icons/Check';
 import SaveIcon from '@material-ui/icons/Save';
+import AddIcon from '@material-ui/icons/Add';
+import DeleteIcon from '@material-ui/icons/Delete'
 import Autocomplete from '@material-ui/lab/Autocomplete'
 import TextField from '@material-ui/core/TextField'
 import TableContainer from '@material-ui/core/TableContainer'
@@ -31,7 +33,16 @@ import InputLabel from '@material-ui/core/InputLabel'
 import RadioGroup from '@material-ui/core/RadioGroup'
 import FormControlLabel from '@material-ui/core/FormControlLabel'
 import Radio from '@material-ui/core/Radio'
+
+import ExpenseSubcategoriesSelect from '../inputs/ExpenseSubcategoriesSelect'
+import Typography from '@material-ui/core/Typography'
+import Switch from '@material-ui/core/Switch'
+import moment from 'moment'
 import FormLabel from '@material-ui/core/FormLabel'
+import Tooltip from '@material-ui/core/Tooltip'
+import IconButton from '@material-ui/core/IconButton'
+import Toolbar from '@material-ui/core/Toolbar'
+import MauObjectSelect from '../inputs/MauObjectSelect'
 
 
 const useStyles = makeStyles((theme) => {
@@ -50,6 +61,9 @@ const useStyles = makeStyles((theme) => {
     },
     wrapper: {
       position: 'relative'
+    },
+    tableTitle: {
+      flexGrow: 1
     },
     buttonSuccess: {
       backgroundColor: green[500],
@@ -78,8 +92,17 @@ const useStyles = makeStyles((theme) => {
 
 const ExpenseForm = (props) => {
 
+
   const [loading, setLoading] = React.useState(false);
   const [success, setSuccess] = React.useState(false);
+  const [isDatePaidRequired, setIsDatePaidRequired] = React.useState(moment(props.expense.date_paid).isValid());
+
+  const classes = useStyles()
+
+  const buttonClassname = clsx({
+    [classes.buttonSuccess]: success
+  });
+
 
   // const theme = useTheme()
 
@@ -94,25 +117,52 @@ const ExpenseForm = (props) => {
   const defaultValues = {
     description: props.expense.description,
     expense_items: props.expense.expense_items,
+    expense_invoice_complements: props.expense.expense_invoice_complements.map(complement => {
+      return {...complement, delivered: complement.delivered === 1}
+    }),
     tax: props.expense.tax,
+    invoice_isr_retained: props.expense.invoice_isr_retained,
+    invoice_tax_retained: props.expense.invoice_tax_retained,
     supplier_id: String(props.expense.supplier_id),
     date_paid: props.expense.date_paid,
     invoice_code: props.expense.invoice_code,
     internal_code: props.expense.internal_code,
-    expense_type_id: String(props.expense.expense_type_id)
+    expense_type_id: String(props.expense.expense_type_id),
+    expense_invoice_payment_method_id: String(props.expense.expense_invoice_payment_method_id)
     // expense_subcategories: initialExpenseSubcategories
   }
 
-  const {register, handleSubmit, reset, watch, control, setValue, getValues, errors} = useForm({
+  const {register, unregister, handleSubmit, reset, watch, control, setValue, getValues, errors} = useForm({
     defaultValues
   });
 
 
+  const expenseItems = useFieldArray(
+    {
+      control,
+      name: "expense_items"
+    }
+  );
+
+  const complements = useFieldArray(
+    {
+      control,
+      name: "expense_invoice_complements"
+    }
+  );
+
   const watchExpenseItems = watch('expense_items')
   const watchExpenseType = watch('expense_type_id')
   const watchDatePaid = watch('date_paid')
+  const watchPaymentMethod = watch('expense_invoice_payment_method_id')
 
-  console.log(watchDatePaid)
+  let isDifferedPaymentMethod = false
+
+  if (watchPaymentMethod === "1") {
+    isDifferedPaymentMethod = true
+  } else {
+    isDifferedPaymentMethod = false
+  }
 
   let total = watchExpenseItems.reduce((acc, expenseItem) => {
     return expenseItem.subtotal !== '' ? acc + Number(expenseItem.subtotal) : acc
@@ -124,19 +174,13 @@ const ExpenseForm = (props) => {
 
   if (watchExpenseType === "1") {
     isNote = true
-  }
-
-  if (watchExpenseType === "2") {
+    isInvoice = false
+  } else if (watchExpenseType === "2") {
     isInvoice = true
+    isNote = false
   }
 
 
-  const {fields, append, prepend, remove, swap, move, insert} = useFieldArray(
-    {
-      control,
-      name: "expense_items"
-    }
-  );
 
 
   // useEffect(() => {
@@ -147,24 +191,27 @@ const ExpenseForm = (props) => {
   //     });
   // }, []);
 
-  const classes = useStyles()
-
-  const buttonClassname = clsx({
-    [classes.buttonSuccess]: success
-  });
-
   const onSubmit = data => {
     let id = props.expense.id
     setSuccess(false);
     setLoading(true);
-    props.onSubmit(
-      {
-        ...data,
-        tax: isInvoice ? data.tax : "0",
-        invoice_code: isInvoice ? data.invoice_code : "",
-        id,
-        defaultValues
-      }, onSubmitCallback)
+    let complements = isDifferedPaymentMethod && data.expense_invoice_complements ? data.expense_invoice_complements
+      .map(complement => {
+        return {...complement, delivered: (complement.delivered ? '1' : '-1')}
+      }) : []
+
+
+    let finalSubmited = {
+      ...data,
+      tax: isInvoice ? data.tax : "0",
+      invoice_code: isInvoice ? data.invoice_code : "",
+      date_paid: isDatePaidRequired ? data.date_paid : '0000-00-00',
+      expense_invoice_complements: complements,
+      id,
+      defaultValues
+    }
+
+    props.onSubmit(finalSubmited, onSubmitCallback)
   };
 
   const onError = data => {
@@ -177,15 +224,33 @@ const ExpenseForm = (props) => {
   }
 
   const handleAddExpenseItem = () => {
-    append({expense_subcategory_id: '', subtotal: 0})
+    expenseItems.append({expense_subcategory_id: '', subtotal: 0})
   }
 
-  const handleRemoveExpenseItem = () => {
-    remove(fields.length - 1)
+  const handleRemoveExpenseItem = (index) => {
+    expenseItems.remove(index)
+  }
+
+
+  const handleAddComplement = () => {
+    complements.append({delivered: false, name: ''})
+  }
+
+  const handleRemoveComplement = (index) => {
+    complements.remove(index)
   }
 
   const handleSubtotalChange = (e) => {
     if (isInvoice) setValue('tax', total * 0.16)
+  }
+
+  const isQuantityRequired = (index) => {
+    let expenseItem = watchExpenseItems[index]
+    // console.log(expenseItem)
+    return (expenseItem.expense_subcategory_id === '12' ||
+      expenseItem.expense_subcategory_id === '13' ||
+      expenseItem.expense_subcategory_id === '39' ||
+      expenseItem.expense_subcategory_id === '54')
   }
 
   // const handleAutocompleteChange = (e, data) => {
@@ -215,12 +280,11 @@ const ExpenseForm = (props) => {
           className={classes.rowContainer}
           style={{marginTop: '2em'}}
         >
-        <InputLabel>Tipo de gasto</InputLabel>
-         <Controller
+          <InputLabel>Tipo de gasto</InputLabel>
+          <Controller
            as={
              <RadioGroup
                aria-label="gender"
-               row
              >
                {props.expenseTypes.map(expenseType => {
                  return (
@@ -242,24 +306,48 @@ const ExpenseForm = (props) => {
 
         <Grid
           item
+          container
           xs={12}
           className={classes.rowContainer}
+          direction={'column'}
           style={{marginTop: '2em'}}
         >
 
-          <FormControl
-            fullWidth
-          >
-            <MauDatePicker
-              register={register}
-              setValue={setValue}
-              error={!!errors.date_paid}
-              helperText={errors.date_paid && errors.date_paid.message}
-              name="date_paid"
-              defaultValue={props.expense.date_paid}
-              label="Fecha de pago"
-            />
-          </FormControl>
+          <Grid item xs>
+           <FormControl>
+             <FormLabel component="legend">
+               ¿Ya se pago?
+             </FormLabel>
+             <FormControlLabel
+               control={
+                 <Switch
+                   checked={isDatePaidRequired}
+                   onChange={() => {setIsDatePaidRequired(!isDatePaidRequired)}}
+                   name="checkedB"
+                   color="primary"
+                 />
+               }
+               label={isDatePaidRequired ? 'Pagada' : 'Pendiente'}
+             />
+           </FormControl>
+          </Grid>
+
+          <Grid item xs style={{marginTop: '0.5em', display: !isDatePaidRequired ? 'none' : 'inherit'}}>
+            <FormControl
+              fullWidth
+            >
+              <MauDatePicker
+                register={register}
+                name="date_paid"
+                setValue={setValue}
+                required={isDatePaidRequired}
+                error={!!errors.date_paid}
+                helperText={errors.date_paid && errors.date_paid.message}
+                defaultValue={props.expense.date_paid}
+                label="Fecha de pago"
+              />
+            </FormControl>
+          </Grid>
         </Grid>
 
         <Grid
@@ -276,6 +364,10 @@ const ExpenseForm = (props) => {
               name="description"
               label="Descripcion"
               error={!!errors.description}
+              placeholder="Se compro 'x' porque 'y' "
+              InputLabelProps={{
+                shrink: true,
+              }}
             />
           </FormControl>
         </Grid>
@@ -294,6 +386,10 @@ const ExpenseForm = (props) => {
               type="number"
               name="internal_code"
               label="Codigo interno"
+              placeholder="14 o 35A o 15 y 16 "
+              InputLabelProps={{
+                shrink: true,
+              }}
             />
           </FormControl>
         </Grid>
@@ -315,6 +411,10 @@ const ExpenseForm = (props) => {
                   })}
                   name="invoice_code"
                   label="Codigo de la factura"
+                  placeholder="CON 770707 "
+                  InputLabelProps={{
+                    shrink: true,
+                  }}
                 />
               </FormControl>
             </Grid> :
@@ -327,47 +427,49 @@ const ExpenseForm = (props) => {
           className={classes.rowContainer}
           style={{marginTop: '2em'}}
         >
-          <FormControl
-            fullWidth
+          <MauObjectSelect
             error={!!errors.supplier_id}
-          >
-            <InputLabel id="supplierLabel">Proveedor</InputLabel>
-            <Controller
-              as={
-                <Select
-                  labelId={'supplierLabel'}
-                >
-                  <MenuItem
-                    key={0}
-                    value={'null'}
-                  >
-                    &nbsp;
-                  </MenuItem>
-                  {props.suppliers.map(supplier => {
-                    return (
-                      <MenuItem
-                        key={supplier.id}
-                        value={supplier.id}
-                      >
-                        {supplier.name}
-                      </MenuItem>
-                    )
-                  })}
-                </Select>
-              }
-              name={`supplier_id`}
-              rules={
-                {
-                  required: "this is required",
-                  validate: (value) => {
-                    return value !== 'null'
-                  }
+            label={'Proveedor'}
+            id={'supplierLabel'}
+            options={props.suppliers}
+            name={'supplier_id'}
+            rules={
+              {
+                required: "this is required",
+                validate: (value) => {
+                  return value !== 'null'
                 }
               }
-              control={control}
-              defaultValue={`${props.expense.supplier_id}`}
-            />
-          </FormControl>
+            }
+            control={control}
+            defaultValue={`${props.expense.supplier_id}`}
+          />
+        </Grid>
+
+
+        <Grid
+          item
+          xs={12}
+          className={classes.rowContainer}
+          style={{marginTop: '2em'}}
+        >
+          <MauObjectSelect
+            error={!!errors.expense_invoice_payment_method_id}
+            label={'Metodo de pago'}
+            id={'paymentMethodLabel'}
+            options={props.paymentMethods}
+            name={'expense_invoice_payment_method_id'}
+            rules={
+              {
+                required: "this is required",
+                validate: (value) => {
+                  return value !== 'null'
+                }
+              }
+            }
+            control={control}
+            defaultValue={`${props.expense.expense_invoice_payment_method_id}`}
+          />
         </Grid>
 
         {/*<Grid*/}
@@ -410,7 +512,6 @@ const ExpenseForm = (props) => {
           className={classes.rowContainer}
           style={{marginTop: '2em'}}
         >
-
           <Grid
             container
             direction={'column'}
@@ -419,28 +520,16 @@ const ExpenseForm = (props) => {
               item
               xs={12}
             >
-              <ButtonGroup
-                variant="contained"
-                color="primary"
-                aria-label="contained primary button group"
-              >
-                <Button
-                  onClick={() => {
-                    handleRemoveExpenseItem()
-                  }}
-                >Remover</Button>
-                <Button
-                  onClick={() => {
-                    handleAddExpenseItem()
-                  }}
-                >Agregar</Button>
-              </ButtonGroup>
-            </Grid>
-
-            <Grid
-              item
-              xs={12}
-            >
+              <Toolbar>
+                <Typography className={classes.tableTitle} variant="h6" id="tableTitle" component="div">
+                  Elementos del gasto
+                </Typography>
+                <Tooltip title="Filter list">
+                  <IconButton aria-label="filter list" onClick={() => {handleAddExpenseItem()}}>
+                    <AddIcon />
+                  </IconButton>
+                </Tooltip>
+              </Toolbar>
               <TableContainer component={Paper}>
                 <Table
                   aria-label="simple table"
@@ -449,12 +538,15 @@ const ExpenseForm = (props) => {
                   <TableHead>
                     <TableRow>
                       <TableCell style={{display: 'none'}}>Id</TableCell>
-                      <TableCell style={{width: '50%'}}>Rubro</TableCell>
-                      <TableCell align="right">Subtotal</TableCell>
+                      <TableCell style={{width: '40%'}}>Rubro</TableCell>
+                      <TableCell style={{width: '20%'}}>Sucursal</TableCell>
+                      <TableCell style={{width: '15'}} align="right">Total</TableCell>
+                      <TableCell style={{width: '15'}} align="right">Cantidad</TableCell>
+                      <TableCell style={{width: '10%'}}>&nbsp;</TableCell>
                     </TableRow>
                   </TableHead>
                   <TableBody>
-                    {fields.map((expenseItem, index) => (
+                    {expenseItems.fields.map((expenseItem, index) => (
                       <TableRow key={index + '' + expenseItem.expense_subcategory_id}>
                         <TableCell style={{display: 'none'}}>
                           <TextField
@@ -470,26 +562,15 @@ const ExpenseForm = (props) => {
 
                           <FormControl fullWidth>
 
-                            <Controller
-                              as={
-                                <Select>
-                                  {props.expenseSubcategories.map(expenseSubcategory => {
-                                    return (
-                                      <MenuItem
-                                        key={expenseSubcategory.id}
-                                        value={expenseSubcategory.id}
-                                      >
-                                        {expenseSubcategory.name}
-                                      </MenuItem>
-                                    )
-                                  })}
-                                </Select>
-                              }
+                            <ExpenseSubcategoriesSelect
                               name={`expense_items[${index}].expense_subcategory_id`}
+                              label={'Rubro'}
                               rules={{required: "this is required"}}
                               control={control}
                               defaultValue={`${expenseItem.expense_subcategory_id}`}
+
                             />
+
                           </FormControl>
 
                           {/*<TextField*/}
@@ -501,6 +582,27 @@ const ExpenseForm = (props) => {
                           {/*  defaultValue={`${expenseItem.expense_subcategory_id}`}*/}
                           {/*  inputRef={register({ required: true })}*/}
                           {/*/>*/}
+                        </TableCell>
+                        <TableCell>
+
+                          <MauObjectSelect
+                            error={!!errors.branch_id}
+                            label={'Sucursal'}
+                            id={'branchLabel'}
+                            options={props.branches}
+                            name={`expense_items[${index}].branch_id`}
+                            rules={
+                              {
+                                required: "this is required",
+                                validate: (value) => {
+                                  return value !== 'null'
+                                }
+                              }
+                            }
+                            control={control}
+                            defaultValue={`${expenseItem.branch_id}`}
+                          />
+
                         </TableCell>
                         <TableCell align="right">
                           <TextField
@@ -515,7 +617,27 @@ const ExpenseForm = (props) => {
                             }}
                           />
                         </TableCell>
+                        <TableCell align="right">
+                          <TextField
+                            style={{display: !isQuantityRequired(index) ? 'none' : 'inherit'}}
+                            id="standard-number"
+                            label="Number"
+                            type="number"
+                            name={`expense_items[${index}].quantity`}
+                            defaultValue={`${expenseItem.quantity}`}
+                            inputRef={register({required: true, max: 10000000})}
+                          />
+                        </TableCell>
+                        <TableCell>
+                          {
+                            index !== 0 ?
+                              <IconButton onClick={() => {handleRemoveExpenseItem(index)}}>
+                                <DeleteIcon />
+                              </IconButton> : ' '
+                          }
+                        </TableCell>
                       </TableRow>
+
                     ))}
                   </TableBody>
                 </Table>
@@ -523,6 +645,104 @@ const ExpenseForm = (props) => {
             </Grid>
           </Grid>
         </Grid>
+
+
+
+        <Grid
+          item
+          xs={12}
+          className={classes.rowContainer}
+          style={{marginTop: '2em', display: !isDifferedPaymentMethod ? 'none' : 'inherit'}}
+        >
+          <Grid
+            container
+            direction={'column'}
+          >
+            <Grid
+              item
+              xs={12}
+            >
+              <Toolbar>
+                <Typography className={classes.tableTitle} variant="h6" id="tableTitle" component="div">
+                  Complementos
+                </Typography>
+                <Tooltip title="Filter list">
+                  <IconButton aria-label="filter list" onClick={() => {handleAddComplement()}}>
+                    <AddIcon />
+                  </IconButton>
+                </Tooltip>
+              </Toolbar>
+              <TableContainer component={Paper}>
+                <Table
+                  aria-label="complements table"
+                  className={classes.table}
+                >
+                  <TableHead>
+                    <TableRow>
+                      <TableCell style={{display: 'none'}}>Id</TableCell>
+                      <TableCell style={{width: '10%'}}>Completado</TableCell>
+                      <TableCell style={{width: '70%'}}>Nombre</TableCell>
+                      <TableCell style={{width: '10%'}}>&nbsp;</TableCell>
+                    </TableRow>
+                  </TableHead>
+                  <TableBody>
+                    {complements.fields.map((complement, index) => (
+                      <TableRow key={index}>
+                        <TableCell style={{display: 'none'}}>
+                          <TextField
+                            id="standard-number"
+                            label="Number"
+                            type="number"
+                            name={`expense_invoice_complements[${index}].id`}
+                            defaultValue={`${complement.id}`}
+                            inputRef={register()}
+                          />
+                        </TableCell>
+                        <TableCell>
+                          <FormControl fullWidth>
+                            <Controller
+                              id={`expense_invoice_complements[${index}].delivered`}
+                              name={`expense_invoice_complements[${index}].delivered`}
+                              control={control}
+                              defaultValue={complement.delivered}
+                              render={(props) => (
+                                <Switch
+                                  onChange={(e) => props.onChange(e.target.checked)}
+                                  checked={props.value}
+                                />
+                              )}
+                            />
+                          </FormControl>
+                        </TableCell>
+                        <TableCell align="right">
+                          <FormControl fullWidth>
+                            <TextField
+                              id="standard-number"
+                              label="Number"
+                              name={`expense_invoice_complements[${index}].name`}
+                              defaultValue={`${complement.name}`}
+                              inputRef={register()}
+                            />
+                          </FormControl>
+                        </TableCell>
+                        <TableCell>
+                          {
+                            index !== 0 ?
+                              <IconButton onClick={() => {handleRemoveComplement(index)}}>
+                                <DeleteIcon />
+                              </IconButton> : ' '
+                          }
+                        </TableCell>
+                      </TableRow>
+
+                    ))}
+                  </TableBody>
+                </Table>
+              </TableContainer>
+            </Grid>
+          </Grid>
+        </Grid>
+
 
         {
           isInvoice ?
@@ -545,6 +765,54 @@ const ExpenseForm = (props) => {
                   />
                 </FormControl>
               </Grid> :
+            null
+        }
+
+        {
+          isInvoice ?
+            <Grid
+              item
+              xs={12}
+              className={classes.rowContainer}
+              style={{marginTop: '2em'}}
+            >
+              <FormControl
+                fullWidth
+              >
+                <TextField
+                  inputRef={register({
+                    required: true
+                  })}
+                  type="number"
+                  name="invoice_tax_retained"
+                  label="IVA retenido"
+                />
+              </FormControl>
+            </Grid> :
+            null
+        }
+
+        {
+          isInvoice ?
+            <Grid
+              item
+              xs={12}
+              className={classes.rowContainer}
+              style={{marginTop: '2em'}}
+            >
+              <FormControl
+                fullWidth
+              >
+                <TextField
+                  inputRef={register({
+                    required: true
+                  })}
+                  type="number"
+                  name="invoice_isr_retained"
+                  label="IVA retenido"
+                />
+              </FormControl>
+            </Grid> :
             null
         }
 
@@ -578,7 +846,6 @@ const ExpenseForm = (props) => {
   )
 }
 
-
 const mapStateToProps = (state) => {
   return {
     suppliers: state.expenses.suppliers.sort((a, b) => {
@@ -587,7 +854,10 @@ const mapStateToProps = (state) => {
     expenseSubcategories: state.expenses.expenseSubcategories.sort((a, b) => {
       return a.expense_category_id > b.expense_category_id ? 1 : -1
     }),
-    expenseTypes: state.expenses.expenseTypes
+    expenseCategories: state.expenses.expenseCategories,
+    expenseTypes: state.expenses.expenseTypes,
+    branches: state.general.branches,
+    paymentMethods: state.expenses.paymentMethods
   }
 }
 

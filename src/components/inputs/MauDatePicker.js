@@ -15,14 +15,15 @@ function MauDatePicker (props) {
       {
         required: true,
         validate: (value) => {
-          return value !== '0000-00-00'
+          return props.required ?  value !== '0000-00-00' : true
         }
       }
     )
   }, [props.register])
 
   const handleDateChange = (momentDate) => {
-    props.setValue(props.name, momentDate !== null && momentDate.isValid()? momentDate.format('YYYY-MM-DD') : '0000-00-00', { shouldValidate: true })
+    props.setValue(props.name, momentDate !== null && momentDate.isValid()
+      ? momentDate.format('YYYY-MM-DD') : '0000-00-00', { shouldValidate: true })
     handleSelectedDate(momentDate)
   }
 
