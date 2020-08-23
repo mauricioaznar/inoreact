@@ -212,6 +212,8 @@ const ExpenseForm = (props) => {
     let finalSubmited = {
       ...data,
       tax: isInvoice ? data.tax : "0",
+      invoice_tax_retained: isInvoice ? data.invoice_tax_retained : "0",
+      invoice_isr_retained: isInvoice ? data.invoice_isr_retained : "0",
       invoice_code: isInvoice ? data.invoice_code : "",
       date_paid: isDatePaidRequired ? data.date_paid : '0000-00-00',
       expense_invoice_complements: complements,
@@ -258,7 +260,7 @@ const ExpenseForm = (props) => {
   }
 
   const handleSubtotalChange = (e) => {
-    if (isInvoice) setValue('tax', total * 0.16)
+    setValue('tax', total * 0.16)
   }
 
   const isQuantityRequired = (index) => {
@@ -314,6 +316,9 @@ const ExpenseForm = (props) => {
                {props.expenseTypes.map(expenseType => {
                  return (
                    <FormControlLabel
+                     onChange={(e) => {
+                       handleSubtotalChange(e)
+                     }}
                      key={expenseType.id}
                      value={String(expenseType.id)}
                      control={<Radio />}
@@ -347,7 +352,9 @@ const ExpenseForm = (props) => {
                control={
                  <Switch
                    checked={isDatePaidRequired}
-                   onChange={() => {setIsDatePaidRequired(!isDatePaidRequired)}}
+                   onChange={() => {
+                     setIsDatePaidRequired(!isDatePaidRequired)
+                   }}
                    name="checkedB"
                    color="primary"
                  />
@@ -873,29 +880,26 @@ const ExpenseForm = (props) => {
 
 
 
-        {
-          isInvoice ?
-            <Grid
-              item
-              xs={12}
-              className={classes.rowContainer}
-              style={{marginTop: '2em'}}
+
+        <Grid
+          item
+          xs={12}
+          className={classes.rowContainer}
+          style={{marginTop: '2em', display: !isInvoice ? 'none' : 'inherit'}}
+        >
+            <FormControl
+              fullWidth
             >
-                <FormControl
-                  fullWidth
-                >
-                  <TextField
-                    inputRef={register({
-                      required: true
-                    })}
-                    type="number"
-                    name="tax"
-                    label="IVA"
-                  />
-                </FormControl>
-              </Grid> :
-            null
-        }
+              <TextField
+                inputRef={register({
+                  required: true
+                })}
+                type="number"
+                name="tax"
+                label="IVA"
+              />
+            </FormControl>
+          </Grid>
 
         {
           isInvoice ?
