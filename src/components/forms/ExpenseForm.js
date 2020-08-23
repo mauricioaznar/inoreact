@@ -540,8 +540,8 @@ const ExpenseForm = (props) => {
                       <TableCell style={{display: 'none'}}>Id</TableCell>
                       <TableCell style={{width: '40%'}}>Rubro</TableCell>
                       <TableCell style={{width: '20%'}}>Sucursal</TableCell>
-                      <TableCell style={{width: '15'}}>Total</TableCell>
-                      <TableCell style={{width: '15'}}>Cantidad</TableCell>
+                      <TableCell style={{width: '15%'}}>Total</TableCell>
+                      <TableCell style={{width: '15%'}}>Cantidad</TableCell>
                       <TableCell style={{width: '10%'}}>&nbsp;</TableCell>
                     </TableRow>
                   </TableHead>
