@@ -3,7 +3,6 @@ import React, {useEffect} from "react";
 import {connect} from 'react-redux'
 
 import clsx from 'clsx';
-import {Input} from "@material-ui/core";
 import {useForm, Controller, useFieldArray} from "react-hook-form";
 import {green} from '@material-ui/core/colors';
 import {makeStyles, useTheme} from '@material-ui/core/styles'
@@ -14,10 +13,8 @@ import CheckIcon from '@material-ui/icons/Check';
 import SaveIcon from '@material-ui/icons/Save';
 import AddIcon from '@material-ui/icons/Add';
 import DeleteIcon from '@material-ui/icons/Delete'
-import Autocomplete from '@material-ui/lab/Autocomplete'
 import TextField from '@material-ui/core/TextField'
 import TableContainer from '@material-ui/core/TableContainer'
-import useMediaQuery from '@material-ui/core/useMediaQuery'
 import Paper from '@material-ui/core/Paper'
 import Table from '@material-ui/core/Table'
 import TableHead from '@material-ui/core/TableHead'
@@ -163,7 +160,6 @@ const ExpenseForm = (props) => {
 
   const watchExpenseItems = watch('expense_items')
   const watchExpenseType = watch('expense_type_id')
-  const watchDatePaid = watch('date_paid')
   const watchPaymentMethod = watch('expense_invoice_payment_method_id')
   const watchExpenseProducts = watch('expense_products')
 
@@ -181,14 +177,11 @@ const ExpenseForm = (props) => {
 
 
   let isInvoice = false
-  let isNote = false
 
   if (watchExpenseType === "1") {
-    isNote = true
     isInvoice = false
   } else if (watchExpenseType === "2") {
     isInvoice = true
-    isNote = false
   }
 
 
@@ -257,7 +250,7 @@ const ExpenseForm = (props) => {
   }
 
   const handleAddExpenseProduct = () => {
-    expenseProducts.append({product_id: false, _kilos: "0", _groups: "0", kilos: "0", groups: "0", group_weight: "0", kilo_price: "0"})
+    expenseProducts.append({product_id: "null", _kilos: "0", _groups: "0", kilos: "0", groups: "0", group_weight: "0", kilo_price: "0"})
   }
 
   const handleRemoveExpenseProduct = (index) => {
@@ -266,8 +259,10 @@ const ExpenseForm = (props) => {
 
   const handleProductSelection = (e, index) => {
     let productId = e.target.value
-    let groupWeight = 0
-    let kiloPrice
+    let groupWeight = "0"
+    let kiloPrice = "0"
+    let kilos = "0"
+    let groups = "0"
     let initialExpenseProduct = defaultValues.expense_products.find(expenseProduct => {
       return productId === String(expenseProduct.product_id)
     })
@@ -277,12 +272,18 @@ const ExpenseForm = (props) => {
       })
       groupWeight = product.current_group_weight
       kiloPrice = product.current_kilo_price
+      kilos = "0"
+      groups = "0"
     } else {
       groupWeight = initialExpenseProduct.group_weight
       kiloPrice = initialExpenseProduct.kilo_price
+      kilos = initialExpenseProduct.kilos
+      groups = initialExpenseProduct.groups
     }
     setValue(`expense_products[${index}].group_weight`, String(groupWeight))
     setValue(`expense_products[${index}].kilo_price`, String(kiloPrice))
+    setValue(`expense_products[${index}].kilos`, String(kilos))
+    setValue(`expense_products[${index}].groups`, String(groups))
   }
 
   const calculateExpenseProductKilos = (e, index) => {
