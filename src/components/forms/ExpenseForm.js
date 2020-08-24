@@ -40,6 +40,7 @@ import Tooltip from '@material-ui/core/Tooltip'
 import IconButton from '@material-ui/core/IconButton'
 import Toolbar from '@material-ui/core/Toolbar'
 import MauObjectSelect from '../inputs/MauObjectSelect'
+import MauAutocomplete from '../inputs/MauAutocomplete'
 
 
 const useStyles = makeStyles((theme) => {
@@ -312,10 +313,9 @@ const ExpenseForm = (props) => {
   }
 
   const isExpenseProductsRequired = () => {
-    // return watchExpenseItems.reduce((acc, expenseItem) => {
-    //   return expenseItem.expense_subcategory_id === "55"
-    // }, false)
-    return true
+    return watchExpenseItems.reduce((acc, expenseItem) => {
+      return expenseItem.expense_subcategory_id === "55"
+    }, false)
   }
 
   // const handleAutocompleteChange = (e, data) => {
@@ -491,18 +491,46 @@ const ExpenseForm = (props) => {
             null
         }
 
-        <Grid
-          item
-          xs={12}
-          className={classes.rowContainer}
-          style={{marginTop: '2em'}}
-        >
-          <MauObjectSelect
+        {/*<Grid*/}
+        {/*  item*/}
+        {/*  xs={12}*/}
+        {/*  className={classes.rowContainer}*/}
+        {/*  style={{marginTop: '2em'}}*/}
+        {/*>*/}
+        {/*  <MauObjectSelect*/}
+        {/*    error={!!errors.supplier_id}*/}
+        {/*    label={'Proveedor'}*/}
+        {/*    id={'supplierLabel'}*/}
+        {/*    options={props.suppliers}*/}
+        {/*    name={'supplier_id'}*/}
+        {/*    rules={*/}
+        {/*      {*/}
+        {/*        required: "this is required",*/}
+        {/*        validate: (value) => {*/}
+        {/*          return value !== 'null'*/}
+        {/*        }*/}
+        {/*      }*/}
+        {/*    }*/}
+        {/*    control={control}*/}
+        {/*    defaultValue={`${props.expense.supplier_id}`}*/}
+        {/*  />*/}
+        {/*</Grid>*/}
+
+
+         <Grid
+           item
+           xs={12}
+           className={classes.rowContainer}
+           style={{marginTop: '2em'}}
+         >
+          <MauAutocomplete
             error={!!errors.supplier_id}
             label={'Proveedor'}
+            placeholder={'Proveedor x'}
             id={'supplierLabel'}
             options={props.suppliers}
             name={'supplier_id'}
+            displayName={'name'}
             rules={
               {
                 required: "this is required",

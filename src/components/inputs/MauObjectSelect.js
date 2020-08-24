@@ -23,7 +23,7 @@ export default function MauObjectSelect (props) {
             <Select
               labelId={props.id}
               onChange={(e) => {
-                props.onChange(e)
+                if (props.onChange) props.onChange(e)
                 renderProps.onChange(e)
               }}
               value={renderProps.value}
