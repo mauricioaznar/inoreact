@@ -698,7 +698,7 @@ const ExpenseForm = (props) => {
                             inputRef={register({required: isQuantityRequired(index), max: 10000000})}
                           />
                         </TableCell>
-                        <TableCell>
+                        <TableCell align={'right'}>
                           {
                             index !== 0 ?
                               <IconButton onClick={() => {handleRemoveExpenseItem(index)}}>
@@ -795,7 +795,7 @@ const ExpenseForm = (props) => {
                             />
                           </FormControl>
                         </TableCell>
-                        <TableCell>
+                        <TableCell align={'right'}>
                           {
                             index !== 0 ?
                               <IconButton onClick={() => {handleRemoveComplement(index)}}>
