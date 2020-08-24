@@ -129,7 +129,9 @@ const ExpenseForm = (props) => {
     internal_code: props.expense.internal_code,
     expense_type_id: String(props.expense.expense_type_id),
     expense_invoice_payment_method_id: String(props.expense.expense_invoice_payment_method_id),
-    expense_products: props.expense.expense_products
+    expense_products: props.expense.expense_products.map(expenseProduct => {
+      return {...expenseProduct, _kilos: expenseProduct.kilos, _groups: expenseProduct.groups}
+    })
     // expense_subcategories: initialExpenseSubcategories
   }
 
@@ -163,6 +165,7 @@ const ExpenseForm = (props) => {
   const watchExpenseType = watch('expense_type_id')
   const watchDatePaid = watch('date_paid')
   const watchPaymentMethod = watch('expense_invoice_payment_method_id')
+  const watchExpenseProducts = watch('expense_products')
 
   let isDifferedPaymentMethod = false
 
@@ -209,6 +212,8 @@ const ExpenseForm = (props) => {
       }) : []
 
 
+    console.log(data.expense_products)
+
     let finalSubmited = {
       ...data,
       tax: isInvoice ? data.tax : "0",
@@ -252,11 +257,42 @@ const ExpenseForm = (props) => {
   }
 
   const handleAddExpenseProduct = () => {
-    expenseProducts.append({product_id: false, kilos: "0"})
+    expenseProducts.append({product_id: false, _kilos: "0", _groups: "0", kilos: "0", groups: "0", group_weight: "0", kilo_price: "0"})
   }
 
   const handleRemoveExpenseProduct = (index) => {
     expenseProducts.remove(index)
+  }
+
+  const handleProductSelection = (e, index) => {
+    let productId = e.target.value
+    let groupWeight = 0
+    let kiloPrice
+    let initialExpenseProduct = defaultValues.expense_products.find(expenseProduct => {
+      return productId === String(expenseProduct.product_id)
+    })
+    if (!initialExpenseProduct) {
+      let product = props.products.find(product => {
+        return String(product.id) === productId
+      })
+      groupWeight = product.current_group_weight
+      kiloPrice = product.current_kilo_price
+    } else {
+      groupWeight = initialExpenseProduct.group_weight
+      kiloPrice = initialExpenseProduct.kilo_price
+    }
+    setValue(`expense_products[${index}].group_weight`, String(groupWeight))
+    setValue(`expense_products[${index}].kilo_price`, String(kiloPrice))
+  }
+
+  const calculateExpenseProductKilos = (e, index) => {
+    let kilos = Number(watchExpenseProducts[index].groups) *  Number(watchExpenseProducts[index].group_weight)
+    setValue(`expense_products[${index}].kilos`, kilos)
+  }
+
+  const hasGroupWeight = (index) => {
+    let expenseProduct = watchExpenseProducts[index]
+    return expenseProduct && expenseProduct.group_weight !== "0"
   }
 
   const handleSubtotalChange = (e) => {
@@ -809,9 +845,9 @@ const ExpenseForm = (props) => {
                   <TableHead>
                     <TableRow>
                       <TableCell style={{display: 'none'}}>Id</TableCell>
-                      <TableCell style={{width: '50%'}}>Producto</TableCell>
-                      <TableCell style={{width: '10%'}}>Kilos</TableCell>
+                      <TableCell style={{width: '30%'}}>Producto</TableCell>
                       <TableCell style={{width: '10%'}}>Bultos</TableCell>
+                      <TableCell style={{width: '10%'}}>Kilos</TableCell>
                       <TableCell style={{width: '10%'}}>Precio</TableCell>
                       <TableCell style={{width: '10%'}}>Peso</TableCell>
                       <TableCell style={{width: '10%'}}>&nbsp;</TableCell>
@@ -820,8 +856,7 @@ const ExpenseForm = (props) => {
                   <TableBody>
                     {expenseProducts.fields.map((expenseProduct, index) => (
                       <TableRow key={index}>
-                        <TableCell>
-                          <TableCell style={{display: 'none'}}>
+                         <TableCell style={{display: 'none'}}>
                             <TextField
                               id="standard-number"
                               label="Number"
@@ -830,13 +865,17 @@ const ExpenseForm = (props) => {
                               defaultValue={`${expenseProduct.id}`}
                               inputRef={register()}
                             />
-                          </TableCell>
+                        </TableCell>
+                        <TableCell>
                           <MauObjectSelect
                             error={!!errors.expense_products && !!errors.expense_products[index]}
                             label={'Producto'}
                             id={'productLabel'}
                             options={props.products}
                             displayName={'description'}
+                            onChange={(e) => {
+                              handleProductSelection(e, index)
+                            }}
                             name={`expense_products[${index}].product_id`}
                             rules={
                               {
@@ -849,25 +888,30 @@ const ExpenseForm = (props) => {
                             control={control}
                             defaultValue={`${expenseProduct.product_id}`}
                           />
-
+                        </TableCell>
+                        <TableCell>
+                          <TextField
+                            id="groups"
+                            label="Bultos"
+                            type="number"
+                            name={`expense_products[${index}].groups`}
+                            onChange={(e) => {
+                              if(hasGroupWeight(index)) {
+                                calculateExpenseProductKilos(e, index)
+                              }
+                            }}
+                            defaultValue={`${expenseProduct.groups}`}
+                            inputRef={register({required: true, max: 10000000})}
+                          />
                         </TableCell>
                         <TableCell>
                           <TextField
                             id="Kilos"
                             label="Kilos"
                             type="number"
+                            disabled={hasGroupWeight(index)}
                             name={`expense_products[${index}].kilos`}
                             defaultValue={`${expenseProduct.kilos}`}
-                            inputRef={register({required: true, max: 10000000})}
-                          />
-                        </TableCell>
-                        <TableCell>
-                          <TextField
-                            id="groups"
-                            label="Butlos"
-                            type="number"
-                            name={`expense_products[${index}].groups`}
-                            defaultValue={`${expenseProduct.groups}`}
                             inputRef={register({required: true, max: 10000000})}
                           />
                         </TableCell>
@@ -885,13 +929,14 @@ const ExpenseForm = (props) => {
                           <TextField
                             id="group_weight"
                             label="Peso por kilo"
+                            disabled
                             type="number"
                             name={`expense_products[${index}].group_weight`}
                             defaultValue={`${expenseProduct.group_weight}`}
                             inputRef={register({required: true, max: 10000000})}
                           />
                         </TableCell>
-                        <TableCell>
+                        <TableCell align={'right'}>
                           {
                             index !== 0 ?
                               <IconButton onClick={() => {handleRemoveExpenseProduct(index)}}>

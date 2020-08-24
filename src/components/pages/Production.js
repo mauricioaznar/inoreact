@@ -209,8 +209,8 @@ function Production(props) {
       expense.expense_products.forEach(expenseProduct => {
         if (expenseProduct.id !== '') {
           promises.push(axios.put(apiUrl + 'expenseProduct/' + expenseProduct.id, {...expenseProduct}, {headers: {...authHeader()}}))
-          deletedExpenseProducts = deletedExpenseComplements.filter(initialComplement => {
-            return String(initialComplement.id) !== expenseProduct.id
+          deletedExpenseProducts = deletedExpenseProducts.filter(initialExpenseProduct => {
+            return String(initialExpenseProduct.id) !== expenseProduct.id
           })
         } else {
           promises.push(axios.post(apiUrl + 'expenseProduct', {...expenseProduct, expense_id: expenseId}, {headers: {...authHeader()}}))

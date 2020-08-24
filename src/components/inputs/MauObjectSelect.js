@@ -17,28 +17,36 @@ export default function MauObjectSelect (props) {
     >
       <InputLabel id={props.id}>{props.label}</InputLabel>
       <Controller
-        as={
-          <Select
-            labelId={props.id}
-          >
+        onChange={e => {console.log(e)}}
+        render={(renderProps) => {
+          return (
+            <Select
+              labelId={props.id}
+              onChange={(e) => {
+                props.onChange(e)
+                renderProps.onChange(e)
+              }}
+              value={renderProps.value}
+            >
             <MenuItem
               key={0}
               value={'null'}
             >
               &nbsp;
             </MenuItem>
-            {props.options.map(option => {
-              return (
-                <MenuItem
-                  key={option.id}
-                  value={String(option.id)}
-                >
+              {props.options.map(option => {
+                return (
+                  <MenuItem
+                    key={option.id}
+                    value={String(option.id)}
+                  >
                   {option[displayName]}
                 </MenuItem>
-              )
-            })}
+                )
+              })}
           </Select>
-        }
+          )
+        }}
         name={props.name}
         rules={props.rules}
         control={props.control}
