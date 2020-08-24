@@ -271,7 +271,7 @@ const ExpenseForm = (props) => {
       let product = props.products.find(product => {
         return String(product.id) === productId
       })
-      groupWeight = product.current_group_weight
+      groupWeight = product.current_group_weight ? product.current_group_weight : "0"
       kiloPrice = product.current_kilo_price
       kilos = "0"
       groups = "0"
