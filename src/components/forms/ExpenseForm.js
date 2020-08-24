@@ -275,9 +275,10 @@ const ExpenseForm = (props) => {
   }
 
   const isExpenseProductsRequired = () => {
-    return watchExpenseItems.reduce((acc, expenseItem) => {
-      return expenseItem.expense_subcategory_id === "55"
-    }, false)
+    // return watchExpenseItems.reduce((acc, expenseItem) => {
+    //   return expenseItem.expense_subcategory_id === "55"
+    // }, false)
+    return true
   }
 
   // const handleAutocompleteChange = (e, data) => {
@@ -808,8 +809,11 @@ const ExpenseForm = (props) => {
                   <TableHead>
                     <TableRow>
                       <TableCell style={{display: 'none'}}>Id</TableCell>
-                      <TableCell style={{width: '60%'}}>Producto</TableCell>
-                      <TableCell style={{width: '30%'}}>Kilos</TableCell>
+                      <TableCell style={{width: '50%'}}>Producto</TableCell>
+                      <TableCell style={{width: '10%'}}>Kilos</TableCell>
+                      <TableCell style={{width: '10%'}}>Bultos</TableCell>
+                      <TableCell style={{width: '10%'}}>Precio</TableCell>
+                      <TableCell style={{width: '10%'}}>Peso</TableCell>
                       <TableCell style={{width: '10%'}}>&nbsp;</TableCell>
                     </TableRow>
                   </TableHead>
@@ -849,15 +853,42 @@ const ExpenseForm = (props) => {
                         </TableCell>
                         <TableCell>
                           <TextField
-                            id="standard-number"
-                            label="Number"
+                            id="Kilos"
+                            label="Kilos"
                             type="number"
                             name={`expense_products[${index}].kilos`}
                             defaultValue={`${expenseProduct.kilos}`}
                             inputRef={register({required: true, max: 10000000})}
-                            onChange={(e) => {
-                              handleSubtotalChange(e)
-                            }}
+                          />
+                        </TableCell>
+                        <TableCell>
+                          <TextField
+                            id="groups"
+                            label="Butlos"
+                            type="number"
+                            name={`expense_products[${index}].groups`}
+                            defaultValue={`${expenseProduct.groups}`}
+                            inputRef={register({required: true, max: 10000000})}
+                          />
+                        </TableCell>
+                        <TableCell>
+                          <TextField
+                            id="kilo_price"
+                            label="Precio por kilo"
+                            type="number"
+                            name={`expense_products[${index}].kilo_price`}
+                            defaultValue={`${expenseProduct.kilo_price}`}
+                            inputRef={register({required: true, max: 10000000})}
+                          />
+                        </TableCell>
+                        <TableCell>
+                          <TextField
+                            id="group_weight"
+                            label="Peso por kilo"
+                            type="number"
+                            name={`expense_products[${index}].group_weight`}
+                            defaultValue={`${expenseProduct.group_weight}`}
+                            inputRef={register({required: true, max: 10000000})}
                           />
                         </TableCell>
                         <TableCell>
