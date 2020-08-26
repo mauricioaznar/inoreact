@@ -264,7 +264,6 @@ function Production(props) {
             editable={{
               onRowDelete: oldData =>
                 new Promise((resolve, reject) => {
-
                   setTimeout(() => {
                     resolve();
                   }, 1000);
@@ -273,17 +272,26 @@ function Production(props) {
             options={{
               pageSize: 25,
               pageSizeOptions: [25, 40, 60],
-              selection: true
+              selection: false,
+              search: false,
+              filtering: false
             }}
             actions={[
               {
-                icon: (props) => <Edit {...props} color={'action'}
-                                       fontSize={'small'}
-                />,
+                icon: (props) => <Edit {...props} color={'action'} fontSize={'small'} />,
                 position: 'row',
                 tooltip: 'Editar gasto',
                 onClick: (event, rowData) => {
                   setRowData(rowData)
+                  setOpen(true)
+                }
+              },
+              {
+                icon: (props) => <AddBox {...props} color={'action'} fontSize={'small'} />,
+                tooltip: 'Agregar gasto',
+                isFreeAction: true,
+                onClick: (event) => {
+                  setRowData(null)
                   setOpen(true)
                 }
               }
@@ -334,6 +342,7 @@ function Production(props) {
             ]}
             data={query =>
               new Promise((resolve, reject) => {
+                console.log(query)
                 let url = apiUrl + 'expense/list?'
                 url += 'per_page=' + query.pageSize
                 url += '&page=' + (query.page + 1)

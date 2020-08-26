@@ -21,10 +21,6 @@ import TableHead from '@material-ui/core/TableHead'
 import TableRow from '@material-ui/core/TableRow'
 import TableCell from '@material-ui/core/TableCell'
 import TableBody from '@material-ui/core/TableBody'
-import Select from '@material-ui/core/Select'
-import MenuItem from '@material-ui/core/MenuItem'
-import ButtonGroup from '@material-ui/core/ButtonGroup'
-import Button from '@material-ui/core/Button'
 import MauDatePicker from '../inputs/MauDatePicker'
 import InputLabel from '@material-ui/core/InputLabel'
 import RadioGroup from '@material-ui/core/RadioGroup'
@@ -93,7 +89,15 @@ const ExpenseForm = (props) => {
 
   const [loading, setLoading] = React.useState(false);
   const [success, setSuccess] = React.useState(false);
-  const [isDatePaidRequired, setIsDatePaidRequired] = React.useState(moment(props.expense.date_paid).isValid());
+  const [isDatePaidRequired, setIsDatePaidRequired] = React.useState(
+    props.expense ? moment(props.expense.date_paid).isValid() : true
+  );
+  const [isDateEmittedRequired, setIsDateEmittedRequired] = React.useState(
+    props.expense ? moment(props.expense.date_emitted).isValid() : true
+  );
+  const [isProvisionDateRequired, setIsProvisionDateRequired] = React.useState(
+    props.expense ? moment(props.expense.invoice_provision_date).isValid() : false
+  );
 
   const classes = useStyles()
 
@@ -113,24 +117,30 @@ const ExpenseForm = (props) => {
   // })
 
   const defaultValues = {
-    description: props.expense.description,
-    expense_items: props.expense.expense_items,
-    expense_invoice_complements: props.expense.expense_invoice_complements.map(complement => {
+    id: props.expense ? props.expense.id : '',
+    description: props.expense ? props.expense.description : '',
+    expense_items: props.expense ? props.expense.expense_items : [],
+    expense_invoice_complements: props.expense ? props.expense.expense_invoice_complements.map(complement => {
       return {...complement, delivered: complement.delivered === 1}
-    }),
-    tax: props.expense.tax,
-    invoice_isr_retained: props.expense.invoice_isr_retained,
-    invoice_tax_retained: props.expense.invoice_tax_retained,
-    supplier_id: String(props.expense.supplier_id),
-    date_paid: props.expense.date_paid,
-    invoice_code: props.expense.invoice_code,
-    internal_code: props.expense.internal_code,
-    expense_type_id: String(props.expense.expense_type_id),
-    expense_invoice_payment_method_id: String(props.expense.expense_invoice_payment_method_id),
-    expense_products: props.expense.expense_products.map(expenseProduct => {
+    }) : [],
+    tax: props.expense ? props.expense.tax : '0',
+    invoice_isr_retained: props.expense ? props.expense.invoice_isr_retained : '0',
+    invoice_tax_retained: props.expense ? props.expense.invoice_tax_retained : '0',
+    supplier_id: props.expense ? String(props.expense.supplier_id) : 'null',
+    invoice_provision_date: props.expense ? props.expense.invoice_provision_date : '',
+    date_emitted: props.expense ? props.expense.date_emitted : '',
+    date_paid: props.expense ? props.expense.date_paid : '',
+    invoice_code: props.expense ? props.expense.invoice_code : '',
+    internal_code: props.expense ? props.expense.internal_code : '',
+    expense_type_id: props.expense ? String(props.expense.expense_type_id) : '',
+    expense_invoice_payment_method_id: props.expense ? String(props.expense.expense_invoice_payment_method_id) : '',
+    expense_invoice_payment_form_id: props.expense ? String(props.expense.expense_invoice_payment_form_id) : '',
+    expense_invoice_cdfi_use_id: props.expense ? String(props.expense.expense_invoice_cdfi_use_id) : '',
+    expense_money_source_id: props.expense ?  String(props.expense.expense_money_source_id) : '',
+    expense_products: props.expense ? props.expense.expense_products.map(expenseProduct => {
       return {...expenseProduct, _kilos: expenseProduct.kilos, _groups: expenseProduct.groups}
-    }),
-    expense_credit_notes: props.expense.expense_credit_notes
+    }) : [],
+    expense_credit_notes: props.expense ? props.expense.expense_credit_notes : []
     // expense_subcategories: initialExpenseSubcategories
   }
 
@@ -216,7 +226,6 @@ const ExpenseForm = (props) => {
   // }, []);
 
   const onSubmit = data => {
-    let id = props.expense.id
     setSuccess(false);
     setLoading(true);
     let complements = isDifferedPaymentMethod && isInvoice && data.expense_invoice_complements ? data.expense_invoice_complements
@@ -234,10 +243,11 @@ const ExpenseForm = (props) => {
       invoice_isr_retained: isInvoice ? data.invoice_isr_retained : "0",
       invoice_code: isInvoice ? data.invoice_code : "",
       date_paid: isDatePaidRequired ? data.date_paid : '0000-00-00',
+      invoice_provision_date: isProvisionDateRequired ? data.invoice_provision_date : '0000-00-00',
+      date_emitted: isDateEmittedRequired ? data.date_emitted : '0000-00-00',
       expense_invoice_complements: complements,
       expense_products: isExpenseProductsRequired() ? data.expense_products : [],
       expense_credit_notes: isInvoice && data.expense_credit_notes ? data.expense_credit_notes : [],
-      id,
       defaultValues
     }
 
@@ -368,6 +378,24 @@ const ExpenseForm = (props) => {
         direction={'column'}
       >
 
+       <Grid
+         item
+         xs={12}
+         className={classes.rowContainer}
+         style={{marginTop: '2em', display: 'none'}}
+       >
+          <FormControl
+            fullWidth
+          >
+            <TextField
+              inputRef={register()}
+              type="number"
+              name="id"
+              label="id"
+            />
+          </FormControl>
+        </Grid>
+
         <Grid
           item
           xs={12}
@@ -437,8 +465,90 @@ const ExpenseForm = (props) => {
               rules={{required: isDatePaidRequired}}
               error={!!errors.date_paid}
               helperText={errors.date_paid && errors.date_paid.message}
-              defaultValue={props.expense.date_paid}
+              defaultValue={defaultValues.date_paid}
               label="Fecha de pago"
+            />
+          </Grid>
+        </Grid>
+
+        <Grid
+          item
+          container
+          xs={12}
+          className={classes.rowContainer}
+          direction={'column'}
+          style={{marginTop: '2em'}}
+        >
+          <Grid item xs>
+           <FormControl>
+             <FormLabel component="legend">
+               ¿Ya se emitió?
+             </FormLabel>
+             <FormControlLabel
+               control={
+                 <Switch
+                   checked={isDateEmittedRequired}
+                   onChange={() => {
+                     setIsDateEmittedRequired(!isDateEmittedRequired)
+                   }}
+                   name="dateEmittedRequired"
+                   color="primary"
+                 />
+               }
+               label={isDateEmittedRequired ? 'Emitida' : 'Pendiente'}
+             />
+           </FormControl>
+          </Grid>
+          <Grid item xs style={{marginTop: '0.5em', display: !isDateEmittedRequired ? 'none' : 'inherit'}}>
+            <MauDatePicker
+              name="date_emitted"
+              control={control}
+              rules={{required: isDateEmittedRequired}}
+              error={!!errors.date_emitted}
+              helperText={errors.date_emitted && errors.date_emitted.message}
+              defaultValue={defaultValues.date_emitted}
+              label="Fecha de emisión"
+            />
+          </Grid>
+        </Grid>
+
+        <Grid
+          item
+          container
+          xs={12}
+          className={classes.rowContainer}
+          direction={'column'}
+          style={{marginTop: '2em'}}
+        >
+          <Grid item xs>
+           <FormControl>
+             <FormLabel component="legend">
+               ¿Fue provisionada?
+             </FormLabel>
+             <FormControlLabel
+               control={
+                 <Switch
+                   checked={isProvisionDateRequired}
+                   onChange={() => {
+                     setIsProvisionDateRequired(!isProvisionDateRequired)
+                   }}
+                   name="provisionDateRequired"
+                   color="primary"
+                 />
+               }
+               label={isProvisionDateRequired ? 'Provisionada' : 'No fue provisionada'}
+             />
+           </FormControl>
+          </Grid>
+          <Grid item xs style={{marginTop: '0.5em', display: !isProvisionDateRequired ? 'none' : 'inherit'}}>
+            <MauDatePicker
+              name="invoice_provision_date"
+              control={control}
+              rules={{required: isProvisionDateRequired}}
+              error={!!errors.invoice_provision_date}
+              helperText={errors.invoice_provision_date && errors.invoice_provision_date.message}
+              defaultValue={defaultValues.invoice_provision_date}
+              label="Fecha de provisión"
             />
           </Grid>
         </Grid>
@@ -563,7 +673,7 @@ const ExpenseForm = (props) => {
               }
             }
             control={control}
-            defaultValue={`${props.expense.supplier_id}`}
+            defaultValue={`${defaultValues.supplier_id}`}
           />
         </Grid>
 
@@ -589,9 +699,85 @@ const ExpenseForm = (props) => {
               }
             }
             control={control}
-            defaultValue={`${props.expense.expense_invoice_payment_method_id}`}
+            defaultValue={`${defaultValues.expense_invoice_payment_method_id}`}
           />
         </Grid>
+
+        <Grid
+          item
+          xs={12}
+          className={classes.rowContainer}
+          style={{marginTop: '2em'}}
+        >
+          <MauObjectSelect
+            error={!!errors.expense_invoice_payment_form_id}
+            label={'Forma de pago'}
+            id={'paymentFrom'}
+            options={props.paymentForms}
+            name={'expense_invoice_payment_form_id'}
+            rules={
+              {
+                required: "this is required",
+                validate: (value) => {
+                  return value !== 'null'
+                }
+              }
+            }
+            control={control}
+            defaultValue={`${defaultValues.expense_invoice_payment_form_id}`}
+          />
+        </Grid>
+
+        <Grid
+          item
+          xs={12}
+          className={classes.rowContainer}
+          style={{marginTop: '2em'}}
+        >
+          <MauObjectSelect
+            error={!!errors.expense_money_source_id}
+            label={'Banco'}
+            id={'moneySource'}
+            options={props.moneySources}
+            name={'expense_money_source_id'}
+            rules={
+              {
+                required: "this is required",
+                validate: (value) => {
+                  return value !== 'null'
+                }
+              }
+            }
+            control={control}
+            defaultValue={`${defaultValues.expense_money_source_id}`}
+          />
+        </Grid>
+
+        <Grid
+          item
+          xs={12}
+          className={classes.rowContainer}
+          style={{marginTop: '2em'}}
+        >
+          <MauObjectSelect
+            error={!!errors.expense_invoice_cdfi_use_id}
+            label={'Usos del cdfi'}
+            id={'cdfiUses'}
+            options={props.cdfiUses}
+            name={'expense_invoice_cdfi_use_id'}
+            rules={
+              {
+                required: "this is required",
+                validate: (value) => {
+                  return value !== 'null'
+                }
+              }
+            }
+            control={control}
+            defaultValue={`${defaultValues.expense_invoice_cdfi_use_id}`}
+          />
+        </Grid>
+
 
         {/*<Grid*/}
         {/*  item*/}
@@ -1208,6 +1394,9 @@ const mapStateToProps = (state) => {
     expenseTypes: state.expenses.expenseTypes,
     branches: state.general.branches,
     paymentMethods: state.expenses.paymentMethods,
+    paymentForms: state.expenses.paymentForms,
+    moneySources: state.expenses.moneySources,
+    cdfiUses: state.expenses.cdfiUses,
     products: state.production.products.filter((product) => product.product_type_id === 4)
   }
 }
