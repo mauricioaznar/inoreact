@@ -156,7 +156,7 @@ const ExpenseForm = (props) => {
   const expenseProducts = useFieldArray(
     {
       control,
-      name: "expense_products"
+      name: "expense_products",
     }
   );
 
@@ -194,6 +194,16 @@ const ExpenseForm = (props) => {
     isInvoice = true
   }
 
+  //this use effect will be used to validate more general stuff
+  // useEffect(() => {
+  //   register({name: "_total", type: "custom"},
+  //     {
+  //       validate: () => {
+  //         console.log(total)
+  //         return total > 100 ? true : 'Total no es mayor papooooooooooooooo'
+  //       }
+  //     });
+  // }, [total]);
 
 
 
