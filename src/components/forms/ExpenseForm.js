@@ -228,15 +228,13 @@ const ExpenseForm = (props) => {
   const onSubmit = data => {
     setSuccess(false);
     setLoading(true);
+
     let complements = isDifferedPaymentMethod && isInvoice && data.expense_invoice_complements ? data.expense_invoice_complements
       .map(complement => {
         return {...complement, delivered: (complement.delivered ? '1' : '-1')}
       }) : []
 
-
-    console.log(data.date_paid)
-
-    let finalSubmited = {
+    let finalSubmitted = {
       ...data,
       tax: isInvoice ? data.tax : "0",
       invoice_tax_retained: isInvoice ? data.invoice_tax_retained : "0",
@@ -251,7 +249,7 @@ const ExpenseForm = (props) => {
       defaultValues
     }
 
-    props.onSubmit(finalSubmited, onSubmitCallback)
+    props.onSubmit(finalSubmitted, onSubmitCallback)
   };
 
   const onError = data => {
