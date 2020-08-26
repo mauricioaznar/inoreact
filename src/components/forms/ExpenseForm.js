@@ -129,7 +129,8 @@ const ExpenseForm = (props) => {
     expense_invoice_payment_method_id: String(props.expense.expense_invoice_payment_method_id),
     expense_products: props.expense.expense_products.map(expenseProduct => {
       return {...expenseProduct, _kilos: expenseProduct.kilos, _groups: expenseProduct.groups}
-    })
+    }),
+    expense_credit_notes: props.expense.expense_credit_notes
     // expense_subcategories: initialExpenseSubcategories
   }
 
@@ -156,6 +157,14 @@ const ExpenseForm = (props) => {
     {
       control,
       name: "expense_products"
+    }
+  );
+
+
+  const expenseCreditNotes = useFieldArray(
+    {
+      control,
+      name: "expense_credit_notes"
     }
   );
 
@@ -200,13 +209,13 @@ const ExpenseForm = (props) => {
     let id = props.expense.id
     setSuccess(false);
     setLoading(true);
-    let complements = isDifferedPaymentMethod && data.expense_invoice_complements ? data.expense_invoice_complements
+    let complements = isDifferedPaymentMethod && isInvoice && data.expense_invoice_complements ? data.expense_invoice_complements
       .map(complement => {
         return {...complement, delivered: (complement.delivered ? '1' : '-1')}
       }) : []
 
 
-    console.log(data.expense_products)
+    console.log(data.date_paid)
 
     let finalSubmited = {
       ...data,
@@ -217,6 +226,7 @@ const ExpenseForm = (props) => {
       date_paid: isDatePaidRequired ? data.date_paid : '0000-00-00',
       expense_invoice_complements: complements,
       expense_products: isExpenseProductsRequired() ? data.expense_products : [],
+      expense_credit_notes: isInvoice && data.expense_credit_notes ? data.expense_credit_notes : [],
       id,
       defaultValues
     }
@@ -251,11 +261,20 @@ const ExpenseForm = (props) => {
   }
 
   const handleAddExpenseProduct = () => {
-    expenseProducts.append({product_id: "null", _kilos: "0", _groups: "0", kilos: "0", groups: "0", group_weight: "0", kilo_price: "0"})
+    expenseProducts.append({product_id: "null", kilos: "0", groups: "0", group_weight: "0", kilo_price: "0"})
   }
 
   const handleRemoveExpenseProduct = (index) => {
     expenseProducts.remove(index)
+  }
+
+
+  const handleAddExpenseCreditNotes = () => {
+    expenseCreditNotes.append({amount: "0", date: ""})
+  }
+
+  const handleRemoveExpenseCreditNotes = (index) => {
+    expenseCreditNotes.remove(index)
   }
 
   const handleProductSelection = (e, index) => {
@@ -401,22 +420,16 @@ const ExpenseForm = (props) => {
              />
            </FormControl>
           </Grid>
-
           <Grid item xs style={{marginTop: '0.5em', display: !isDatePaidRequired ? 'none' : 'inherit'}}>
-            <FormControl
-              fullWidth
-            >
-              <MauDatePicker
-                register={register}
-                name="date_paid"
-                setValue={setValue}
-                required={isDatePaidRequired}
-                error={!!errors.date_paid}
-                helperText={errors.date_paid && errors.date_paid.message}
-                defaultValue={props.expense.date_paid}
-                label="Fecha de pago"
-              />
-            </FormControl>
+            <MauDatePicker
+              name="date_paid"
+              control={control}
+              rules={{required: isDatePaidRequired}}
+              error={!!errors.date_paid}
+              helperText={errors.date_paid && errors.date_paid.message}
+              defaultValue={props.expense.date_paid}
+              label="Fecha de pago"
+            />
           </Grid>
         </Grid>
 
@@ -897,7 +910,7 @@ const ExpenseForm = (props) => {
                         </TableCell>
                         <TableCell>
                           <MauObjectSelect
-                            error={!!errors.expense_products && !!errors.expense_products[index]}
+                            error={!!errors.expense_products && !!errors.expense_products[index].product_id}
                             label={'Producto'}
                             id={'productLabel'}
                             options={props.products}
@@ -920,6 +933,7 @@ const ExpenseForm = (props) => {
                         </TableCell>
                         <TableCell>
                           <TextField
+                            error={!!errors.expense_products && !!errors.expense_products[index].groups}
                             id="groups"
                             label="Bultos"
                             type="number"
@@ -962,7 +976,7 @@ const ExpenseForm = (props) => {
                             type="number"
                             name={`expense_products[${index}].group_weight`}
                             defaultValue={`${expenseProduct.group_weight}`}
-                            inputRef={register({required: true, max: 10000000})}
+                            inputRef={register({max: 10000000})}
                           />
                         </TableCell>
                         <TableCell align={'right'}>
@@ -983,6 +997,94 @@ const ExpenseForm = (props) => {
           </Grid>
         </Grid>
 
+
+
+        <Grid
+          item
+          xs={12}
+          className={classes.rowContainer}
+          style={{marginTop: '2em', display: !isInvoice ? 'none' : 'inherit'}}
+        >
+          <Grid
+            container
+            direction={'column'}
+          >
+            <Grid
+              item
+              xs={12}
+            >
+              <Toolbar>
+                <Typography className={classes.tableTitle} variant="h6" id="tableTitle" component="div">
+                  Notas de credito
+                </Typography>
+                <Tooltip title="Filter list">
+                  <IconButton aria-label="filter list" onClick={() => {handleAddExpenseCreditNotes()}}>
+                    <AddIcon />
+                  </IconButton>
+                </Tooltip>
+              </Toolbar>
+              <TableContainer component={Paper}>
+                <Table
+                  aria-label="credit notes table"
+                  className={classes.table}
+                >
+                  <TableHead>
+                    <TableRow>
+                      <TableCell style={{display: 'none'}}>Id</TableCell>
+                      <TableCell style={{width: '40%'}}>Fecha</TableCell>
+                      <TableCell style={{width: '40%'}}>Nombre</TableCell>
+                      <TableCell style={{width: '10%'}}>&nbsp;</TableCell>
+                    </TableRow>
+                  </TableHead>
+                  <TableBody>
+                    {expenseCreditNotes.fields.map((creditNote, index) => (
+                      <TableRow key={index}>
+                        <TableCell style={{display: 'none'}}>
+                          <TextField
+                            id="standard-number"
+                            label="Number"
+                            type="number"
+                            name={`expense_credit_notes[${index}].id`}
+                            defaultValue={`${creditNote.id}`}
+                            inputRef={register()}
+                          />
+                        </TableCell>
+                        <TableCell>
+                          <MauDatePicker
+                            error={!!errors.expense_credit_notes && !!errors.expense_credit_notes[index] && !!errors.expense_credit_notes[index].date}
+                            name={`expense_credit_notes[${index}].date`}
+                            control={control}
+                            rules={{required: true}}
+                            defaultValue={`${creditNote.date}`}
+                            label="Fecha del complemento"
+                          />
+                        </TableCell>
+                        <TableCell align="right">
+                          <FormControl fullWidth>
+                            <TextField
+                              id="standard-number"
+                              label="Number"
+                              error={!!errors.expense_credit_notes && !!errors.expense_credit_notes[index] && !!errors.expense_credit_notes[index].amount}
+                              name={`expense_credit_notes[${index}].amount`}
+                              defaultValue={`${creditNote.amount}`}
+                              inputRef={register({required: true})}
+                            />
+                          </FormControl>
+                        </TableCell>
+                        <TableCell align={'right'}>
+                          <IconButton onClick={() => {handleRemoveExpenseCreditNotes(index)}}>
+                            <DeleteIcon />
+                          </IconButton>
+                        </TableCell>
+                      </TableRow>
+
+                    ))}
+                  </TableBody>
+                </Table>
+              </TableContainer>
+            </Grid>
+          </Grid>
+        </Grid>
 
 
 

@@ -177,6 +177,7 @@ function Production(props) {
     }
     expensePromise.then(result => {
       let expenseId = result.data.data.id
+
       let deletedExpenseItems = expense.defaultValues.expense_items
       expense.expense_items.forEach(expenseItem => {
         if (expenseItem.id !== '') {
@@ -191,6 +192,7 @@ function Production(props) {
       deletedExpenseItems.forEach(expenseItem => {
         promises.push(axios.put(apiUrl + 'expenseItem/' + expenseItem.id, {active: -1}, {headers: {...authHeader()}}))
       })
+
       let deletedExpenseComplements = expense.defaultValues.expense_invoice_complements
       expense.expense_invoice_complements.forEach(complement => {
         if (complement.id !== '') {
@@ -205,6 +207,7 @@ function Production(props) {
       deletedExpenseComplements.forEach(complement => {
         promises.push(axios.put(apiUrl + 'expenseInvoiceComplement/' + complement.id, {active: -1}, {headers: {...authHeader()}}))
       })
+
       let deletedExpenseProducts = expense.defaultValues.expense_products
       expense.expense_products.forEach(expenseProduct => {
         if (expenseProduct.id !== '') {
@@ -218,6 +221,21 @@ function Production(props) {
       })
       deletedExpenseProducts.forEach(expenseProduct => {
         promises.push(axios.put(apiUrl + 'expenseProduct/' + expenseProduct.id, {active: -1}, {headers: {...authHeader()}}))
+      })
+
+      let deletedExpenseCreditNotes = expense.defaultValues.expense_credit_notes
+      expense.expense_credit_notes.forEach(creditNote => {
+        if (creditNote.id !== '') {
+          promises.push(axios.put(apiUrl + 'expenseCreditNote/' + creditNote.id, {...creditNote}, {headers: {...authHeader()}}))
+          deletedExpenseCreditNotes = deletedExpenseCreditNotes.filter(initialExpenseCreditNote => {
+            return String(initialExpenseCreditNote.id) !== creditNote.id
+          })
+        } else {
+          promises.push(axios.post(apiUrl + 'expenseCreditNote', {...creditNote, expense_id: expenseId}, {headers: {...authHeader()}}))
+        }
+      })
+      deletedExpenseCreditNotes.forEach(creditNote => {
+        promises.push(axios.put(apiUrl + 'expenseCreditNote/' + creditNote.id, {active: -1}, {headers: {...authHeader()}}))
       })
       return Promise.all(promises)
     }).then(results => {

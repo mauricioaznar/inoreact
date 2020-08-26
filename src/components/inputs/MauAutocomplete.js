@@ -1,19 +1,12 @@
 import React from 'react'
-import InputLabel from '@material-ui/core/InputLabel'
 import {Controller} from 'react-hook-form'
-import Select from '@material-ui/core/Select'
-import MenuItem from '@material-ui/core/MenuItem'
 import FormControl from '@material-ui/core/FormControl'
-import Grid from '@material-ui/core/Grid'
 import TextField from '@material-ui/core/TextField'
 import Autocomplete from '@material-ui/lab/Autocomplete'
 
 export default function MauAutocomplete (props) {
 
-
   let displayName = props.displayName || 'name'
-
-  console.log(props.options)
 
   return (
     <FormControl
