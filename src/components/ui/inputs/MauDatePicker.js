@@ -1,5 +1,4 @@
-import React, {useState, useEffect} from 'react'
-import moment from 'moment'
+import React from 'react'
 import DateMomentUtils from '@date-io/moment';
 import {
   KeyboardDatePicker,
@@ -7,8 +6,6 @@ import {
 } from '@material-ui/pickers';
 import FormControl from '@material-ui/core/FormControl'
 import {Controller} from 'react-hook-form'
-import Autocomplete from '@material-ui/lab/Autocomplete'
-import TextField from '@material-ui/core/TextField'
 
 function MauDatePicker (props) {
   return (

@@ -3,7 +3,7 @@ import React from 'react'
 import moment from 'moment'
 
 
-import LineAreaChart from '../charts/LineAreaChart'
+import LineAreaChart from './charts/LineAreaChart'
 
 const dateFormat = 'YYYY-MM-DD'
 

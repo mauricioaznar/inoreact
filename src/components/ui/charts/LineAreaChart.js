@@ -2,7 +2,7 @@ import React, { PureComponent } from 'react';
 import {
   LineChart, Line, XAxis, YAxis, Legend, CartesianGrid, Tooltip, ResponsiveContainer,
 } from 'recharts';
-import mdColors from '../../helpers/colors'
+import mdColors from '../../../helpers/colors'
 import AreaChart from 'recharts/lib/chart/AreaChart'
 import Area from 'recharts/lib/cartesian/Area'
 

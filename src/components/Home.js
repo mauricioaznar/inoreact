@@ -7,6 +7,7 @@ import Navbar from './ui/Navbar'
 import Equilibrium from './pages/Equilibrium'
 import Production from './pages/Production'
 import InventoryDrawer from './ui/InventoryDrawer'
+import Expenses from './pages/Expenses'
 
 
 const useStyles = makeStyles((theme) => ({
@@ -34,6 +35,7 @@ const Home = (props) => {
         <Switch>
           <Route path={'/'} exact component={() => <Equilibrium />}/>
           <Route path={'/production'} component={() => <Production />}/>
+          <Route path={'/expenses'} component={() => <Expenses />}/>
         </Switch>
         <InventoryDrawer/>
       </div>

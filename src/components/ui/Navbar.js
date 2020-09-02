@@ -44,6 +44,12 @@ function Navbar(props) {
                 to={'/production'}
                 value={'/production'}
               />
+              <Tab
+                label={'EX'}
+                component={Link}
+                to={'/expenses'}
+                value={'/expenses'}
+              />
             </Tabs>
           </Grid>
           <Grid
