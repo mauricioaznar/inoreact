@@ -59,6 +59,9 @@ function InvoicesBySupTable(props) {
       .filter(obj => {
         return props.month === obj.month && props.year === obj.year
       })
+      .sort((a, b) => {
+        return a.money_sources > b.money_sources ? 1 : -1
+      })
 
   }
 

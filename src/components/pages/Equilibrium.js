@@ -65,7 +65,7 @@ const useFetch = (url) => {
 export default function Equilibrium(props) {
 
   const [year, setYear] = React.useState(moment().year())
-  const [month, setMonth] = React.useState(moment().month() + 1)
+  const [month, setMonth] = React.useState(moment().month())
 
   const classes = useStyles()
   const theme = useTheme()
