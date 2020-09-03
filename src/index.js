@@ -11,6 +11,7 @@ import combinedReducers from './store/index'
 import {composeWithDevTools} from 'redux-devtools-extension/developmentOnly'
 import {BrowserRouter as Router} from 'react-router-dom'
 import createMuiTheme from '@material-ui/core/styles/createMuiTheme'
+import CssBaseline from '@material-ui/core/CssBaseline'
 import { ThemeProvider } from '@material-ui/styles';
 
 
@@ -29,6 +30,7 @@ ReactDOM.render(
   <Provider store={store}>
     <Router>
       <ThemeProvider theme={theme}>
+        <CssBaseline />
         <App />
       </ThemeProvider>
     </Router>
