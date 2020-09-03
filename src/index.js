@@ -10,6 +10,8 @@ import {Provider} from 'react-redux'
 import combinedReducers from './store/index'
 import {composeWithDevTools} from 'redux-devtools-extension/developmentOnly'
 import {BrowserRouter as Router} from 'react-router-dom'
+import createMuiTheme from '@material-ui/core/styles/createMuiTheme'
+import { ThemeProvider } from '@material-ui/styles';
 
 
 const store = createStore(combinedReducers, {}, composeWithDevTools(applyMiddleware(thunk)))
@@ -17,10 +19,18 @@ const store = createStore(combinedReducers, {}, composeWithDevTools(applyMiddlew
 
 moment.locale('es')
 
+const theme = createMuiTheme({
+  palette: {
+    type: 'dark'
+  },
+})
+
 ReactDOM.render(
   <Provider store={store}>
     <Router>
-      <App />
+      <ThemeProvider theme={theme}>
+        <App />
+      </ThemeProvider>
     </Router>
   </Provider>,
   document.getElementById('root')

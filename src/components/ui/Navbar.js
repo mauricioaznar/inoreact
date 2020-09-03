@@ -17,7 +17,7 @@ function Navbar(props) {
   };
 
   return (
-    <AppBar position="fixed">
+    <AppBar position="fixed" color="default">
       <Toolbar>
         <Grid
           container
