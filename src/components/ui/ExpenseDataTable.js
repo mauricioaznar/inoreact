@@ -256,6 +256,26 @@ function ExpenseDataTable(props) {
     })
   }
 
+
+  const handleRowDelete = (oldData) => {
+    let promises = []
+    promises.push(axios.put(apiUrl + 'expense/' + oldData.id, {active: -1}, {headers: {...authHeader()}}))
+    oldData.expense_items.forEach(expenseItem => {
+      promises.push(axios.put(apiUrl + 'expenseItem/' + expenseItem.id, {active: -1}, {headers: {...authHeader()}}))
+    })
+    oldData.expense_credit_notes.forEach(creditNote => {
+      promises.push(axios.put(apiUrl + 'expenseCreditNote/' + creditNote.id, {active: -1}, {headers: {...authHeader()}}))
+    })
+    oldData.expense_products.forEach(expenseProduct => {
+      promises.push(axios.put(apiUrl + 'expenseProduct/' + expenseProduct.id, {active: -1}, {headers: {...authHeader()}}))
+    })
+    oldData.expense_invoice_complements.forEach(complement => {
+      promises.push(axios.put(apiUrl + 'expenseInvoiceComplement/' + complement.id, {active: -1}, {headers: {...authHeader()}}))
+    })
+    return Promise.all(promises)
+  }
+
+
   return (
     <>
       <Grid
@@ -272,13 +292,33 @@ function ExpenseDataTable(props) {
             icons={tableIcons}
             title="Gastos"
             tableRef={tableRef}
+            localization={{
+              body: {
+                deleteTooltip: 'Borrar',
+                addTooltip: 'Añadir',
+                editTooltip: 'Editar',
+                editRow: {
+                  deleteText: '¿Estas seguro que quieres borrar esta fila?'
+                },
+                filterRow: {
+                  filterTooltip: 'Filtrar'
+                }
+              },
+              header: {
+                actions: 'Acciones'
+              },
+              pagination: {
+                labelDisplayedRows: '{from} - {to} de {count}',
+                labelRowsSelect: 'Filas',
+                firstTooltip: 'Primera pagina',
+                previousTooltip: 'Pagina anterior',
+                nextTooltip: 'Pagina siguiente',
+                lastTooltip: 'Ultima pagina'
+
+              }
+            }}
             editable={{
-              onRowDelete: oldData =>
-                new Promise((resolve, reject) => {
-                  setTimeout(() => {
-                    resolve();
-                  }, 1000);
-                })
+              onRowDelete: handleRowDelete
             }}
             options={{
               pageSize: 25,
@@ -291,7 +331,7 @@ function ExpenseDataTable(props) {
               {
                 icon: (props) => <Edit {...props} color={'action'} fontSize={'small'} />,
                 position: 'row',
-                tooltip: 'Editar gasto',
+                tooltip: 'Editar',
                 onClick: (event, rowData) => {
                   setRowData(rowData)
                   setOpen(true)
@@ -299,7 +339,7 @@ function ExpenseDataTable(props) {
               },
               {
                 icon: (props) => <AddBox {...props} color={'action'} fontSize={'small'} />,
-                tooltip: 'Agregar gasto',
+                tooltip: 'Agregar',
                 isFreeAction: true,
                 onClick: (event) => {
                   setRowData(null)
@@ -309,11 +349,14 @@ function ExpenseDataTable(props) {
             ]}
             columns={[
               {
+                title: 'id',
+                field: 'id'
+              },
+              {
                 title: 'Fecha de pago',
                 field: 'date_paid',
                 type: 'date',
                 dateSetting: {locale: 'en-ca'},
-                defaultSort: 'desc',
                 defaultFilter: moment().subtract(1, 'month').format('YYYY-MM'),
                 filterComponent: (filterProps) => {
                   return (
@@ -367,11 +410,11 @@ function ExpenseDataTable(props) {
                 title: 'Proveedor',
                 field: 'supplier_id',
                 lookup: suppliersLookup,
-                defaultFilter: props.suppliers[0],
+                // defaultFilter: props.suppliers[0],
                 filterComponent: (filterProps) => {
                   return (
                     <Autocomplete
-                      defaultValue={props.suppliers[0]}
+                      // defaultValue={props.suppliers[0]}
                       options={props.suppliers}
                       getOptionLabel={option => {
                         return option['name']
@@ -416,6 +459,8 @@ function ExpenseDataTable(props) {
                   url += '&sort=' + query.orderBy.field + '|' + query.orderDirection
                 }
                 if (query.filters) {
+                  let likes = 1
+                  let exacts = 1
                   query.filters.forEach((filter, index) => {
                     if (filter.column.type === 'date') {
                       let startDate = moment(filter.value).startOf('month').format(dateFormat)
@@ -425,11 +470,13 @@ function ExpenseDataTable(props) {
                       url += `&end_date_${index + 1}=${filter.column.field}`
                       url += `&end_date_value_${index + 1}=${endDate}`
                     } else if (filter.column.lookup) {
-                      url += `&filter_exact_${index + 1}=${filter.column.field}`
-                      url += `&filter_exact_value_${index + 1}=${filter.value.id}`
+                      url += `&filter_exact_${exacts}=${filter.column.field}`
+                      url += `&filter_exact_value_${exacts}=${filter.value.id}`
+                      exacts++
                     } else {
-                      url += `&filter_exact_${index + 1}=${filter.column.field}`
-                      url += `&filter_exact_value_${index + 1}=${filter.value}`
+                      url += `&filter_like_${likes}=${filter.column.field}`
+                      url += `&filter_like_value_${likes}=${filter.value}`
+                      likes++
                     }
                     // url += `&filter_exact_${index}=${}`
                   })
