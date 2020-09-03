@@ -136,7 +136,7 @@ const ExpenseForm = (props) => {
     expense_invoice_payment_method_id: props.expense ? String(props.expense.expense_invoice_payment_method_id) : '',
     expense_invoice_payment_form_id: props.expense ? String(props.expense.expense_invoice_payment_form_id) : '',
     expense_invoice_cdfi_use_id: props.expense ? String(props.expense.expense_invoice_cdfi_use_id) : '',
-    expense_money_source_id: props.expense ?  String(props.expense.expense_money_source_id) : '',
+    expense_money_source_id: props.expense ? String(props.expense.expense_money_source_id) : '',
     expense_products: props.expense ? props.expense.expense_products.map(expenseProduct => {
       return {...expenseProduct, _kilos: expenseProduct.kilos, _groups: expenseProduct.groups}
     }) : [],
@@ -216,7 +216,6 @@ const ExpenseForm = (props) => {
   // }, [total]);
 
 
-
   // useEffect(() => {
   //   register({name: "expense_subcategories"},
   //     {
@@ -236,16 +235,21 @@ const ExpenseForm = (props) => {
 
     let finalSubmitted = {
       ...data,
-      tax: isInvoice ? data.tax : "0",
-      invoice_tax_retained: isInvoice ? data.invoice_tax_retained : "0",
-      invoice_isr_retained: isInvoice ? data.invoice_isr_retained : "0",
-      invoice_code: isInvoice ? data.invoice_code : "",
+      tax: isInvoice ? data.tax : '0',
+      invoice_tax_retained: isInvoice ? data.invoice_tax_retained : '0',
+      invoice_isr_retained: isInvoice ? data.invoice_isr_retained : '0',
+      invoice_code: isInvoice ? data.invoice_code : '',
+      internal_code: isInvoice ? data.internal_code : '',
       date_paid: isDatePaidRequired ? data.date_paid : '0000-00-00',
-      invoice_provision_date: isProvisionDateRequired ? data.invoice_provision_date : '0000-00-00',
-      date_emitted: isDateEmittedRequired ? data.date_emitted : '0000-00-00',
+      invoice_provision_date: isProvisionDateRequired && isInvoice ? data.invoice_provision_date : '0000-00-00',
+      date_emitted: isDateEmittedRequired && isInvoice ? data.date_emitted : '0000-00-00',
       expense_invoice_complements: complements,
       expense_products: isExpenseProductsRequired() ? data.expense_products : [],
       expense_credit_notes: isInvoice && data.expense_credit_notes ? data.expense_credit_notes : [],
+      expense_invoice_payment_method_id: isInvoice ? String(props.expense.expense_invoice_payment_method_id) : 'null',
+      expense_invoice_payment_form_id: isInvoice ? String(props.expense.expense_invoice_payment_form_id) : 'null',
+      expense_invoice_cdfi_use_id: isInvoice ? String(props.expense.expense_invoice_cdfi_use_id) : 'null',
+      expense_money_source_id: isInvoice ? String(props.expense.expense_money_source_id) : 'null',
       defaultValues
     }
 
@@ -325,7 +329,7 @@ const ExpenseForm = (props) => {
   }
 
   const calculateExpenseProductKilos = (e, index) => {
-    let kilos = Number(watchExpenseProducts[index].groups) *  Number(watchExpenseProducts[index].group_weight)
+    let kilos = Number(watchExpenseProducts[index].groups) * Number(watchExpenseProducts[index].group_weight)
     setValue(`expense_products[${index}].kilos`, kilos)
   }
 
@@ -376,12 +380,12 @@ const ExpenseForm = (props) => {
         direction={'column'}
       >
 
-       <Grid
-         item
-         xs={12}
-         className={classes.rowContainer}
-         style={{marginTop: '2em', display: 'none'}}
-       >
+        <Grid
+          item
+          xs={12}
+          className={classes.rowContainer}
+          style={{marginTop: '2em', display: 'none'}}
+        >
           <FormControl
             fullWidth
           >
@@ -400,12 +404,16 @@ const ExpenseForm = (props) => {
           className={classes.rowContainer}
           style={{marginTop: '2em'}}
         >
-          <InputLabel>Tipo de gasto</InputLabel>
+          <InputLabel
+            error={errors.expense_type_id}
+          >
+            Tipo de gasto
+          </InputLabel>
           <Controller
-           as={
-             <RadioGroup
-               aria-label="gender"
-             >
+            as={
+              <RadioGroup
+                aria-label="gender"
+              >
                {props.expenseTypes.map(expenseType => {
                  return (
                    <FormControlLabel
@@ -420,10 +428,13 @@ const ExpenseForm = (props) => {
                  )
                })}
               </RadioGroup>
-           }
-           name="expense_type_id"
-           control={control}
-         />
+            }
+            name="expense_type_id"
+            control={control}
+            rules={{
+              required: true
+            }}
+          />
         </Grid>
 
 
@@ -436,7 +447,10 @@ const ExpenseForm = (props) => {
           style={{marginTop: '2em'}}
         >
 
-          <Grid item xs>
+          <Grid
+            item
+            xs
+          >
            <FormControl>
              <FormLabel component="legend">
                ¿Ya se pago?
@@ -456,7 +470,11 @@ const ExpenseForm = (props) => {
              />
            </FormControl>
           </Grid>
-          <Grid item xs style={{marginTop: '0.5em', display: !isDatePaidRequired ? 'none' : 'inherit'}}>
+          <Grid
+            item
+            xs
+            style={{marginTop: '0.5em', display: !isDatePaidRequired ? 'none' : 'inherit'}}
+          >
             <MauDatePicker
               name="date_paid"
               control={control}
@@ -475,9 +493,12 @@ const ExpenseForm = (props) => {
           xs={12}
           className={classes.rowContainer}
           direction={'column'}
-          style={{marginTop: '2em'}}
+          style={{marginTop: '2em', display: isInvoice ? 'inherit' : 'none'}}
         >
-          <Grid item xs>
+          <Grid
+            item
+            xs
+          >
            <FormControl>
              <FormLabel component="legend">
                ¿Ya se emitió?
@@ -497,11 +518,15 @@ const ExpenseForm = (props) => {
              />
            </FormControl>
           </Grid>
-          <Grid item xs style={{marginTop: '0.5em', display: !isDateEmittedRequired ? 'none' : 'inherit'}}>
+          <Grid
+            item
+            xs
+            style={{marginTop: '0.5em', display: !isDateEmittedRequired ? 'none' : 'inherit'}}
+          >
             <MauDatePicker
               name="date_emitted"
               control={control}
-              rules={{required: isDateEmittedRequired}}
+              rules={{required: isDateEmittedRequired && isInvoice}}
               error={!!errors.date_emitted}
               helperText={errors.date_emitted && errors.date_emitted.message}
               defaultValue={defaultValues.date_emitted}
@@ -516,9 +541,12 @@ const ExpenseForm = (props) => {
           xs={12}
           className={classes.rowContainer}
           direction={'column'}
-          style={{marginTop: '2em'}}
+          style={{marginTop: '2em', display: isInvoice ? 'inherit' : 'none'}}
         >
-          <Grid item xs>
+          <Grid
+            item
+            xs
+          >
            <FormControl>
              <FormLabel component="legend">
                ¿Fue provisionada?
@@ -538,11 +566,15 @@ const ExpenseForm = (props) => {
              />
            </FormControl>
           </Grid>
-          <Grid item xs style={{marginTop: '0.5em', display: !isProvisionDateRequired ? 'none' : 'inherit'}}>
+          <Grid
+            item
+            xs
+            style={{marginTop: '0.5em', display: !isProvisionDateRequired ? 'none' : 'inherit'}}
+          >
             <MauDatePicker
               name="invoice_provision_date"
               control={control}
-              rules={{required: isProvisionDateRequired}}
+              rules={{required: isProvisionDateRequired && isInvoice}}
               error={!!errors.invoice_provision_date}
               helperText={errors.invoice_provision_date && errors.invoice_provision_date.message}
               defaultValue={defaultValues.invoice_provision_date}
@@ -577,7 +609,7 @@ const ExpenseForm = (props) => {
           item
           xs={12}
           className={classes.rowContainer}
-          style={{marginTop: '2em'}}
+          style={{marginTop: '2em', display: isInvoice ? 'inherit' : 'none'}}
         >
           <FormControl
             fullWidth
@@ -595,32 +627,29 @@ const ExpenseForm = (props) => {
           </FormControl>
         </Grid>
 
-        {
-          isInvoice ?
-            <Grid
-              item
-              xs={12}
-              className={classes.rowContainer}
-              style={{marginTop: '2em'}}
-            >
-              <FormControl
-                fullWidth
-              >
-                <TextField
-                  inputRef={register({
-                    required: true
-                  })}
-                  name="invoice_code"
-                  label="Codigo de la factura"
-                  placeholder="CON 770707 "
-                  InputLabelProps={{
-                    shrink: true,
-                  }}
-                />
-              </FormControl>
-            </Grid> :
-            null
-        }
+
+        <Grid
+          item
+          xs={12}
+          className={classes.rowContainer}
+          style={{marginTop: '2em', display: isInvoice ? 'inherit' : 'none'}}
+        >
+          <FormControl
+            fullWidth
+          >
+            <TextField
+              inputRef={register({
+                required: isInvoice
+              })}
+              name="invoice_code"
+              label="Codigo de la factura"
+              placeholder="CON 770707 "
+              InputLabelProps={{
+                shrink: true,
+              }}
+            />
+          </FormControl>
+        </Grid>
 
         {/*<Grid*/}
         {/*  item*/}
@@ -647,13 +676,12 @@ const ExpenseForm = (props) => {
         {/*  />*/}
         {/*</Grid>*/}
 
-
-         <Grid
-           item
-           xs={12}
-           className={classes.rowContainer}
-           style={{marginTop: '2em'}}
-         >
+        <Grid
+          item
+          xs={12}
+          className={classes.rowContainer}
+          style={{marginTop: '2em'}}
+        >
           <MauAutocomplete
             error={!!errors.supplier_id}
             label={'Proveedor'}
@@ -664,7 +692,7 @@ const ExpenseForm = (props) => {
             displayName={'name'}
             rules={
               {
-                required: "this is required",
+                required: true,
                 validate: (value) => {
                   return value !== 'null'
                 }
@@ -680,7 +708,7 @@ const ExpenseForm = (props) => {
           item
           xs={12}
           className={classes.rowContainer}
-          style={{marginTop: '2em'}}
+          style={{marginTop: '2em', display: isInvoice ? 'inherit' : 'none'}}
         >
           <MauObjectSelect
             error={!!errors.expense_invoice_payment_method_id}
@@ -690,7 +718,7 @@ const ExpenseForm = (props) => {
             name={'expense_invoice_payment_method_id'}
             rules={
               {
-                required: "this is required",
+                required: isInvoice,
                 validate: (value) => {
                   return value !== 'null'
                 }
@@ -705,7 +733,7 @@ const ExpenseForm = (props) => {
           item
           xs={12}
           className={classes.rowContainer}
-          style={{marginTop: '2em'}}
+          style={{marginTop: '2em', display: isInvoice ? 'inherit' : 'none'}}
         >
           <MauObjectSelect
             error={!!errors.expense_invoice_payment_form_id}
@@ -715,7 +743,7 @@ const ExpenseForm = (props) => {
             name={'expense_invoice_payment_form_id'}
             rules={
               {
-                required: "this is required",
+                required: isInvoice,
                 validate: (value) => {
                   return value !== 'null'
                 }
@@ -730,7 +758,7 @@ const ExpenseForm = (props) => {
           item
           xs={12}
           className={classes.rowContainer}
-          style={{marginTop: '2em'}}
+          style={{marginTop: '2em', display: isInvoice ? 'inherit' : 'none'}}
         >
           <MauObjectSelect
             error={!!errors.expense_money_source_id}
@@ -740,7 +768,7 @@ const ExpenseForm = (props) => {
             name={'expense_money_source_id'}
             rules={
               {
-                required: "this is required",
+                required: isInvoice,
                 validate: (value) => {
                   return value !== 'null'
                 }
@@ -755,7 +783,7 @@ const ExpenseForm = (props) => {
           item
           xs={12}
           className={classes.rowContainer}
-          style={{marginTop: '2em'}}
+          style={{marginTop: '2em', display: isInvoice ? 'inherit' : 'none'}}
         >
           <MauObjectSelect
             error={!!errors.expense_invoice_cdfi_use_id}
@@ -765,7 +793,7 @@ const ExpenseForm = (props) => {
             name={'expense_invoice_cdfi_use_id'}
             rules={
               {
-                required: "this is required",
+                required: isInvoice,
                 validate: (value) => {
                   return value !== 'null'
                 }
@@ -775,7 +803,6 @@ const ExpenseForm = (props) => {
             defaultValue={`${defaultValues.expense_invoice_cdfi_use_id}`}
           />
         </Grid>
-
 
         {/*<Grid*/}
         {/*  item*/}
@@ -826,11 +853,21 @@ const ExpenseForm = (props) => {
               xs={12}
             >
               <Toolbar>
-                <Typography className={classes.tableTitle} variant="h6" id="tableTitle" component="div">
+                <Typography
+                  className={classes.tableTitle}
+                  variant="h6"
+                  id="tableTitle"
+                  component="div"
+                >
                   Elementos del gasto
                 </Typography>
                 <Tooltip title="Filter list">
-                  <IconButton aria-label="filter list" onClick={() => {handleAddExpenseItem()}}>
+                  <IconButton
+                    aria-label="filter list"
+                    onClick={() => {
+                      handleAddExpenseItem()
+                    }}
+                  >
                     <AddIcon />
                   </IconButton>
                 </Tooltip>
@@ -924,7 +961,7 @@ const ExpenseForm = (props) => {
                         </TableCell>
                         <TableCell>
                           <TextField
-                            style={{display: !isQuantityRequired(index) ? 'none' : 'inherit'}}
+                            style={{display: isQuantityRequired(index) ? 'inherit' : 'none'}}
                             id="standard-number"
                             label="Number"
                             type="number"
@@ -936,7 +973,11 @@ const ExpenseForm = (props) => {
                         <TableCell align={'right'}>
                           {
                             index !== 0 ?
-                              <IconButton onClick={() => {handleRemoveExpenseItem(index)}}>
+                              <IconButton
+                                onClick={() => {
+                                  handleRemoveExpenseItem(index)
+                                }}
+                              >
                                 <DeleteIcon />
                               </IconButton> : ' '
                           }
@@ -957,7 +998,7 @@ const ExpenseForm = (props) => {
           item
           xs={12}
           className={classes.rowContainer}
-          style={{marginTop: '2em', display: !isDifferedPaymentMethod ? 'none' : 'inherit'}}
+          style={{marginTop: '2em', display: isDifferedPaymentMethod && isInvoice ? 'inherit' : 'none'}}
         >
           <Grid
             container
@@ -968,11 +1009,21 @@ const ExpenseForm = (props) => {
               xs={12}
             >
               <Toolbar>
-                <Typography className={classes.tableTitle} variant="h6" id="tableTitle" component="div">
+                <Typography
+                  className={classes.tableTitle}
+                  variant="h6"
+                  id="tableTitle"
+                  component="div"
+                >
                   Complementos
                 </Typography>
                 <Tooltip title="Filter list">
-                  <IconButton aria-label="filter list" onClick={() => {handleAddComplement()}}>
+                  <IconButton
+                    aria-label="filter list"
+                    onClick={() => {
+                      handleAddComplement()
+                    }}
+                  >
                     <AddIcon />
                   </IconButton>
                 </Tooltip>
@@ -1033,7 +1084,11 @@ const ExpenseForm = (props) => {
                         <TableCell align={'right'}>
                           {
                             index !== 0 ?
-                              <IconButton onClick={() => {handleRemoveComplement(index)}}>
+                              <IconButton
+                                onClick={() => {
+                                  handleRemoveComplement(index)
+                                }}
+                              >
                                 <DeleteIcon />
                               </IconButton> : ' '
                           }
@@ -1053,7 +1108,7 @@ const ExpenseForm = (props) => {
           item
           xs={12}
           className={classes.rowContainer}
-          style={{marginTop: '2em', display: !isExpenseProductsRequired() ? 'none' : 'inherit'}}
+          style={{marginTop: '2em', display: isExpenseProductsRequired() ? 'inherit' : 'none'}}
         >
           <Grid
             container
@@ -1064,11 +1119,21 @@ const ExpenseForm = (props) => {
               xs={12}
             >
               <Toolbar>
-                <Typography className={classes.tableTitle} variant="h6" id="tableTitle" component="div">
+                <Typography
+                  className={classes.tableTitle}
+                  variant="h6"
+                  id="tableTitle"
+                  component="div"
+                >
                   Productos
                 </Typography>
                 <Tooltip title="Filter list">
-                  <IconButton aria-label="filter list" onClick={() => {handleAddExpenseProduct()}}>
+                  <IconButton
+                    aria-label="filter list"
+                    onClick={() => {
+                      handleAddExpenseProduct()
+                    }}
+                  >
                     <AddIcon />
                   </IconButton>
                 </Tooltip>
@@ -1133,7 +1198,7 @@ const ExpenseForm = (props) => {
                             type="number"
                             name={`expense_products[${index}].groups`}
                             onChange={(e) => {
-                              if(hasGroupWeight(index)) {
+                              if (hasGroupWeight(index)) {
                                 calculateExpenseProductKilos(e, index)
                               }
                             }}
@@ -1176,7 +1241,11 @@ const ExpenseForm = (props) => {
                         <TableCell align={'right'}>
                           {
                             index !== 0 ?
-                              <IconButton onClick={() => {handleRemoveExpenseProduct(index)}}>
+                              <IconButton
+                                onClick={() => {
+                                  handleRemoveExpenseProduct(index)
+                                }}
+                              >
                                 <DeleteIcon />
                               </IconButton> : ' '
                           }
@@ -1197,7 +1266,7 @@ const ExpenseForm = (props) => {
           item
           xs={12}
           className={classes.rowContainer}
-          style={{marginTop: '2em', display: !isInvoice ? 'none' : 'inherit'}}
+          style={{marginTop: '2em', display: isInvoice ? 'inherit' : 'none'}}
         >
           <Grid
             container
@@ -1208,11 +1277,21 @@ const ExpenseForm = (props) => {
               xs={12}
             >
               <Toolbar>
-                <Typography className={classes.tableTitle} variant="h6" id="tableTitle" component="div">
+                <Typography
+                  className={classes.tableTitle}
+                  variant="h6"
+                  id="tableTitle"
+                  component="div"
+                >
                   Notas de credito
                 </Typography>
                 <Tooltip title="Filter list">
-                  <IconButton aria-label="filter list" onClick={() => {handleAddExpenseCreditNotes()}}>
+                  <IconButton
+                    aria-label="filter list"
+                    onClick={() => {
+                      handleAddExpenseCreditNotes()
+                    }}
+                  >
                     <AddIcon />
                   </IconButton>
                 </Tooltip>
@@ -1266,7 +1345,11 @@ const ExpenseForm = (props) => {
                           </FormControl>
                         </TableCell>
                         <TableCell align={'right'}>
-                          <IconButton onClick={() => {handleRemoveExpenseCreditNotes(index)}}>
+                          <IconButton
+                            onClick={() => {
+                              handleRemoveExpenseCreditNotes(index)
+                            }}
+                          >
                             <DeleteIcon />
                           </IconButton>
                         </TableCell>
@@ -1286,69 +1369,62 @@ const ExpenseForm = (props) => {
           item
           xs={12}
           className={classes.rowContainer}
-          style={{marginTop: '2em', display: !isInvoice ? 'none' : 'inherit'}}
+          style={{marginTop: '2em', display: isInvoice ? 'inherit' : 'none'}}
         >
-            <FormControl
-              fullWidth
-            >
-              <TextField
-                inputRef={register({
-                  required: true
-                })}
-                type="number"
-                name="tax"
-                label="IVA"
-              />
-            </FormControl>
-          </Grid>
+          <FormControl
+            fullWidth
+          >
+            <TextField
+              inputRef={register({
+                required: isInvoice
+              })}
+              type="number"
+              name="tax"
+              label="IVA"
+            />
+          </FormControl>
+        </Grid>
 
-        {
-          isInvoice ?
-            <Grid
-              item
-              xs={12}
-              className={classes.rowContainer}
-              style={{marginTop: '2em'}}
-            >
-              <FormControl
-                fullWidth
-              >
-                <TextField
-                  inputRef={register({
-                    required: true
-                  })}
-                  type="number"
-                  name="invoice_tax_retained"
-                  label="IVA retenido"
-                />
-              </FormControl>
-            </Grid> :
-            null
-        }
+        <Grid
+          item
+          xs={12}
+          className={classes.rowContainer}
+          style={{marginTop: '2em', display: isInvoice ? 'inherit' : 'none'}}
+        >
+          <FormControl
+            fullWidth
+          >
+            <TextField
+              inputRef={register({
+                required: isInvoice
+              })}
+              type="number"
+              name="invoice_tax_retained"
+              label="IVA retenido"
+            />
+          </FormControl>
+        </Grid>
 
-        {
-          isInvoice ?
-            <Grid
-              item
-              xs={12}
-              className={classes.rowContainer}
-              style={{marginTop: '2em'}}
-            >
-              <FormControl
-                fullWidth
-              >
-                <TextField
-                  inputRef={register({
-                    required: true
-                  })}
-                  type="number"
-                  name="invoice_isr_retained"
-                  label="IVA retenido"
-                />
-              </FormControl>
-            </Grid> :
-            null
-        }
+        <Grid
+          item
+          xs={12}
+          className={classes.rowContainer}
+          style={{marginTop: '2em', display: isInvoice ? 'inherit' : 'none'}}
+        >
+          <FormControl
+            fullWidth
+          >
+            <TextField
+              inputRef={register({
+                required: isInvoice
+              })}
+              type="number"
+              name="invoice_isr_retained"
+              label="IVA retenido"
+            />
+          </FormControl>
+        </Grid>
+
 
         <Grid
           item
