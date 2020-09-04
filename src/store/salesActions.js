@@ -33,3 +33,10 @@ export const setOtherIncomes = (otherIncomes) => {
     otherIncomes: otherIncomes
   }
 }
+
+export const setOrderSaleCollectionStatuses = (collectionStatuses) => {
+  return {
+    type: 'SET_ORDER_SALE_COLLECTION_STATUSES',
+    collectionStatuses
+  }
+}

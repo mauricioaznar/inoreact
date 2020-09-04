@@ -50,6 +50,12 @@ function Navbar(props) {
                 to={'/expenses'}
                 value={'/expenses'}
               />
+              <Tab
+                label={'S'}
+                component={Link}
+                to={'/sales'}
+                value={'/sales'}
+              />
             </Tabs>
           </Grid>
           <Grid

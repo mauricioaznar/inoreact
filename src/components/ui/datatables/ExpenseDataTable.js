@@ -3,36 +3,24 @@ import {connect} from 'react-redux'
 
 
 import AddBox from '@material-ui/icons/AddBox';
-import ArrowDownward from '@material-ui/icons/ArrowDownward';
-import Check from '@material-ui/icons/Check';
-import ChevronLeft from '@material-ui/icons/ChevronLeft';
-import ChevronRight from '@material-ui/icons/ChevronRight';
-import Clear from '@material-ui/icons/Clear';
-import DeleteOutline from '@material-ui/icons/DeleteOutline';
 import Edit from '@material-ui/icons/Edit';
-import FilterList from '@material-ui/icons/FilterList';
-import FirstPage from '@material-ui/icons/FirstPage';
-import LastPage from '@material-ui/icons/LastPage';
-import Remove from '@material-ui/icons/Remove';
-import SaveAlt from '@material-ui/icons/SaveAlt';
-import Search from '@material-ui/icons/Search';
-import ViewColumn from '@material-ui/icons/ViewColumn'
 
 import moment from 'moment'
 import Grid from '@material-ui/core/Grid'
 import {makeStyles, useTheme} from '@material-ui/core/styles'
 import axios from 'axios'
-import apiUrl from '../../helpers/apiUrl'
-import authHeader from '../../helpers/authHeader'
+import apiUrl from '../../../helpers/apiUrl'
+import authHeader from '../../../helpers/authHeader'
 import MaterialTable from 'material-table'
 import Dialog from '@material-ui/core/Dialog'
-import ExpenseForm from './forms/ExpenseForm'
+import ExpenseForm from '../forms/ExpenseForm'
 import useMediaQuery from '@material-ui/core/useMediaQuery'
 import Slide from '@material-ui/core/Slide'
 import {KeyboardDatePicker, MuiPickersUtilsProvider} from '@material-ui/pickers'
 import DateMomentUtils from '@date-io/moment'
 import TextField from '@material-ui/core/TextField'
 import Autocomplete from '@material-ui/lab/Autocomplete'
+import {localization, tableIcons} from './common/common'
 
 const useStyles = makeStyles((theme) => {
   return {
@@ -48,94 +36,6 @@ const dateFormat = 'YYYY-MM-DD'
 const Transition = React.forwardRef(function Transition(props, ref) {
   return <Slide direction="up" ref={ref} {...props} />;
 });
-
-
-const tableIcons = {
-  Add: forwardRef((props, ref) => <AddBox {...props} ref={ref}
-                                          color={'action'}
-                                          fontSize={'small'}
-  />),
-  Check: forwardRef((props, ref) => <Check {...props} ref={ref}
-                                           color={'action'}
-                                           fontSize={'small'}
-  />),
-  Clear: forwardRef((props, ref) => <Clear {...props} ref={ref}
-                                           color={'action'}
-                                           fontSize={'small'}
-  />),
-  Delete: forwardRef((props, ref) => <DeleteOutline {...props} ref={ref}
-                                                    color={'action'}
-                                                    fontSize={'small'}
-  />),
-  DetailPanel: forwardRef((props, ref) => <ChevronRight {...props} ref={ref}
-                                                        color={'action'}
-                                                        fontSize={'small'}
-  />),
-  Edit: forwardRef((props, ref) => <Edit {...props} ref={ref}
-                                         color={'action'}
-                                         fontSize={'small'}
-  />),
-  Export: forwardRef((props, ref) => <SaveAlt {...props} ref={ref}
-                                              color={'action'}
-                                              fontSize={'small'}
-  />),
-  Filter: forwardRef((props, ref) => <FilterList {...props} ref={ref}
-                                                 color={'action'}
-                                                 fontSize={'small'}
-  />),
-  FirstPage: forwardRef((props, ref) => <FirstPage {...props} ref={ref}
-                                                   color={'action'}
-                                                   fontSize={'small'}
-  />),
-  LastPage: forwardRef((props, ref) => <LastPage {...props} ref={ref}
-                                                 color={'action'}
-                                                 fontSize={'small'}
-  />),
-  NextPage: forwardRef((props, ref) => <ChevronRight {...props} ref={ref}
-                                                     color={'action'}
-                                                     fontSize={'small'}
-  />),
-  PreviousPage: forwardRef((props, ref) => <ChevronLeft {...props} ref={ref}
-                                                        color={'action'}
-                                                        fontSize={'small'}
-  />),
-  ResetSearch: forwardRef((props, ref) => <Clear {...props} ref={ref}
-                                                 color={'action'}
-                                                 fontSize={'small'}
-  />),
-  Search: forwardRef((props, ref) => <Search {...props} ref={ref}
-                                             color={'action'}
-                                             fontSize={'small'}
-  />),
-  SortArrow: forwardRef((props, ref) => <ArrowDownward {...props} ref={ref}
-                                                       color={'action'}
-                                                       fontSize={'small'}
-  />),
-  ThirdStateCheck: forwardRef((props, ref) => <Remove {...props} ref={ref}
-                                                      color={'action'}
-                                                      fontSize={'small'}
-  />),
-  ViewColumn: forwardRef((props, ref) => <ViewColumn {...props} ref={ref}
-                                                     color={'action'}
-                                                     fontSize={'small'}
-  />)
-};
-
-function getDayRange(day = 0, content) {
-  let currentStart = moment().add(day, 'days');
-  let endDay = moment()
-  let days = []
-
-  while (currentStart.isBefore(endDay, '[]')) {
-    days.push({
-      day: currentStart.format('MM-DD'),
-      date: currentStart.format(dateFormat),
-      ...content
-    })
-    currentStart = currentStart.add(1, 'day')
-  }
-  return days
-}
 
 
 const formatNumber = (x, digits = 2) => {
@@ -292,31 +192,7 @@ function ExpenseDataTable(props) {
             icons={tableIcons}
             title="Gastos"
             tableRef={tableRef}
-            localization={{
-              body: {
-                deleteTooltip: 'Borrar',
-                addTooltip: 'Añadir',
-                editTooltip: 'Editar',
-                editRow: {
-                  deleteText: '¿Estas seguro que quieres borrar esta fila?'
-                },
-                filterRow: {
-                  filterTooltip: 'Filtrar'
-                }
-              },
-              header: {
-                actions: 'Acciones'
-              },
-              pagination: {
-                labelDisplayedRows: '{from} - {to} de {count}',
-                labelRowsSelect: 'Filas',
-                firstTooltip: 'Primera pagina',
-                previousTooltip: 'Pagina anterior',
-                nextTooltip: 'Pagina siguiente',
-                lastTooltip: 'Ultima pagina'
-
-              }
-            }}
+            localization={localization}
             editable={{
               onRowDelete: handleRowDelete
             }}

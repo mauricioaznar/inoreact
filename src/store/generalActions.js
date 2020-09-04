@@ -14,6 +14,7 @@ import {
   setProductTypes
 } from './productionActions'
 import apiUrl from '../helpers/apiUrl'
+import {setOrderSaleCollectionStatuses} from './salesActions'
 
 export const setInventory = (inventory) => {
   return {
@@ -58,7 +59,8 @@ export const getApiEntities = () => {
         products,
         expense_invoice_cdfi_uses: cdfiUses,
         expense_invoice_payment_forms: paymentForms,
-        expense_money_sources: moneySources
+        expense_money_sources: moneySources,
+        order_sale_collection_statuses: collectionStatuses
       } = result[1].data.data
       // dispatch(setOrderProductions(orderProductions))
       dispatch(setInventory(inventory))
@@ -75,6 +77,7 @@ export const getApiEntities = () => {
       dispatch(setExpenseInvoicePaymentForms(paymentForms))
       dispatch(setExpenseInvoiceCdfiUses(cdfiUses))
       dispatch(setExpenseMoneySources(moneySources))
+      dispatch(setOrderSaleCollectionStatuses(collectionStatuses))
     }).finally(() => {
       dispatch(unsetAreEntitiesLoading())
     })

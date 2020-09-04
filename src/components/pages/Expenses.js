@@ -1,6 +1,6 @@
 import React from 'react'
 import Grid from '@material-ui/core/Grid'
-import ExpenseDataTable from '../ui/ExpenseDataTable'
+import ExpenseDataTable from '../ui/datatables/ExpenseDataTable'
 
 export default function Expenses (props) {
   return (

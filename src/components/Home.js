@@ -8,6 +8,7 @@ import Equilibrium from './pages/Equilibrium'
 import Production from './pages/Production'
 import InventoryDrawer from './ui/InventoryDrawer'
 import Expenses from './pages/Expenses'
+import Sales from './pages/Sales'
 
 
 const useStyles = makeStyles((theme) => ({
@@ -36,6 +37,7 @@ const Home = (props) => {
           <Route path={'/'} exact component={() => <Equilibrium />}/>
           <Route path={'/production'} component={() => <Production />}/>
           <Route path={'/expenses'} component={() => <Expenses />}/>
+          <Route path={'/sales'} component={() => <Sales />}/>
         </Switch>
         <InventoryDrawer/>
       </div>
