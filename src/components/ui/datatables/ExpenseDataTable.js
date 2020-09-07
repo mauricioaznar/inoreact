@@ -3,7 +3,9 @@ import {connect} from 'react-redux'
 
 
 import AddBox from '@material-ui/icons/AddBox';
+import ImportExport from '@material-ui/icons/ImportExport'
 import Edit from '@material-ui/icons/Edit';
+import CircularProgress from '@material-ui/core/CircularProgress'
 
 import moment from 'moment'
 import Grid from '@material-ui/core/Grid'
@@ -21,6 +23,8 @@ import DateMomentUtils from '@date-io/moment'
 import TextField from '@material-ui/core/TextField'
 import Autocomplete from '@material-ui/lab/Autocomplete'
 import {localization, tableIcons} from './common/common'
+import xlsx from 'xlsx'
+import fileSaver from 'file-saver'
 
 const useStyles = makeStyles((theme) => {
   return {
@@ -45,6 +49,13 @@ const formatNumber = (x, digits = 2) => {
   return x.toFixed(digits).toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",")
 }
 
+const mapExpenseToInvoice = (expenses) => {
+  return expenses.map(expense => {
+    return {
+      id: expense.id
+    }
+  })
+}
 
 //Fix call in useEffect that is leaking memory (because is trying to set state in before component mounts?)
 
@@ -61,6 +72,37 @@ function ExpenseDataTable(props) {
 
   const [open, setOpen] = React.useState(false);
   const [rowData, setRowData] = React.useState(null);
+  const [date, setDate] = React.useState(moment().subtract(1, 'month').format('YYYY-MM-DD'))
+  const [loading, setLoading] = React.useState(false)
+  const [exportedExpenses, setExportedExpenses] = React.useState(null)
+
+  React.useEffect(() => {
+    let active = true;
+    setLoading(true);
+
+    (async () => {
+      let paidInvoicesResponse = await axios.get(apiUrl + 'expense/list?', {headers: {...authHeader()}})
+      if (active) {
+        let startDate = moment(date).startOf('month').format(dateFormat)
+        let endDate = moment(date).add(1, 'month').startOf('month').format(dateFormat)
+        paidInvoicesResponse = await axios.get(apiUrl + 'expense/list?' +
+          'paginate=false' +
+          '&filter_exact_1=expense_type_id' +
+          '&filter_exact_value_1=2' +
+          '&start_date_1=date_paid' +
+          '&start_date_value_1=' +  startDate +
+          '&end_date_1=date_paid' +
+          '&end_date_value_1=' +  endDate,
+          {headers: {...authHeader()}})
+        setExportedExpenses({paidInvoices: mapExpenseToInvoice(paidInvoicesResponse.data.data)})
+        setLoading(false)
+      }
+    })()
+
+    return () => {
+      active = false
+    }
+  }, [date])
 
   const handleClickOpen = () => {
     setOpen(true);
@@ -214,6 +256,25 @@ function ExpenseDataTable(props) {
                 }
               },
               {
+                icon: (props) =>
+                  loading ? <CircularProgress size={25} /> :
+                    <ImportExport {...props} color={'action'} fontSize={'small'} />,
+                tooltip: 'Exportar',
+                isFreeAction: true,
+                onClick: (event) => {
+                  if (!loading) {
+                    const fileType = 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet;charset=UTF-8';
+                    const fileExtension = '.xlsx';
+                    let workbook = xlsx.utils.book_new()
+                    let invoicesExcel = xlsx.utils.json_to_sheet(exportedExpenses.paidInvoices)
+                    xlsx.utils.book_append_sheet(workbook, invoicesExcel, 'Facturas pagadas')
+                    const excelBuffer = xlsx.write(workbook, { bookType: 'xlsx', type: 'array' })
+                    const data = new Blob([excelBuffer], {type: fileType})
+                    fileSaver.saveAs(data, 'Facturas de ' + fileExtension)
+                  }
+                }
+              },
+              {
                 icon: (props) => <AddBox {...props} color={'action'} fontSize={'small'} />,
                 tooltip: 'Agregar',
                 isFreeAction: true,
@@ -250,6 +311,7 @@ function ExpenseDataTable(props) {
                           filterProps.onFilterChanged(
                             filterProps.columnDef.tableData.id,
                             momentDate !== null && momentDate.isValid() ? momentDate.format('YYYY-MM-DD') : null)
+                          setDate(momentDate !== null && momentDate.isValid() ? momentDate.format('YYYY-MM-DD') : null)
                         }}
                         animateYearScrolling
                       />
