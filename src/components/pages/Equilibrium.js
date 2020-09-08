@@ -189,7 +189,6 @@ export default function Equilibrium(props) {
           container
           direction={matchesXS ? 'column' : 'row'}
           alignItems={'flex-start'}
-          spacing={8}
         >
           <Grid
             item
@@ -301,12 +300,15 @@ export default function Equilibrium(props) {
           item
           container
           direction={matchesXS ? 'column' : 'row'}
-          spacing={8}
         >
           <Grid
             item
             xs={12}
             sm={6}
+            style={{
+              paddingRight: '1em',
+              paddingLeft: '1em'
+            }}
           >
             <Grid container>
               <Grid
@@ -337,6 +339,10 @@ export default function Equilibrium(props) {
             item
             xs={12}
             sm={6}
+            style={{
+              paddingRight: '1em',
+              paddingLeft: '1em'
+            }}
           >
             <Grid container>
               <Grid

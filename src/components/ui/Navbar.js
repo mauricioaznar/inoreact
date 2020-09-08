@@ -33,25 +33,25 @@ function Navbar(props) {
               value={location.pathname}
             >
               <Tab
-                label={'P E'}
+                label={'Punto de equilibrio'}
                 component={Link}
                 to={'/'}
                 value={'/'}
               />
               <Tab
-                label={'Prod'}
+                label={'Produccion'}
                 component={Link}
                 to={'/production'}
                 value={'/production'}
               />
               <Tab
-                label={'EX'}
+                label={'Gastos'}
                 component={Link}
                 to={'/expenses'}
                 value={'/expenses'}
               />
               <Tab
-                label={'S'}
+                label={'Ventas'}
                 component={Link}
                 to={'/sales'}
                 value={'/sales'}
