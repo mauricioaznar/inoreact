@@ -51,8 +51,25 @@ const formatNumber = (x, digits = 2) => {
 
 const mapExpenseToInvoice = (expenses) => {
   return expenses.map(expense => {
+    let total = 0
+    expense.expense_items.forEach(expenseItem => {
+      total += expenseItem.subtotal
+    })
     return {
-      id: expense.id
+      'Proveedor': expense.supplier.name,
+      'Fecha de pago': expense.date_paid,
+      'Fecha de emision': expense.date_emitted,
+      'Banco': expense.expense_money_source ? expense.expense_money_source.name : '',
+      'Forma de pago': expense.expense_invoice_payment_form ? expense.expense_invoice_payment_form.name : '',
+      'Estado de la factura': expense.expense_invoice_status.name,
+      'Total': total,
+      'Iva': expense.tax,
+      'Isr': (total - expense.tax).toFixed(2),
+      'Codigo interno': expense.internal_code,
+      'Codigo de la factura': expense.invoice_code,
+      'ISR retenido': expense.invoice_isr_retained,
+      'IVA retenido': expense.invoice_tax_retained,
+      'Complementos': expense.expense_invoice_complements.map(complement => { return (complement.delivered === 1 ? 'E' : 'P') + ' ' + complement.name }).join(', ')
     }
   })
 }
@@ -74,6 +91,7 @@ function ExpenseDataTable(props) {
   const [rowData, setRowData] = React.useState(null);
   const [date, setDate] = React.useState(moment().subtract(1, 'month').format('YYYY-MM-DD'))
   const [loading, setLoading] = React.useState(false)
+  const [updates, setUpdates] =React.useState(0)
   const [exportedExpenses, setExportedExpenses] = React.useState(null)
 
   React.useEffect(() => {
@@ -81,20 +99,39 @@ function ExpenseDataTable(props) {
     setLoading(true);
 
     (async () => {
-      let paidInvoicesResponse = await axios.get(apiUrl + 'expense/list?', {headers: {...authHeader()}})
+      let startDate = moment(date).startOf('month').format(dateFormat)
+      let endDate = moment(date).add(1, 'month').startOf('month').format(dateFormat)
+      const paidInvoicesResponse = await axios.get(apiUrl + 'expense/list?' +
+        'paginate=false' +
+        '&filter_exact_1=expense_type_id' +
+        '&filter_exact_value_1=2' +
+        '&start_date_1=date_paid' +
+        '&start_date_value_1=' +  startDate +
+        '&end_date_1=date_paid' +
+        '&end_date_value_1=' +  endDate,
+        {headers: {...authHeader()}})
+      const provisionedInvoicesResponse = await axios.get(apiUrl + 'expense/list?' +
+        'paginate=false' +
+        '&filter_exact_1=expense_type_id' +
+        '&filter_exact_value_1=2' +
+        '&start_date_1=invoice_provision_date' +
+        '&start_date_value_1=' +  startDate +
+        '&end_date_1=invoice_provision_date' +
+        '&end_date_value_1=' +  endDate,
+        {headers: {...authHeader()}})
+      const pendingInvoicesResponse = await axios.get(apiUrl + 'expense/list?' +
+        'paginate=false' +
+        '&filter_exact_1=expense_type_id' +
+        '&filter_exact_value_1=2' +
+        '&filter_exact_2=date_paid' +
+        '&filter_exact_value_2=0000-00-00',
+        {headers: {...authHeader()}})
       if (active) {
-        let startDate = moment(date).startOf('month').format(dateFormat)
-        let endDate = moment(date).add(1, 'month').startOf('month').format(dateFormat)
-        paidInvoicesResponse = await axios.get(apiUrl + 'expense/list?' +
-          'paginate=false' +
-          '&filter_exact_1=expense_type_id' +
-          '&filter_exact_value_1=2' +
-          '&start_date_1=date_paid' +
-          '&start_date_value_1=' +  startDate +
-          '&end_date_1=date_paid' +
-          '&end_date_value_1=' +  endDate,
-          {headers: {...authHeader()}})
-        setExportedExpenses({paidInvoices: mapExpenseToInvoice(paidInvoicesResponse.data.data)})
+        setExportedExpenses({
+          paidInvoices: mapExpenseToInvoice(paidInvoicesResponse.data.data),
+          provisionedInvoices: mapExpenseToInvoice(provisionedInvoicesResponse.data.data),
+          pendingInvoices: mapExpenseToInvoice(pendingInvoicesResponse.data.data)
+        })
         setLoading(false)
       }
     })()
@@ -102,7 +139,7 @@ function ExpenseDataTable(props) {
     return () => {
       active = false
     }
-  }, [date])
+  }, [date, updates])
 
   const handleClickOpen = () => {
     setOpen(true);
@@ -195,6 +232,8 @@ function ExpenseDataTable(props) {
       callback(true)
       tableRef.current && tableRef.current.onQueryChange()
       setOpen(false)
+    }).finally(() => {
+      setUpdates(updates + 1)
     })
   }
 
@@ -214,7 +253,12 @@ function ExpenseDataTable(props) {
     oldData.expense_invoice_complements.forEach(complement => {
       promises.push(axios.put(apiUrl + 'expenseInvoiceComplement/' + complement.id, {active: -1}, {headers: {...authHeader()}}))
     })
-    return Promise.all(promises)
+    return Promise.all(promises).then(results => {
+      return new Promise((resolve, reject) => {
+        setUpdates(updates + 1)
+        resolve()
+      })
+    })
   }
 
 
@@ -236,7 +280,9 @@ function ExpenseDataTable(props) {
             tableRef={tableRef}
             localization={localization}
             editable={{
-              onRowDelete: handleRowDelete
+              onRowDelete: (oldData) => {
+                return handleRowDelete(oldData)
+              }
             }}
             options={{
               pageSize: 25,
@@ -266,8 +312,12 @@ function ExpenseDataTable(props) {
                     const fileType = 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet;charset=UTF-8';
                     const fileExtension = '.xlsx';
                     let workbook = xlsx.utils.book_new()
-                    let invoicesExcel = xlsx.utils.json_to_sheet(exportedExpenses.paidInvoices)
-                    xlsx.utils.book_append_sheet(workbook, invoicesExcel, 'Facturas pagadas')
+                    let paidInvoicedExcel = xlsx.utils.json_to_sheet(exportedExpenses.paidInvoices)
+                    xlsx.utils.book_append_sheet(workbook, paidInvoicedExcel, 'Facturas pagadas')
+                    let provisionedInvoicedExcel = xlsx.utils.json_to_sheet(exportedExpenses.provisionedInvoices)
+                    xlsx.utils.book_append_sheet(workbook, provisionedInvoicedExcel, 'Facturas provisionadas')
+                    let pendingInvoicesExcel = xlsx.utils.json_to_sheet(exportedExpenses.pendingInvoices)
+                    xlsx.utils.book_append_sheet(workbook, pendingInvoicesExcel, 'Facturas pendientes')
                     const excelBuffer = xlsx.write(workbook, { bookType: 'xlsx', type: 'array' })
                     const data = new Blob([excelBuffer], {type: fileType})
                     fileSaver.saveAs(data, 'Facturas de ' + fileExtension)
