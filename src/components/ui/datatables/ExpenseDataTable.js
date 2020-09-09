@@ -355,8 +355,7 @@ function ExpenseDataTable(props) {
               pageSizeOptions: [25, 40, 60],
               selection: false,
               search: false,
-              filtering: true,
-              debounceInterval: 1000
+              filtering: true
             }}
             actions={[
               {
