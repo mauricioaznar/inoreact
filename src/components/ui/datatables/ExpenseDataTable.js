@@ -249,6 +249,7 @@ function ExpenseDataTable(props) {
                           filterProps.onFilterChanged(
                             filterProps.columnDef.tableData.id,
                             momentDate !== null && momentDate.isValid() ? momentDate.format('YYYY-MM-DD') : null)
+                          setDatePaid(datePaid)
                         }}
                       />
                     </MuiPickersUtilsProvider>
