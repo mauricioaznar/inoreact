@@ -52,6 +52,9 @@ function ExpenseDataTable(props) {
 
   const [open, setOpen] = React.useState(false);
   const [rowData, setRowData] = React.useState(null);
+  const [datePaid, setDatePaid] = React.useState(null);
+  const [dateProvisioned, setDateProvisioned] = React.useState(null);
+  const [dateEmitted, setDateEmitted] = React.useState(null);
 
 
   const handleClickOpen = () => {
@@ -229,7 +232,6 @@ function ExpenseDataTable(props) {
                 field: 'date_paid',
                 type: 'date',
                 dateSetting: {locale: 'en-ca'},
-                defaultFilter: moment().format('YYYY-MM-DD'),
                 filterComponent: (filterProps) => {
                   return (
                     <MuiPickersUtilsProvider utils={DateMomentUtils} key={'provision'}>
@@ -239,78 +241,8 @@ function ExpenseDataTable(props) {
                         views={["month"]}
                         minDate={new Date("2018-01-01")}
                         maxDate={new Date("2021-12-31")}
+                        variant={'dialog'}
                         value={filterProps.columnDef.tableData.filterValue}
-                        variant={'inline'}
-                        PopoverProps={{
-                          anchorOrigin: {horizontal: "left", vertical: "bottom"},
-                          transformOrigin: {horizontal: "left", vertical: "top"}
-                        }}
-                        format={'YYYY-MM'}
-                        animateYearScrolling
-                        onChange={(momentDate) => {
-                          filterProps.onFilterChanged(
-                            filterProps.columnDef.tableData.id,
-                            momentDate !== null && momentDate.isValid() ? momentDate.format('YYYY-MM-DD') : null)
-                        }}
-                      />
-                    </MuiPickersUtilsProvider>
-                  )
-                }
-              },
-              {
-                title: 'Fecha de provision',
-                field: 'invoice_provision_date',
-                type: 'date',
-                dateSetting: {locale: 'en-ca'},
-                defaultFilter: null,
-                filterComponent: (filterProps) => {
-                  return (
-                    <MuiPickersUtilsProvider utils={DateMomentUtils} key={'provision'}>
-                      <KeyboardDatePicker
-                        clearable
-                        autoOk={true}
-                        views={["month"]}
-                        minDate={new Date("2018-01-01")}
-                        maxDate={new Date("2021-12-31")}
-                        value={filterProps.columnDef.tableData.filterValue}
-                        variant={'inline'}
-                        PopoverProps={{
-                          anchorOrigin: {horizontal: "left", vertical: "bottom"},
-                          transformOrigin: {horizontal: "left", vertical: "top"}
-                        }}
-                        format={'YYYY-MM'}
-                        animateYearScrolling
-                        onChange={(momentDate) => {
-                          filterProps.onFilterChanged(
-                            filterProps.columnDef.tableData.id,
-                            momentDate !== null && momentDate.isValid() ? momentDate.format('YYYY-MM-DD') : null)
-                        }}
-                      />
-                    </MuiPickersUtilsProvider>
-                  )
-                }
-              },
-              {
-                title: 'Fecha de emision',
-                field: 'date_emitted',
-                type: 'date',
-                dateSetting: {locale: 'en-ca'},
-                defaultFilter: null,
-                filterComponent: (filterProps) => {
-                  return (
-                    <MuiPickersUtilsProvider utils={DateMomentUtils} key={'provision'}>
-                      <KeyboardDatePicker
-                        clearable
-                        autoOk={true}
-                        views={["month"]}
-                        minDate={new Date("2018-01-01")}
-                        maxDate={new Date("2021-12-31")}
-                        value={filterProps.columnDef.tableData.filterValue}
-                        variant={'inline'}
-                        PopoverProps={{
-                          anchorOrigin: {horizontal: "left", vertical: "bottom"},
-                          transformOrigin: {horizontal: "left", vertical: "top"}
-                        }}
                         format={'YYYY-MM'}
                         animateYearScrolling
                         onChange={(momentDate) => {
