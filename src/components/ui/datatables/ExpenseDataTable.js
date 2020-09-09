@@ -225,7 +225,7 @@ function ExpenseDataTable(props) {
             ]}
             columns={[
               {
-                title: 'Fecha de provision',
+                title: 'Fecha de pago',
                 field: 'date_paid',
                 type: 'date',
                 dateSetting: {locale: 'en-ca'},
@@ -248,7 +248,6 @@ function ExpenseDataTable(props) {
                         format={'YYYY-MM'}
                         animateYearScrolling
                         onChange={(momentDate) => {
-                          console.log(filterProps)
                           filterProps.onFilterChanged(
                             filterProps.columnDef.tableData.id,
                             momentDate !== null && momentDate.isValid() ? momentDate.format('YYYY-MM-DD') : null)
