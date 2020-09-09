@@ -381,12 +381,23 @@ function ExpenseDataTable(props) {
                 field: 'invoice_code'
               },
               {
+                title: 'Codigo interno',
+                field: 'internal_code'
+              },
+              {
                 title: 'Descripcion',
                 field: 'description'
               },
               {
-                title: 'Codigo interno',
-                field: 'internal_code'
+                title: 'Rubros',
+                sorting: false,
+                render: (rawData) => {
+                  let expenseItemsTotal = rawData.expense_items.reduce((a, b) => {
+                    return a + b.expense_subcategory.name + ','
+                  }, '')
+                  expenseItemsTotal = expenseItemsTotal.slice(0 , expenseItemsTotal.length - 1)
+                  return <>{expenseItemsTotal}</>
+                }
               },
               {
                 title: 'Total',
@@ -404,17 +415,6 @@ function ExpenseDataTable(props) {
                 field: 'tax',
                 type: 'currency',
                 filtering: false
-              },
-              {
-                title: 'Rubros',
-                sorting: false,
-                render: (rawData) => {
-                  let expenseItemsTotal = rawData.expense_items.reduce((a, b) => {
-                    return a + b.expense_subcategory.name + ','
-                  }, '')
-                  expenseItemsTotal = expenseItemsTotal.slice(0 , expenseItemsTotal.length - 1)
-                  return <>{expenseItemsTotal}</>
-                }
               }
             ]}
             data={query =>
