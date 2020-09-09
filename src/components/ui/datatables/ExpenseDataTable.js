@@ -381,23 +381,12 @@ function ExpenseDataTable(props) {
                 field: 'invoice_code'
               },
               {
+                title: 'Descripcion',
+                field: 'description'
+              },
+              {
                 title: 'Codigo interno',
                 field: 'internal_code'
-              },
-              {
-                title: 'IVA',
-                field: 'tax',
-                type: 'currency'
-              },
-              {
-                title: 'ISR ret',
-                field: 'invoice_isr_retained',
-                type: 'currency'
-              },
-              {
-                title: 'Tax ret',
-                field: 'invoice_tax_retained',
-                type: 'currency'
               },
               {
                 title: 'Total',
@@ -408,6 +397,23 @@ function ExpenseDataTable(props) {
                     return a + b.subtotal
                   }, 0)
                   return <>${formatNumber(expenseItemsTotal)}</>
+                }
+              },
+              {
+                title: 'IVA',
+                field: 'tax',
+                type: 'currency',
+                filtering: false
+              },
+              {
+                title: 'Rubros',
+                sorting: false,
+                render: (rawData) => {
+                  let expenseItemsTotal = rawData.expense_items.reduce((a, b) => {
+                    return a + b.expense_subcategory.name + ','
+                  }, '')
+                  expenseItemsTotal = expenseItemsTotal.slice(0 , expenseItemsTotal.length - 1)
+                  return <>{expenseItemsTotal}</>
                 }
               }
             ]}
