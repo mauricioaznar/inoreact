@@ -23,17 +23,6 @@ import DateMomentUtils from '@date-io/moment'
 import TextField from '@material-ui/core/TextField'
 import Autocomplete from '@material-ui/lab/Autocomplete'
 import {localization, tableIcons} from './common/common'
-import xlsx from 'xlsx'
-import fileSaver from 'file-saver'
-
-const useStyles = makeStyles((theme) => {
-  return {
-    rowContainer: {
-      paddingLeft: '2em',
-      paddingRight: '2em'
-    }
-  }
-})
 
 const dateFormat = 'YYYY-MM-DD'
 
@@ -49,36 +38,10 @@ const formatNumber = (x, digits = 2) => {
   return x.toFixed(digits).toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",")
 }
 
-const mapExpenseToInvoice = (expenses) => {
-  return expenses.map(expense => {
-    let total = 0
-    expense.expense_items.forEach(expenseItem => {
-      total += expenseItem.subtotal
-    })
-    return {
-      'Proveedor': expense.supplier.name,
-      'Fecha de pago': expense.date_paid,
-      'Fecha de emision': expense.date_emitted,
-      'Banco': expense.expense_money_source ? expense.expense_money_source.name : '',
-      'Forma de pago': expense.expense_invoice_payment_form ? expense.expense_invoice_payment_form.name : '',
-      'Estado de la factura': expense.expense_invoice_status.name,
-      'Total': total,
-      'Iva': expense.tax,
-      'Isr': (total - expense.tax).toFixed(2),
-      'Codigo interno': expense.internal_code,
-      'Codigo de la factura': expense.invoice_code,
-      'ISR retenido': expense.invoice_isr_retained,
-      'IVA retenido': expense.invoice_tax_retained,
-      'Complementos': expense.expense_invoice_complements.map(complement => { return (complement.delivered === 1 ? 'E' : 'P') + ' ' + complement.name }).join(', ')
-    }
-  })
-}
 
 //Fix call in useEffect that is leaking memory (because is trying to set state in before component mounts?)
 
 function ExpenseDataTable(props) {
-
-  const classes = useStyles()
 
   const tableRef = React.createRef();
 
@@ -89,57 +52,7 @@ function ExpenseDataTable(props) {
 
   const [open, setOpen] = React.useState(false);
   const [rowData, setRowData] = React.useState(null);
-  const [date, setDate] = React.useState(moment().subtract(1, 'month').format('YYYY-MM-DD'))
-  const [loading, setLoading] = React.useState(false)
-  const [updates, setUpdates] =React.useState(0)
-  const [exportedExpenses, setExportedExpenses] = React.useState(null)
 
-  React.useEffect(() => {
-    let active = true;
-    setLoading(true);
-
-    (async () => {
-      let startDate = moment(date).startOf('month').format(dateFormat)
-      let endDate = moment(date).add(1, 'month').startOf('month').format(dateFormat)
-      const paidInvoicesResponse = await axios.get(apiUrl + 'expense/list?' +
-        'paginate=false' +
-        '&filter_exact_1=expense_type_id' +
-        '&filter_exact_value_1=2' +
-        '&start_date_1=date_paid' +
-        '&start_date_value_1=' +  startDate +
-        '&end_date_1=date_paid' +
-        '&end_date_value_1=' +  endDate,
-        {headers: {...authHeader()}})
-      const provisionedInvoicesResponse = await axios.get(apiUrl + 'expense/list?' +
-        'paginate=false' +
-        '&filter_exact_1=expense_type_id' +
-        '&filter_exact_value_1=2' +
-        '&start_date_1=invoice_provision_date' +
-        '&start_date_value_1=' +  startDate +
-        '&end_date_1=invoice_provision_date' +
-        '&end_date_value_1=' +  endDate,
-        {headers: {...authHeader()}})
-      const pendingInvoicesResponse = await axios.get(apiUrl + 'expense/list?' +
-        'paginate=false' +
-        '&filter_exact_1=expense_type_id' +
-        '&filter_exact_value_1=2' +
-        '&filter_exact_2=date_paid' +
-        '&filter_exact_value_2=0000-00-00',
-        {headers: {...authHeader()}})
-      if (active) {
-        setExportedExpenses({
-          paidInvoices: mapExpenseToInvoice(paidInvoicesResponse.data.data),
-          provisionedInvoices: mapExpenseToInvoice(provisionedInvoicesResponse.data.data),
-          pendingInvoices: mapExpenseToInvoice(pendingInvoicesResponse.data.data)
-        })
-        setLoading(false)
-      }
-    })()
-
-    return () => {
-      active = false
-    }
-  }, [date, updates])
 
   const handleClickOpen = () => {
     setOpen(true);
@@ -233,7 +146,7 @@ function ExpenseDataTable(props) {
       tableRef.current && tableRef.current.onQueryChange()
       setOpen(false)
     }).finally(() => {
-      setUpdates(updates + 1)
+      props.setUpdates(props.updates + 1)
     })
   }
 
@@ -255,7 +168,7 @@ function ExpenseDataTable(props) {
     })
     return Promise.all(promises).then(results => {
       return new Promise((resolve, reject) => {
-        setUpdates(updates + 1)
+        props.setUpdates(props.updates + 1)
         resolve()
       })
     })
@@ -271,7 +184,6 @@ function ExpenseDataTable(props) {
         <Grid
           item
           xs={12}
-          className={classes.rowContainer}
           style={{marginTop: '2em'}}
         >
           <MaterialTable
@@ -302,29 +214,6 @@ function ExpenseDataTable(props) {
                 }
               },
               {
-                icon: (props) =>
-                  loading ? <CircularProgress size={25} /> :
-                    <ImportExport {...props} color={'action'} fontSize={'small'} />,
-                tooltip: 'Exportar',
-                isFreeAction: true,
-                onClick: (event) => {
-                  if (!loading) {
-                    const fileType = 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet;charset=UTF-8';
-                    const fileExtension = '.xlsx';
-                    let workbook = xlsx.utils.book_new()
-                    let paidInvoicedExcel = xlsx.utils.json_to_sheet(exportedExpenses.paidInvoices)
-                    xlsx.utils.book_append_sheet(workbook, paidInvoicedExcel, 'Facturas pagadas')
-                    let provisionedInvoicedExcel = xlsx.utils.json_to_sheet(exportedExpenses.provisionedInvoices)
-                    xlsx.utils.book_append_sheet(workbook, provisionedInvoicedExcel, 'Facturas provisionadas')
-                    let pendingInvoicesExcel = xlsx.utils.json_to_sheet(exportedExpenses.pendingInvoices)
-                    xlsx.utils.book_append_sheet(workbook, pendingInvoicesExcel, 'Facturas pendientes')
-                    const excelBuffer = xlsx.write(workbook, { bookType: 'xlsx', type: 'array' })
-                    const data = new Blob([excelBuffer], {type: fileType})
-                    fileSaver.saveAs(data, 'Facturas de ' + fileExtension)
-                  }
-                }
-              },
-              {
                 icon: (props) => <AddBox {...props} color={'action'} fontSize={'small'} />,
                 tooltip: 'Agregar',
                 isFreeAction: true,
@@ -336,18 +225,14 @@ function ExpenseDataTable(props) {
             ]}
             columns={[
               {
-                title: 'id',
-                field: 'id'
-              },
-              {
-                title: 'Fecha de pago',
+                title: 'Fecha de provision',
                 field: 'date_paid',
                 type: 'date',
                 dateSetting: {locale: 'en-ca'},
-                defaultFilter: moment().subtract(1, 'month').format('YYYY-MM'),
+                defaultFilter: moment().format('YYYY-MM-DD'),
                 filterComponent: (filterProps) => {
                   return (
-                    <MuiPickersUtilsProvider utils={DateMomentUtils}>
+                    <MuiPickersUtilsProvider utils={DateMomentUtils} key={'provision'}>
                       <KeyboardDatePicker
                         clearable
                         autoOk={true}
@@ -355,15 +240,85 @@ function ExpenseDataTable(props) {
                         minDate={new Date("2018-01-01")}
                         maxDate={new Date("2021-12-31")}
                         value={filterProps.columnDef.tableData.filterValue}
-                        variant={'dialog'}
+                        variant={'inline'}
+                        PopoverProps={{
+                          anchorOrigin: {horizontal: "left", vertical: "bottom"},
+                          transformOrigin: {horizontal: "left", vertical: "top"}
+                        }}
                         format={'YYYY-MM'}
+                        animateYearScrolling
+                        onChange={(momentDate) => {
+                          console.log(filterProps)
+                          filterProps.onFilterChanged(
+                            filterProps.columnDef.tableData.id,
+                            momentDate !== null && momentDate.isValid() ? momentDate.format('YYYY-MM-DD') : null)
+                        }}
+                      />
+                    </MuiPickersUtilsProvider>
+                  )
+                }
+              },
+              {
+                title: 'Fecha de provision',
+                field: 'invoice_provision_date',
+                type: 'date',
+                dateSetting: {locale: 'en-ca'},
+                defaultFilter: null,
+                filterComponent: (filterProps) => {
+                  return (
+                    <MuiPickersUtilsProvider utils={DateMomentUtils} key={'provision'}>
+                      <KeyboardDatePicker
+                        clearable
+                        autoOk={true}
+                        views={["month"]}
+                        minDate={new Date("2018-01-01")}
+                        maxDate={new Date("2021-12-31")}
+                        value={filterProps.columnDef.tableData.filterValue}
+                        variant={'inline'}
+                        PopoverProps={{
+                          anchorOrigin: {horizontal: "left", vertical: "bottom"},
+                          transformOrigin: {horizontal: "left", vertical: "top"}
+                        }}
+                        format={'YYYY-MM'}
+                        animateYearScrolling
                         onChange={(momentDate) => {
                           filterProps.onFilterChanged(
                             filterProps.columnDef.tableData.id,
                             momentDate !== null && momentDate.isValid() ? momentDate.format('YYYY-MM-DD') : null)
-                          setDate(momentDate !== null && momentDate.isValid() ? momentDate.format('YYYY-MM-DD') : null)
                         }}
+                      />
+                    </MuiPickersUtilsProvider>
+                  )
+                }
+              },
+              {
+                title: 'Fecha de emision',
+                field: 'date_emitted',
+                type: 'date',
+                dateSetting: {locale: 'en-ca'},
+                defaultFilter: null,
+                filterComponent: (filterProps) => {
+                  return (
+                    <MuiPickersUtilsProvider utils={DateMomentUtils} key={'provision'}>
+                      <KeyboardDatePicker
+                        clearable
+                        autoOk={true}
+                        views={["month"]}
+                        minDate={new Date("2018-01-01")}
+                        maxDate={new Date("2021-12-31")}
+                        value={filterProps.columnDef.tableData.filterValue}
+                        variant={'inline'}
+                        PopoverProps={{
+                          anchorOrigin: {horizontal: "left", vertical: "bottom"},
+                          transformOrigin: {horizontal: "left", vertical: "top"}
+                        }}
+                        format={'YYYY-MM'}
                         animateYearScrolling
+                        onChange={(momentDate) => {
+                          filterProps.onFilterChanged(
+                            filterProps.columnDef.tableData.id,
+                            momentDate !== null && momentDate.isValid() ? momentDate.format('YYYY-MM-DD') : null)
+                        }}
                       />
                     </MuiPickersUtilsProvider>
                   )
@@ -422,8 +377,27 @@ function ExpenseDataTable(props) {
                 }
               },
               {
-                title: 'Descripcion',
-                field: 'description'
+                title: 'Codigo de la factura',
+                field: 'invoice_code'
+              },
+              {
+                title: 'Codigo interno',
+                field: 'internal_code'
+              },
+              {
+                title: 'IVA',
+                field: 'tax',
+                type: 'currency'
+              },
+              {
+                title: 'ISR ret',
+                field: 'invoice_isr_retained',
+                type: 'currency'
+              },
+              {
+                title: 'Tax ret',
+                field: 'invoice_tax_retained',
+                type: 'currency'
               },
               {
                 title: 'Total',
@@ -433,13 +407,12 @@ function ExpenseDataTable(props) {
                   let expenseItemsTotal = rawData.expense_items.reduce((a, b) => {
                     return a + b.subtotal
                   }, 0)
-                  return <>{formatNumber(expenseItemsTotal)}</>
+                  return <>${formatNumber(expenseItemsTotal)}</>
                 }
               }
             ]}
             data={query =>
               new Promise((resolve, reject) => {
-                console.log(query)
                 let url = apiUrl + 'expense/list?'
                 url += 'per_page=' + query.pageSize
                 url += '&page=' + (query.page + 1)
@@ -505,7 +478,10 @@ const mapStateToProps = (state, ownProps) => {
     machines: state.production.machines,
     productTypes: state.production.productTypes,
     expenseTypes: state.expenses.expenseTypes,
-    suppliers: state.expenses.suppliers
+    suppliers: state.expenses.suppliers,
+    paymentMethods: state.expenses.paymentMethods,
+    paymentForm: state.expenses.paymentForm,
+    moneySources: state.expenses.moneySources
   }
 }
 
