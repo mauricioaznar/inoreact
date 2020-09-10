@@ -1420,7 +1420,7 @@ const ExpenseForm = (props) => {
               })}
               type="number"
               name="invoice_isr_retained"
-              label="IVA retenido"
+              label="ISR retenido"
             />
           </FormControl>
         </Grid>

@@ -32,7 +32,6 @@ const Home = (props) => {
     return (
       <div>
         <Navbar/>
-        <div className={classes.toolbarMargin}/>
         <Switch>
           <Route path={'/'} exact component={() => <Equilibrium />}/>
           <Route path={'/production'} component={() => <Production />}/>
