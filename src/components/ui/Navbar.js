@@ -66,6 +66,7 @@ function Navbar(props) {
               indicatorColor="primary"
               onChange={handleChange}
               value={value}
+              TabIndicatorProps={{style: {backgroundColor: "transparent"}}}
             >
               <Tab
                 icon={<ListAlt />}
