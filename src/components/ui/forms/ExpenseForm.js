@@ -138,7 +138,12 @@ const ExpenseForm = (props) => {
     expense_invoice_cdfi_use_id: props.expense ? String(props.expense.expense_invoice_cdfi_use_id) : '',
     expense_money_source_id: props.expense ? String(props.expense.expense_money_source_id) : '',
     expense_products: props.expense ? props.expense.expense_products.map(expenseProduct => {
-      return {...expenseProduct, _kilos: expenseProduct.kilos, _groups: expenseProduct.groups}
+      return {
+        ...expenseProduct,
+        _kilos: expenseProduct.kilos,
+        _total: expenseProduct ? (expenseProduct.kilos * expenseProduct.kilo_price * 1.16) : 0,
+        _tax: expenseProduct ? (expenseProduct.kilos * expenseProduct.kilo_price * 0.16) : 0
+      }
     }) : [],
     expense_credit_notes: props.expense ? props.expense.expense_credit_notes : []
     // expense_subcategories: initialExpenseSubcategories
@@ -166,7 +171,7 @@ const ExpenseForm = (props) => {
   const expenseProducts = useFieldArray(
     {
       control,
-      name: "expense_products",
+      name: "expense_products"
     }
   );
 
@@ -266,7 +271,11 @@ const ExpenseForm = (props) => {
   }
 
   const handleAddExpenseItem = () => {
-    expenseItems.append({expense_subcategory_id: '', subtotal: "0", branch_id: ''})
+    expenseItems.append({
+      expense_subcategory_id: '',
+      subtotal: "0",
+      branch_id: ''
+    })
   }
 
   const handleRemoveExpenseItem = (index) => {
@@ -283,7 +292,15 @@ const ExpenseForm = (props) => {
   }
 
   const handleAddExpenseProduct = () => {
-    expenseProducts.append({product_id: "null", kilos: "0", groups: "0", group_weight: "0", kilo_price: "0"})
+    expenseProducts.append({
+      product_id: "null",
+      kilos: "0",
+      groups: "0",
+      group_weight: "0",
+      kilo_price: "0",
+      _tax: "0",
+      _total: "0"
+    })
   }
 
   const handleRemoveExpenseProduct = (index) => {
@@ -305,6 +322,8 @@ const ExpenseForm = (props) => {
     let kiloPrice = "0"
     let kilos = "0"
     let groups = "0"
+    let _total = "0"
+    let _tax = "0"
     let initialExpenseProduct = defaultValues.expense_products.find(expenseProduct => {
       return productId === String(expenseProduct.product_id)
     })
@@ -316,21 +335,34 @@ const ExpenseForm = (props) => {
       kiloPrice = product.current_kilo_price
       kilos = "0"
       groups = "0"
+      _total = "0"
+      _tax = "0"
     } else {
       groupWeight = initialExpenseProduct.group_weight
       kiloPrice = initialExpenseProduct.kilo_price
       kilos = initialExpenseProduct.kilos
       groups = initialExpenseProduct.groups
+      _total = initialExpenseProduct.kilos * initialExpenseProduct.group_weight * 1.16
+      _tax = initialExpenseProduct.kilos * initialExpenseProduct.group_weight * 0.16
     }
     setValue(`expense_products[${index}].group_weight`, String(groupWeight))
     setValue(`expense_products[${index}].kilo_price`, String(kiloPrice))
     setValue(`expense_products[${index}].kilos`, String(kilos))
     setValue(`expense_products[${index}].groups`, String(groups))
+    setValue(`expense_products[${index}]._total`, String(_total))
+    setValue(`expense_products[${index}]._tax`, String(_tax))
   }
 
   const calculateExpenseProductKilos = (e, index) => {
     let kilos = Number(watchExpenseProducts[index].groups) * Number(watchExpenseProducts[index].group_weight)
-    setValue(`expense_products[${index}].kilos`, kilos)
+    setValue(`expense_products[${index}].kilos`, String(kilos))
+  }
+
+  const calculateExpenseProductTotal = (e, index) => {
+    let _total = Number(watchExpenseProducts[index].kilos) * Number(watchExpenseProducts[index].kilo_price) * 1.16
+    let _tax = Number(watchExpenseProducts[index].kilos) * Number(watchExpenseProducts[index].kilo_price) * 0.16
+    setValue(`expense_products[${index}]._total`, String(_total))
+    setValue(`expense_products[${index}]._tax`, String(_tax))
   }
 
   const hasGroupWeight = (index) => {
@@ -414,19 +446,19 @@ const ExpenseForm = (props) => {
               <RadioGroup
                 aria-label="gender"
               >
-               {props.expenseTypes.map(expenseType => {
-                 return (
-                   <FormControlLabel
-                     onChange={(e) => {
-                       handleSubtotalChange(e)
-                     }}
-                     key={expenseType.id}
-                     value={String(expenseType.id)}
-                     control={<Radio />}
-                     label={expenseType.name}
-                   />
-                 )
-               })}
+                {props.expenseTypes.map(expenseType => {
+                  return (
+                    <FormControlLabel
+                      onChange={(e) => {
+                        handleSubtotalChange(e)
+                      }}
+                      key={expenseType.id}
+                      value={String(expenseType.id)}
+                      control={<Radio/>}
+                      label={expenseType.name}
+                    />
+                  )
+                })}
               </RadioGroup>
             }
             name="expense_type_id"
@@ -451,29 +483,32 @@ const ExpenseForm = (props) => {
             item
             xs
           >
-           <FormControl>
-             <FormLabel component="legend">
-               ¿Ya se pago?
-             </FormLabel>
-             <FormControlLabel
-               control={
-                 <Switch
-                   checked={isDatePaidRequired}
-                   onChange={() => {
-                     setIsDatePaidRequired(!isDatePaidRequired)
-                   }}
-                   name="checkedB"
-                   color="primary"
-                 />
-               }
-               label={isDatePaidRequired ? 'Pagada' : 'Pendiente'}
-             />
-           </FormControl>
+            <FormControl>
+              <FormLabel component="legend">
+                ¿Ya se pago?
+              </FormLabel>
+              <FormControlLabel
+                control={
+                  <Switch
+                    checked={isDatePaidRequired}
+                    onChange={() => {
+                      setIsDatePaidRequired(!isDatePaidRequired)
+                    }}
+                    name="checkedB"
+                    color="primary"
+                  />
+                }
+                label={isDatePaidRequired ? 'Pagada' : 'Pendiente'}
+              />
+            </FormControl>
           </Grid>
           <Grid
             item
             xs
-            style={{marginTop: '0.5em', display: !isDatePaidRequired ? 'none' : 'inherit'}}
+            style={{
+              marginTop: '0.5em',
+              display: !isDatePaidRequired ? 'none' : 'inherit'
+            }}
           >
             <MauDatePicker
               name="date_paid"
@@ -499,29 +534,32 @@ const ExpenseForm = (props) => {
             item
             xs
           >
-           <FormControl>
-             <FormLabel component="legend">
-               ¿Ya se emitió?
-             </FormLabel>
-             <FormControlLabel
-               control={
-                 <Switch
-                   checked={isDateEmittedRequired}
-                   onChange={() => {
-                     setIsDateEmittedRequired(!isDateEmittedRequired)
-                   }}
-                   name="dateEmittedRequired"
-                   color="primary"
-                 />
-               }
-               label={isDateEmittedRequired ? 'Emitida' : 'Pendiente'}
-             />
-           </FormControl>
+            <FormControl>
+              <FormLabel component="legend">
+                ¿Ya se emitió?
+              </FormLabel>
+              <FormControlLabel
+                control={
+                  <Switch
+                    checked={isDateEmittedRequired}
+                    onChange={() => {
+                      setIsDateEmittedRequired(!isDateEmittedRequired)
+                    }}
+                    name="dateEmittedRequired"
+                    color="primary"
+                  />
+                }
+                label={isDateEmittedRequired ? 'Emitida' : 'Pendiente'}
+              />
+            </FormControl>
           </Grid>
           <Grid
             item
             xs
-            style={{marginTop: '0.5em', display: !isDateEmittedRequired ? 'none' : 'inherit'}}
+            style={{
+              marginTop: '0.5em',
+              display: !isDateEmittedRequired ? 'none' : 'inherit'
+            }}
           >
             <MauDatePicker
               name="date_emitted"
@@ -547,29 +585,32 @@ const ExpenseForm = (props) => {
             item
             xs
           >
-           <FormControl>
-             <FormLabel component="legend">
-               ¿Fue provisionada?
-             </FormLabel>
-             <FormControlLabel
-               control={
-                 <Switch
-                   checked={isProvisionDateRequired}
-                   onChange={() => {
-                     setIsProvisionDateRequired(!isProvisionDateRequired)
-                   }}
-                   name="provisionDateRequired"
-                   color="primary"
-                 />
-               }
-               label={isProvisionDateRequired ? 'Provisionada' : 'No fue provisionada'}
-             />
-           </FormControl>
+            <FormControl>
+              <FormLabel component="legend">
+                ¿Fue provisionada?
+              </FormLabel>
+              <FormControlLabel
+                control={
+                  <Switch
+                    checked={isProvisionDateRequired}
+                    onChange={() => {
+                      setIsProvisionDateRequired(!isProvisionDateRequired)
+                    }}
+                    name="provisionDateRequired"
+                    color="primary"
+                  />
+                }
+                label={isProvisionDateRequired ? 'Provisionada' : 'No fue provisionada'}
+              />
+            </FormControl>
           </Grid>
           <Grid
             item
             xs
-            style={{marginTop: '0.5em', display: !isProvisionDateRequired ? 'none' : 'inherit'}}
+            style={{
+              marginTop: '0.5em',
+              display: !isProvisionDateRequired ? 'none' : 'inherit'
+            }}
           >
             <MauDatePicker
               name="invoice_provision_date"
@@ -599,7 +640,7 @@ const ExpenseForm = (props) => {
               error={!!errors.description}
               placeholder="Se compro 'x' porque 'y' "
               InputLabelProps={{
-                shrink: true,
+                shrink: true
               }}
             />
           </FormControl>
@@ -621,7 +662,7 @@ const ExpenseForm = (props) => {
               label="Codigo interno"
               placeholder="14 o 35A o 15 y 16 "
               InputLabelProps={{
-                shrink: true,
+                shrink: true
               }}
             />
           </FormControl>
@@ -645,7 +686,7 @@ const ExpenseForm = (props) => {
               label="Codigo de la factura"
               placeholder="CON 770707 "
               InputLabelProps={{
-                shrink: true,
+                shrink: true
               }}
             />
           </FormControl>
@@ -868,7 +909,7 @@ const ExpenseForm = (props) => {
                       handleAddExpenseItem()
                     }}
                   >
-                    <AddIcon />
+                    <AddIcon/>
                   </IconButton>
                 </Tooltip>
               </Toolbar>
@@ -967,7 +1008,10 @@ const ExpenseForm = (props) => {
                             type="number"
                             name={`expense_items[${index}].quantity`}
                             defaultValue={`${expenseItem.quantity}`}
-                            inputRef={register({required: isQuantityRequired(index), max: 10000000})}
+                            inputRef={register({
+                              required: isQuantityRequired(index),
+                              max: 10000000
+                            })}
                           />
                         </TableCell>
                         <TableCell align={'right'}>
@@ -978,7 +1022,7 @@ const ExpenseForm = (props) => {
                                   handleRemoveExpenseItem(index)
                                 }}
                               >
-                                <DeleteIcon />
+                                <DeleteIcon/>
                               </IconButton> : ' '
                           }
                         </TableCell>
@@ -993,12 +1037,14 @@ const ExpenseForm = (props) => {
         </Grid>
 
 
-
         <Grid
           item
           xs={12}
           className={classes.rowContainer}
-          style={{marginTop: '2em', display: isDifferedPaymentMethod && isInvoice ? 'inherit' : 'none'}}
+          style={{
+            marginTop: '2em',
+            display: isDifferedPaymentMethod && isInvoice ? 'inherit' : 'none'
+          }}
         >
           <Grid
             container
@@ -1024,7 +1070,7 @@ const ExpenseForm = (props) => {
                       handleAddComplement()
                     }}
                   >
-                    <AddIcon />
+                    <AddIcon/>
                   </IconButton>
                 </Tooltip>
               </Toolbar>
@@ -1089,7 +1135,7 @@ const ExpenseForm = (props) => {
                                   handleRemoveComplement(index)
                                 }}
                               >
-                                <DeleteIcon />
+                                <DeleteIcon/>
                               </IconButton> : ' '
                           }
                         </TableCell>
@@ -1108,7 +1154,10 @@ const ExpenseForm = (props) => {
           item
           xs={12}
           className={classes.rowContainer}
-          style={{marginTop: '2em', display: isExpenseProductsRequired() ? 'inherit' : 'none'}}
+          style={{
+            marginTop: '2em',
+            display: isExpenseProductsRequired() ? 'inherit' : 'none'
+          }}
         >
           <Grid
             container
@@ -1134,7 +1183,7 @@ const ExpenseForm = (props) => {
                       handleAddExpenseProduct()
                     }}
                   >
-                    <AddIcon />
+                    <AddIcon/>
                   </IconButton>
                 </Tooltip>
               </Toolbar>
@@ -1151,21 +1200,23 @@ const ExpenseForm = (props) => {
                       <TableCell style={{width: '10%'}}>Kilos</TableCell>
                       <TableCell style={{width: '10%'}}>Precio</TableCell>
                       <TableCell style={{width: '10%'}}>Peso</TableCell>
+                      <TableCell style={{width: '10%'}}>Iva</TableCell>
+                      <TableCell style={{width: '10%'}}>Total</TableCell>
                       <TableCell style={{width: '10%'}}>&nbsp;</TableCell>
                     </TableRow>
                   </TableHead>
                   <TableBody>
                     {expenseProducts.fields.map((expenseProduct, index) => (
                       <TableRow key={index}>
-                         <TableCell style={{display: 'none'}}>
-                            <TextField
-                              id="standard-number"
-                              label="Number"
-                              type="number"
-                              name={`expense_products[${index}].id`}
-                              defaultValue={`${expenseProduct.id}`}
-                              inputRef={register()}
-                            />
+                        <TableCell style={{display: 'none'}}>
+                          <TextField
+                            id="standard-number"
+                            label="Number"
+                            type="number"
+                            name={`expense_products[${index}].id`}
+                            defaultValue={`${expenseProduct.id}`}
+                            inputRef={register()}
+                          />
                         </TableCell>
                         <TableCell>
                           <MauObjectSelect
@@ -1201,6 +1252,7 @@ const ExpenseForm = (props) => {
                               if (hasGroupWeight(index)) {
                                 calculateExpenseProductKilos(e, index)
                               }
+                              calculateExpenseProductTotal(e, index)
                             }}
                             defaultValue={`${expenseProduct.groups}`}
                             inputRef={register({required: true, max: 10000000})}
@@ -1211,6 +1263,9 @@ const ExpenseForm = (props) => {
                             id="Kilos"
                             label="Kilos"
                             type="number"
+                            onChange={(e) => {
+                              calculateExpenseProductTotal(e, index)
+                            }}
                             disabled={hasGroupWeight(index)}
                             name={`expense_products[${index}].kilos`}
                             defaultValue={`${expenseProduct.kilos}`}
@@ -1238,6 +1293,28 @@ const ExpenseForm = (props) => {
                             inputRef={register({max: 10000000})}
                           />
                         </TableCell>
+                        <TableCell>
+                          <TextField
+                            id="tax"
+                            label="IVA"
+                            disabled
+                            type="number"
+                            name={`expense_products[${index}]._tax`}
+                            defaultValue={`${expenseProduct._tax}`}
+                            inputRef={register({max: 10000000})}
+                          />
+                        </TableCell>
+                        <TableCell>
+                          <TextField
+                            id="total"
+                            label="Total"
+                            disabled
+                            type="number"
+                            name={`expense_products[${index}]._total`}
+                            defaultValue={`${expenseProduct._total}`}
+                            inputRef={register({max: 10000000})}
+                          />
+                        </TableCell>
                         <TableCell align={'right'}>
                           {
                             index !== 0 ?
@@ -1246,7 +1323,7 @@ const ExpenseForm = (props) => {
                                   handleRemoveExpenseProduct(index)
                                 }}
                               >
-                                <DeleteIcon />
+                                <DeleteIcon/>
                               </IconButton> : ' '
                           }
                         </TableCell>
@@ -1259,7 +1336,6 @@ const ExpenseForm = (props) => {
             </Grid>
           </Grid>
         </Grid>
-
 
 
         <Grid
@@ -1292,7 +1368,7 @@ const ExpenseForm = (props) => {
                       handleAddExpenseCreditNotes()
                     }}
                   >
-                    <AddIcon />
+                    <AddIcon/>
                   </IconButton>
                 </Tooltip>
               </Toolbar>
@@ -1350,7 +1426,7 @@ const ExpenseForm = (props) => {
                               handleRemoveExpenseCreditNotes(index)
                             }}
                           >
-                            <DeleteIcon />
+                            <DeleteIcon/>
                           </IconButton>
                         </TableCell>
                       </TableRow>
@@ -1362,7 +1438,6 @@ const ExpenseForm = (props) => {
             </Grid>
           </Grid>
         </Grid>
-
 
 
         <Grid
@@ -1441,7 +1516,7 @@ const ExpenseForm = (props) => {
               className={buttonClassname}
               onClick={handleSubmit(onSubmit, onError)}
             >
-              {success ? <CheckIcon /> : <SaveIcon />}
+              {success ? <CheckIcon/> : <SaveIcon/>}
             </Fab>
             {loading && <CircularProgress
               size={68}
@@ -1476,3 +1551,4 @@ const mapStateToProps = (state) => {
 }
 
 export default connect(mapStateToProps, null)(ExpenseForm)
+
