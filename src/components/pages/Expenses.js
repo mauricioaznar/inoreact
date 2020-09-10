@@ -12,8 +12,13 @@ import fileSaver from 'file-saver'
 import axios from 'axios'
 import {KeyboardDatePicker, MuiPickersUtilsProvider} from '@material-ui/pickers'
 import DateMomentUtils from '@date-io/moment'
-import {makeStyles} from '@material-ui/core/styles'
+import {makeStyles, useTheme} from '@material-ui/core/styles'
 import IconButton from '@material-ui/core/IconButton'
+import FormControl from '@material-ui/core/FormControl'
+import InputLabel from '@material-ui/core/InputLabel'
+import Select from '@material-ui/core/Select'
+import MenuItem from '@material-ui/core/MenuItem'
+import useMediaQuery from '@material-ui/core/useMediaQuery'
 
 const useStyles = makeStyles((theme) => {
   return {
@@ -97,8 +102,12 @@ export default function Expenses(props) {
   const [updates, setUpdates] = React.useState(0)
   const [exportedExpenses, setExportedExpenses] = React.useState(null)
 
+  const theme = useTheme()
+
+  const matchesXS = useMediaQuery(theme.breakpoints.down('md'))
 
   const classes = useStyles()
+
 
   const exportExcel = () => {
     if (!loading) {
@@ -184,33 +193,31 @@ export default function Expenses(props) {
     >
       <Grid
         item
+        container
         className={classes.rowContainer}
-        style={{marginBottom: '2em'}}
+        style={{marginTop: '4em'}}
+      >
+        <Grid item>
+          <Typography variant={matchesXS ? 'h2' : 'h1'}>
+            Gastos
+          </Typography>
+        </Grid>
+      </Grid>
+
+      <Grid
+        item
+        container
+        direction={matchesXS ? 'column' : 'row'}
+        className={classes.rowContainer}
+        style={{marginTop: '4em', marginBottom: '2em'}}
       >
         <Grid
-          container
-          direction={'column'}
+          item
+          xs={12}
+          sm={4}
+          md={2}
         >
-          <Grid item style={{marginBottom: '.5em'}}>
-            <Typography variant={'h2'}>
-              Gastos
-              {
-                loading
-                  ? <CircularProgress size={40} style={{marginLeft: '.5em'}}/>
-                  : <IconButton
-                      onClick={(e) => {
-                        exportExcel()
-                      }}
-                      color={'action'}
-                      fontSize={'small'}
-                      style={{marginLeft: '.5em'}}
-                    >
-                      <ImportExport />
-                    </IconButton>
-              }
-            </Typography>
-          </Grid>
-          <Grid item>
+          <FormControl>
             <MuiPickersUtilsProvider utils={DateMomentUtils}>
               <KeyboardDatePicker
                 value={date}
@@ -232,13 +239,36 @@ export default function Expenses(props) {
                 }}
               />
             </MuiPickersUtilsProvider>
-          </Grid>
+          </FormControl>
+        </Grid>
+        <Grid
+          item
+          xs={12}
+          sm={4}
+          md={2}
+          style={{marginLeft: matchesXS ? 0 : '.5em'}}
+        >
+          {
+            loading
+              ? <CircularProgress size={40} style={{marginLeft: '.5em'}}/>
+              : <IconButton
+                onClick={(e) => {
+                  exportExcel()
+                }}
+                color={'action'}
+                fontSize={'small'}
+                style={{marginLeft: '.5em'}}
+              >
+                <ImportExport />
+              </IconButton>
+          }
         </Grid>
       </Grid>
       <Grid
         item
         xs
         className={classes.rowContainer}
+        style={{marginBottom: '2em'}}
       >
         <ExpenseDataTable
           updates={updates}

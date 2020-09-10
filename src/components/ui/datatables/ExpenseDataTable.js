@@ -1,15 +1,13 @@
-import React, {forwardRef} from 'react'
+import React from 'react'
 import {connect} from 'react-redux'
 
 
 import AddBox from '@material-ui/icons/AddBox';
-import ImportExport from '@material-ui/icons/ImportExport'
 import Edit from '@material-ui/icons/Edit';
-import CircularProgress from '@material-ui/core/CircularProgress'
 
 import moment from 'moment'
 import Grid from '@material-ui/core/Grid'
-import {makeStyles, useTheme} from '@material-ui/core/styles'
+import {useTheme} from '@material-ui/core/styles'
 import axios from 'axios'
 import apiUrl from '../../../helpers/apiUrl'
 import authHeader from '../../../helpers/authHeader'
@@ -18,11 +16,11 @@ import Dialog from '@material-ui/core/Dialog'
 import ExpenseForm from '../forms/ExpenseForm'
 import useMediaQuery from '@material-ui/core/useMediaQuery'
 import Slide from '@material-ui/core/Slide'
-import {KeyboardDatePicker, MuiPickersUtilsProvider} from '@material-ui/pickers'
-import DateMomentUtils from '@date-io/moment'
 import TextField from '@material-ui/core/TextField'
 import Autocomplete from '@material-ui/lab/Autocomplete'
 import {localization, tableIcons} from './common/common'
+import MaterialTableDate from './common/MaterialTableDate'
+import MaterialTableText from './common/MaterialTableText'
 
 const dateFormat = 'YYYY-MM-DD'
 
@@ -39,6 +37,8 @@ const formatNumber = (x, digits = 2) => {
 }
 
 
+
+
 //Fix call in useEffect that is leaking memory (because is trying to set state in before component mounts?)
 
 function ExpenseDataTable(props) {
@@ -52,18 +52,6 @@ function ExpenseDataTable(props) {
 
   const [open, setOpen] = React.useState(false);
   const [rowData, setRowData] = React.useState(null);
-  const [datePaid, setDatePaid] = React.useState(null);
-  const [dateProvisioned, setDateProvisioned] = React.useState(null);
-  const [dateEmitted, setDateEmitted] = React.useState(null);
-
-
-  const handleClickOpen = () => {
-    setOpen(true);
-  };
-
-  const handleClose = () => {
-    setOpen(false);
-  };
 
   let expenseTypeLookup = props.expenseTypes.reduce((acc, expenseType) => {
     return {...acc, [expenseType.id]: expenseType.name}
@@ -72,6 +60,207 @@ function ExpenseDataTable(props) {
   let suppliersLookup = props.suppliers.reduce((prevObject, supplier) => {
     return {...prevObject, [supplier.id]: supplier.name}
   }, {})
+
+  const columns = [
+    {
+      title: 'Fecha de pago',
+      field: 'date_paid',
+      type: 'date',
+      dateSetting: {locale: 'en-ca'},
+      filterComponent: (filterProps) => {
+        return (
+          <>
+            <MaterialTableDate
+              value={filters['date_paid'].value}
+              onChange={(momentDate) => {
+                handleFilters( 'date_paid', momentDate !== null && momentDate.isValid() ?
+                  momentDate.format('YYYY-MM-DD') : null)
+              }}
+            />
+          </>
+        )
+      }
+    },
+    {
+      title: 'Fecha de provision',
+      field: 'invoice_provision_date',
+      type: 'date',
+      dateSetting: {locale: 'en-ca'},
+      filterComponent: (filterProps) => {
+        return (
+          <>
+            <MaterialTableDate
+              value={filters['invoice_provision_date'].value}
+              onChange={(momentDate) => {
+                handleFilters( 'invoice_provision_date', momentDate !== null && momentDate.isValid() ?
+                  momentDate.format('YYYY-MM-DD') : null)
+              }}
+            />
+          </>
+        )
+      }
+    },
+    {
+      title: 'Fecha de emision',
+      field: 'date_emitted',
+      type: 'date',
+      dateSetting: {locale: 'en-ca'},
+      filterComponent: (filterProps) => {
+        return (
+          <>
+            <MaterialTableDate
+              value={filters['date_emitted'].value}
+              onChange={(momentDate) => {
+                handleFilters( 'date_emitted', momentDate !== null && momentDate.isValid() ?
+                  momentDate.format('YYYY-MM-DD') : null)
+              }}
+            />
+          </>
+        )
+      }
+    },
+    {
+      title: 'Tipo de gasto',
+      field: 'expense_type_id',
+      lookup: expenseTypeLookup,
+      filterComponent: (filterProps) => {
+        return (
+          <Autocomplete
+            options={props.expenseTypes}
+            value={filters['expense_type_id'].value}
+            getOptionLabel={option => {
+              return option['name']
+            }}
+            renderInput={params => (
+              <TextField
+                {...params}
+              />
+            )}
+            onChange={(e, data) => {
+              handleFilters( 'expense_type_id', data)
+            }}
+          />
+        )
+      }
+    },
+    {
+      title: 'Proveedor',
+      field: 'supplier_id',
+      lookup: suppliersLookup,
+      // defaultFilter: props.suppliers[0],
+      filterComponent: (filterProps) => {
+        return (
+          <Autocomplete
+            // defaultValue={props.suppliers[0]}
+            value={filters['supplier_id'].value}
+            options={props.suppliers}
+            getOptionLabel={option => {
+              return option['name']
+            }}
+            renderInput={params => (
+              <TextField
+                {...params}
+              />
+            )}
+            onChange={(e, data) => {
+              handleFilters( 'supplier_id', data)
+            }}
+          />
+        )
+      }
+    },
+    {
+      title: 'Descripcion',
+      field: 'description',
+      filterComponent: (filterProps) => {
+        return (
+          <MaterialTableText
+            focus={filters['description'].focus}
+            value={filters['description'].value}
+            onChange={(text) => {
+              handleFilters( 'description', text)
+            }}
+          />
+        )
+      }
+    },
+    {
+      title: 'Codigo de la factura',
+      field: 'invoice_code',
+      filterComponent: (filterProps) => {
+        return (
+          <MaterialTableText
+            focus={filters['invoice_code'].focus}
+            value={filters['invoice_code'].value}
+            onChange={(text) => {
+              handleFilters( 'invoice_code', text)
+            }}
+          />
+        )
+      }
+    },
+    {
+      title: 'Codigo interno',
+      field: 'internal_code',
+      filterComponent: (filterProps) => {
+        return (
+          <MaterialTableText
+            focus={filters['internal_code'].focus}
+            value={filters['internal_code'].value}
+            onChange={(text) => {
+              handleFilters( 'internal_code', text)
+            }}
+          />
+        )
+      }
+    },
+    {
+      title: 'Total',
+      sorting: false,
+      type: 'currency',
+      render: (rawData) => {
+        let expenseItemsTotal = rawData.expense_items.reduce((a, b) => {
+          return a + b.subtotal
+        }, 0)
+        return <>${formatNumber(expenseItemsTotal)}</>
+      }
+    },
+    {
+      title: 'IVA',
+      sorting: false,
+      field: 'tax',
+      filtering: false,
+      type: 'currency'
+    }
+  ]
+
+  let storageFilters = localStorage.getItem('expense_filters') ?
+    JSON.parse(localStorage.getItem('expense_filters')) : {}
+
+  const [filters, setFilters] = React.useState(columns.reduce((acc, column) => {
+      return {...acc, [column.field]: {
+          value: storageFilters[column.field] ? storageFilters[column.field].value : (column.type === 'date' || column.lookup) ? null : '',
+          type: column.type ? column.type : column.lookup ? 'lookup' : 'text',
+          focus: false
+        }}
+    }, {}));
+
+  const handleFilters = (field, value) => {
+    const newFilters = {...filters, focus: false}
+    const foundFilter = newFilters[field]
+    foundFilter.value = value
+    foundFilter.focus = true
+    setFilters(newFilters)
+    tableRef.current && tableRef.current.onQueryChange()
+  }
+
+  const handleClickOpen = () => {
+    setOpen(true);
+  };
+
+  const handleClose = () => {
+    setOpen(false);
+  };
 
   const handleOnSubmit = (expense, callback) => {
     let promises = []
@@ -153,7 +342,6 @@ function ExpenseDataTable(props) {
     })
   }
 
-
   const handleRowDelete = (oldData) => {
     let promises = []
     promises.push(axios.put(apiUrl + 'expense/' + oldData.id, {active: -1}, {headers: {...authHeader()}}))
@@ -200,8 +388,8 @@ function ExpenseDataTable(props) {
               }
             }}
             options={{
-              pageSize: 25,
-              pageSizeOptions: [25, 40, 60],
+              pageSize: 10,
+              pageSizeOptions: [10, 20, 30],
               selection: false,
               search: false,
               filtering: true
@@ -226,129 +414,7 @@ function ExpenseDataTable(props) {
                 }
               }
             ]}
-            columns={[
-              {
-                title: 'Fecha de pago',
-                field: 'date_paid',
-                type: 'date',
-                dateSetting: {locale: 'en-ca'},
-                filterComponent: (filterProps) => {
-                  return (
-                    <MuiPickersUtilsProvider utils={DateMomentUtils} key={'provision'}>
-                      <KeyboardDatePicker
-                        clearable
-                        autoOk={true}
-                        views={["month"]}
-                        minDate={new Date("2018-01-01")}
-                        maxDate={new Date("2021-12-31")}
-                        variant={'dialog'}
-                        value={filterProps.columnDef.tableData.filterValue}
-                        format={'YYYY-MM'}
-                        animateYearScrolling
-                        onChange={(momentDate) => {
-                          filterProps.onFilterChanged(
-                            filterProps.columnDef.tableData.id,
-                            momentDate !== null && momentDate.isValid() ? momentDate.format('YYYY-MM-DD') : null)
-                          setDatePaid(datePaid)
-                        }}
-                      />
-                    </MuiPickersUtilsProvider>
-                  )
-                }
-              },
-              {
-                title: 'Tipo de gasto',
-                field: 'expense_type_id',
-                lookup: expenseTypeLookup,
-                filterComponent: (filterProps) => {
-                  return (
-                    <Autocomplete
-                      options={props.expenseTypes}
-                      getOptionLabel={option => {
-                        return option['name']
-                      }}
-                      renderInput={params => (
-                        <TextField
-                          {...params}
-                        />
-                      )}
-                      onChange={(e, data) => {
-                        filterProps.onFilterChanged(
-                          filterProps.columnDef.tableData.id,
-                          data)
-                      }}
-                    />
-                  )
-                }
-              },
-              {
-                title: 'Proveedor',
-                field: 'supplier_id',
-                lookup: suppliersLookup,
-                // defaultFilter: props.suppliers[0],
-                filterComponent: (filterProps) => {
-                  return (
-                    <Autocomplete
-                      // defaultValue={props.suppliers[0]}
-                      options={props.suppliers}
-                      getOptionLabel={option => {
-                        return option['name']
-                      }}
-                      renderInput={params => (
-                        <TextField
-                          {...params}
-                        />
-                      )}
-                      onChange={(e, data) => {
-                        filterProps.onFilterChanged(
-                          filterProps.columnDef.tableData.id,
-                          data)
-                      }}
-                    />
-                  )
-                }
-              },
-              {
-                title: 'Codigo de la factura',
-                field: 'invoice_code'
-              },
-              {
-                title: 'Codigo interno',
-                field: 'internal_code'
-              },
-              {
-                title: 'Descripcion',
-                field: 'description'
-              },
-              {
-                title: 'Rubros',
-                sorting: false,
-                render: (rawData) => {
-                  let expenseItemsTotal = rawData.expense_items.reduce((a, b) => {
-                    return a + b.expense_subcategory.name + ','
-                  }, '')
-                  expenseItemsTotal = expenseItemsTotal.slice(0 , expenseItemsTotal.length - 1)
-                  return <>{expenseItemsTotal}</>
-                }
-              },
-              {
-                title: 'Total',
-                sorting: false,
-                type: 'currency',
-                render: (rawData) => {
-                  let expenseItemsTotal = rawData.expense_items.reduce((a, b) => {
-                    return a + b.subtotal
-                  }, 0)
-                  return <>${formatNumber(expenseItemsTotal)}</>
-                }
-              },
-              {
-                title: 'IVA',
-                field: 'tax',
-                type: 'currency',
-                filtering: false
-              }
-            ]}
+            columns={columns}
             data={query =>
               new Promise((resolve, reject) => {
                 let url = apiUrl + 'expense/list?'
@@ -357,34 +423,37 @@ function ExpenseDataTable(props) {
                 if (query.orderBy) {
                   url += '&sort=' + query.orderBy.field + '|' + query.orderDirection
                 }
-                if (query.filters) {
-                  let likes = 1
-                  let exacts = 1
-                  query.filters.forEach((filter, index) => {
-                    if (filter.column.type === 'date') {
+                let likes = 1
+                let exacts = 1
+                let index = 1
+                for (let field in filters) {
+                  if (filters.hasOwnProperty(field)) {
+                    let filter = filters[field]
+                    if (filter.type === 'date' && filter.value !== null) {
                       let startDate = moment(filter.value).startOf('month').format(dateFormat)
-                      url += `&start_date_${index + 1}=${filter.column.field}`
+                      url += `&start_date_${index + 1}=${field}`
                       url += `&start_date_value_${index + 1}=${startDate}`
                       let endDate = moment(filter.value).startOf('month').add(1, 'month').format(dateFormat)
-                      url += `&end_date_${index + 1}=${filter.column.field}`
+                      url += `&end_date_${index + 1}=${field}`
                       url += `&end_date_value_${index + 1}=${endDate}`
-                    } else if (filter.column.lookup) {
-                      url += `&filter_exact_${exacts}=${filter.column.field}`
+                      index++
+                    } else if (filter.type === 'lookup' && filter.value !== null) {
+                      url += `&filter_exact_${exacts}=${field}`
                       url += `&filter_exact_value_${exacts}=${filter.value.id}`
                       exacts++
-                    } else {
-                      url += `&filter_like_${likes}=${filter.column.field}`
+                    } else if (filter.type === 'text' && filter.value !== '') {
+                      url += `&filter_like_${likes}=${field}`
                       url += `&filter_like_value_${likes}=${filter.value}`
                       likes++
                     }
-                    // url += `&filter_exact_${index}=${}`
-                  })
+                  }
                 }
                 axios.get(url, {headers: {...authHeader()}})
                   .then(response => {
                     return response.data
                   })
                   .then(result => {
+                    localStorage.setItem('expense_filters', JSON.stringify(filters))
                     resolve({
                       data: result.data,
                       page: result.links.pagination.current_page - 1,
