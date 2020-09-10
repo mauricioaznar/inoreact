@@ -1,15 +1,13 @@
-import React, {forwardRef} from 'react'
+import React from 'react'
 import {connect} from 'react-redux'
 
 
 import AddBox from '@material-ui/icons/AddBox';
-import ImportExport from '@material-ui/icons/ImportExport'
 import Edit from '@material-ui/icons/Edit';
-import CircularProgress from '@material-ui/core/CircularProgress'
 
 import moment from 'moment'
 import Grid from '@material-ui/core/Grid'
-import {makeStyles, useTheme} from '@material-ui/core/styles'
+import {useTheme} from '@material-ui/core/styles'
 import axios from 'axios'
 import apiUrl from '../../../helpers/apiUrl'
 import authHeader from '../../../helpers/authHeader'
@@ -18,13 +16,11 @@ import Dialog from '@material-ui/core/Dialog'
 import ExpenseForm from '../forms/ExpenseForm'
 import useMediaQuery from '@material-ui/core/useMediaQuery'
 import Slide from '@material-ui/core/Slide'
-import {KeyboardDatePicker, MuiPickersUtilsProvider} from '@material-ui/pickers'
-import DateMomentUtils from '@date-io/moment'
 import TextField from '@material-ui/core/TextField'
 import Autocomplete from '@material-ui/lab/Autocomplete'
 import {localization, tableIcons} from './common/common'
-import MaterialTableDate from '../../../helpers/materialTable/MaterialTableDate'
-import MaterialTableText from '../../../helpers/materialTable/MaterialTableText'
+import MaterialTableDate from './common/MaterialTableDate'
+import MaterialTableText from './common/MaterialTableText'
 
 const dateFormat = 'YYYY-MM-DD'
 
@@ -78,6 +74,44 @@ function ExpenseDataTable(props) {
               value={filters['date_paid'].value}
               onChange={(momentDate) => {
                 handleFilters( 'date_paid', momentDate !== null && momentDate.isValid() ?
+                  momentDate.format('YYYY-MM-DD') : null)
+              }}
+            />
+          </>
+        )
+      }
+    },
+    {
+      title: 'Fecha de provision',
+      field: 'invoice_provision_date',
+      type: 'date',
+      dateSetting: {locale: 'en-ca'},
+      filterComponent: (filterProps) => {
+        return (
+          <>
+            <MaterialTableDate
+              value={filters['invoice_provision_date'].value}
+              onChange={(momentDate) => {
+                handleFilters( 'invoice_provision_date', momentDate !== null && momentDate.isValid() ?
+                  momentDate.format('YYYY-MM-DD') : null)
+              }}
+            />
+          </>
+        )
+      }
+    },
+    {
+      title: 'Fecha de emision',
+      field: 'date_emitted',
+      type: 'date',
+      dateSetting: {locale: 'en-ca'},
+      filterComponent: (filterProps) => {
+        return (
+          <>
+            <MaterialTableDate
+              value={filters['date_emitted'].value}
+              onChange={(momentDate) => {
+                handleFilters( 'date_emitted', momentDate !== null && momentDate.isValid() ?
                   momentDate.format('YYYY-MM-DD') : null)
               }}
             />
@@ -200,9 +234,12 @@ function ExpenseDataTable(props) {
     }
   ]
 
+  let storageFilters = localStorage.getItem('expense_filters') ?
+    JSON.parse(localStorage.getItem('expense_filters')) : {}
+
   const [filters, setFilters] = React.useState(columns.reduce((acc, column) => {
       return {...acc, [column.field]: {
-          value: column.type === 'date' || column.lookup ? null : '',
+          value: storageFilters[column.field] ? storageFilters[column.field].value : (column.type === 'date' || column.lookup) ? null : '',
           type: column.type ? column.type : column.lookup ? 'lookup' : 'text',
           focus: false
         }}
@@ -351,8 +388,8 @@ function ExpenseDataTable(props) {
               }
             }}
             options={{
-              pageSize: 25,
-              pageSizeOptions: [25, 40, 60],
+              pageSize: 10,
+              pageSizeOptions: [10, 20, 30],
               selection: false,
               search: false,
               filtering: true
@@ -416,6 +453,7 @@ function ExpenseDataTable(props) {
                     return response.data
                   })
                   .then(result => {
+                    localStorage.setItem('expense_filters', JSON.stringify(filters))
                     resolve({
                       data: result.data,
                       page: result.links.pagination.current_page - 1,
