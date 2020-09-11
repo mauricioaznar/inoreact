@@ -11,6 +11,10 @@ import TableContainer from '@material-ui/core/TableContainer';
 import TableHead from '@material-ui/core/TableHead';
 import TableRow from '@material-ui/core/TableRow';
 import Paper from '@material-ui/core/Paper';
+import Grid from '@material-ui/core/Grid'
+import Autocomplete from '../ui/inputs/Autocomplete'
+import moment from 'moment'
+import * as ss from 'simple-statistics'
 
 
 const useStyles = makeStyles({
@@ -19,6 +23,8 @@ const useStyles = makeStyles({
     overflow: 'auto'
   },
 });
+
+
 
 
 const formatNumber = (x, digits = 2) => {
@@ -31,64 +37,127 @@ const formatNumber = (x, digits = 2) => {
 const dateFormat = 'YYYY-MM-DD'
 
 
+function ProductionsByMatMacTable(props) {
+  const [product, setProduct] = React.useState(null)
+  const [rows, setRows] = React.useState([])
 
-function ExpensesByCatSubBraTable(props) {
+  const {productions} = props
+
   const classes = useStyles();
 
-  let rows = []
+  React.useEffect(() => {
+    if (props.productions && product) {
+      let machines = props.machines
+        .map(machine => {
+          return {
+          machine_id: machine.id,
+          machine_name: machine.name,
+          machine_type_id: machine.machine_type_id,
+          data: props.productions
+            .filter((production, index) => {
+              if (index === 0) {
+                console.log(production)
+              }
+              return production.machine_id === machine.id && product.id === production.product_id
+            })
+            .map((production, index) => {
+              let startDateTime = moment(production.start_date_time, 'YYYY-MM-DD HH:mm:ss')
+              let endDateTime = moment(production.end_date_time, 'YYYY-MM-DD HH:mm:ss')
+              let durationAsHours = moment.duration(endDateTime.diff(startDateTime)).asHours()
+              return production.kilos / durationAsHours
+            })
+            .filter(kiloPerHour => {
+              return kiloPerHour > 10
+            })
+          }
+        })
+        .filter(machine => {
+          return machine.data.length > 2
+        })
+        .map(machine => {
+          let mean = ss.mean(machine.data)
+          let standardDeviation = ss.sampleStandardDeviation(machine.data)
+          return {
+            ...machine,
+            mean: mean.toFixed(2),
+            sampleStandardDeviation: standardDeviation.toFixed(2),
+            n: machine.data.length,
+            eightHours: (mean * 8).toFixed(2)
+          }
+        })
+      setRows(machines)
+    }
+  }, [product, productions])
 
-  if (props.productions) {
-
-  }
-
+  console.log(rows)
 
   return (
     <>
-      <TableContainer
-        component={Paper}
-        style={{maxHeight: 550}}
+      <Grid
+        container
+        direction={'column'}
       >
-        <Table
-          className={classes.table}
-          aria-label="spanning table"
-          stickyHeader
+        <Grid
+          item
+          xs={12}
+          sm={4}
         >
-          <TableHead>
-            <TableRow>
-              <TableCell style={{width: '5%'}}>&nbsp;</TableCell>
-              <TableCell style={{width: '20%'}}>Rubro</TableCell>
-              <TableCell>Costo</TableCell>
-              <TableCell>Total</TableCell>
-            </TableRow>
-          </TableHead>
-          <TableBody>
-            {rows.map((row, index) => (
-              <ExpenseByCatSubBraRow key={row.expense_category_id} row={row} />
-            ))}
-          </TableBody>
-        </Table>
-      </TableContainer>
+          <Autocomplete
+            options={props.products}
+            displayName={'description'}
+            value={product}
+            onChange={(e, data) => {
+              setProduct(data)
+            }}
+          />
+        </Grid>
+        <Grid
+          item
+          xs
+          style={{marginTop: '2em'}}
+        >
+          <TableContainer
+            component={Paper}
+            style={{maxHeight: 550}}
+          >
+            <Table
+              className={classes.table}
+              aria-label="spanning table"
+              stickyHeader
+            >
+              <TableHead>
+                <TableRow>
+                  <TableCell style={{width: '5%'}}>&nbsp;</TableCell>
+                  <TableCell style={{width: '20%'}}>Maquina</TableCell>
+                  <TableCell>N</TableCell>
+                  <TableCell>Promedio</TableCell>
+                  <TableCell>Muestra de la desviacion estandar</TableCell>
+                  <TableCell>Produccion en 8 horas</TableCell>
+                </TableRow>
+              </TableHead>
+              <TableBody>
+                {
+                  rows.map(row => {
+                    return (
+                      <TableRow key={row.machine_id}>
+                        <TableCell>&nbsp;</TableCell>
+                        <TableCell>{row.machine_name}</TableCell>
+                        <TableCell>{row.n}</TableCell>
+                        <TableCell>{row.mean}</TableCell>
+                        <TableCell>{row.sampleStandardDeviation}</TableCell>
+                        <TableCell>{row.eightHours}</TableCell>
+                      </TableRow>
+                    )
+                  })
+                }
+              </TableBody>
+            </Table>
+          </TableContainer>
+        </Grid>
+      </Grid>
     </>
   );
 }
-
-
-function ExpenseByCatSubBraRow(props) {
-  const {row} = props;
-  const [open, setOpen] = React.useState(false);
-  return (
-    <React.Fragment>
-      <TableRow>
-
-      </TableRow>
-    </React.Fragment>
-  );
-}
-
-ExpenseByCatSubBraRow.propTypes = {
-  row: PropTypes.object.isRequired
-}
-
 
 
 
@@ -101,4 +170,4 @@ const mapStateToProps = (state, ownProps) => {
   }
 }
 
-export default connect(mapStateToProps, null)(ExpensesByCatSubBraTable)
+export default connect(mapStateToProps, null)(ProductionsByMatMacTable)

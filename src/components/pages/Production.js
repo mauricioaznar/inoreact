@@ -5,6 +5,7 @@ import {makeStyles, useTheme} from '@material-ui/core/styles'
 import useMediaQuery from '@material-ui/core/useMediaQuery'
 import useFetch from '../../helpers/useFetch'
 import apiUrl from '../../helpers/apiUrl'
+import ProductionsByMatMacTable from '../ui/ProductionsByMatMacTable'
 
 const useStyles = makeStyles((theme) => {
   return {
@@ -28,10 +29,6 @@ export default function Production () {
 
   const productions = useFetch(apiUrl + 'analytics/production?dateGroup=none&entityGroup=material|product|machine')
 
-  if (productions) {
-    console.log(productions)
-  }
-
   return (
     <Grid
       container
@@ -47,6 +44,16 @@ export default function Production () {
           <Typography variant={matchesXS ? 'h2' : 'h1'}>
             Produccion
           </Typography>
+        </Grid>
+      </Grid>
+      <Grid
+        item
+        container
+        className={classes.rowContainer}
+        style={{marginTop: '2em'}}
+      >
+        <Grid item xs>
+          <ProductionsByMatMacTable productions={productions}/>
         </Grid>
       </Grid>
     </Grid>
