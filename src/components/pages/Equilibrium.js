@@ -21,6 +21,7 @@ import InputLabel from '@material-ui/core/InputLabel'
 import Select from '@material-ui/core/Select'
 import MenuItem from '@material-ui/core/MenuItem'
 import useMediaQuery from '@material-ui/core/useMediaQuery'
+import useFetch from '../../helpers/useFetch'
 
 
 const useStyles = makeStyles((theme) => {
@@ -36,30 +37,6 @@ const useStyles = makeStyles((theme) => {
 })
 
 
-const useFetch = (url) => {
-  const [data, setData] = React.useState(null);
-
-  // empty array as second argument equivalent to componentDidMount
-  React.useEffect(() => {
-    let unmounted = false
-
-    async function fetchData() {
-      const response = await axios.get(url, {headers: {...authHeader()}});
-      if (!unmounted) {
-        setData(response.data.data)
-      }
-    }
-
-    if (!unmounted) {
-      fetchData();
-    }
-    return () => {
-      unmounted = true
-    };
-  }, [url]);
-
-  return data;
-};
 
 
 export default function Equilibrium(props) {
