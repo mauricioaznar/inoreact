@@ -26,7 +26,7 @@ export default function Production () {
 
   const matchesXS = useMediaQuery(theme.breakpoints.down('md'))
 
-  const productions = useFetch(apiUrl + 'analytics/production?dateGroup=none&entityGroup=material|machine')
+  const productions = useFetch(apiUrl + 'analytics/production?dateGroup=none&entityGroup=material|product|machine')
 
   if (productions) {
     console.log(productions)
