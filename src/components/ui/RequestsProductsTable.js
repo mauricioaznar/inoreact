@@ -1,5 +1,6 @@
 import React from 'react'
 import {connect} from 'react-redux'
+import moment from 'moment'
 
 import {makeStyles, useTheme} from '@material-ui/core/styles'
 import Table from '@material-ui/core/Table';
@@ -25,47 +26,91 @@ const formatNumber = (x) => {
   return x.toFixed(0).toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",")
 }
 
+const dateFormat = 'YYYY-MM-DD'
+
 function RequestsProductsTable(props) {
   const classes = useStyles();
 
-  const headers = ['Folio', 'Cliente', 'Producto', 'Cantidad solicitada', 'Inventario fisico']
-  const rows = []
-  props.requestsProducts.forEach(requestProduct => {
-    if (requestProduct.order_request_status_id === 2) {
-      const inventoryProduct = props.inventory.find(inventoryElement => {
-        return inventoryElement.product_id === requestProduct.product_id
+
+  let rows = []
+
+  if (props.requestProducts) {
+    let {requestProducts, inventory: inventoryForCalcs} = props
+    rows = requestProducts
+      .sort((a, b) => {
+        let aRequestDate = moment(a.order_request_date, dateFormat)
+        let bRequestDate = moment(b.order_request_date, dateFormat)
+        return a.priority > b.priority ? -1
+          : a.priority < b.priority ? 1
+            : aRequestDate.isBefore(bRequestDate) ? -1
+              : aRequestDate.isAfter(bRequestDate) ? 1
+                : 0
       })
-      if (!inventoryProduct) {
-        console.log(requestProduct)
-      }
-      rows.push([
-        requestProduct.order_code,
-        requestProduct.client_name,
-        requestProduct.product_description,
-        formatNumber(requestProduct.product_kilos),
-        inventoryProduct ? formatNumber(inventoryProduct.kilos_balance) : '-'
-      ])
-    }
-  })
+      .map((requestProduct) => {
+        let inventoryProduct = inventoryForCalcs.find(product => {
+          return product.product_id === requestProduct.product_id
+        })
+        let requestKilos = requestProduct.order_request_kilos
+        let saleDeliveredKilos = requestProduct.order_sale_delivered_kilos
+        let requestNetKilos = (requestKilos < saleDeliveredKilos) ?
+          0 : (requestKilos - saleDeliveredKilos)
+        let inventoryKilos = inventoryProduct && inventoryProduct.kilos_balance ? inventoryProduct.kilos_balance : 0
+        let givenInventoryKilos
+        if (requestNetKilos > 0 && inventoryKilos > 0) {
+          if (requestNetKilos > inventoryKilos) {
+            givenInventoryKilos = inventoryKilos
+            inventoryProduct.kilos_balance = 0
+          } else {
+            givenInventoryKilos = requestNetKilos
+            inventoryProduct.kilos_balance =  inventoryKilos - requestNetKilos
+          }
+        } else {
+          givenInventoryKilos = 0
+        }
+        let pendingToProduceKilos = requestNetKilos - givenInventoryKilos
+        return {...requestProduct,
+          pending_to_produce: pendingToProduceKilos,
+          given_inventory_kilos: givenInventoryKilos
+        }
+      })
+  }
 
   return (
-      <TableContainer className={classes.table} style={{maxHeight: 500}}>
+      <TableContainer className={classes.table} style={{maxHeight: 800}}>
         <Table aria-label="simple table" stickyHeader>
           <TableHead>
             <TableRow>
-              {headers.map(header => {
-                return (<TableCell>{header}</TableCell>)
-              })}
+              <TableCell style={{width: '5%'}}>&nbsp;</TableCell>
+              <TableCell>Folio</TableCell>
+              <TableCell>Cliente</TableCell>
+              <TableCell>Prioridad</TableCell>
+              <TableCell>Producto</TableCell>
+              <TableCell>Fecha de solicitud</TableCell>
+              <TableCell>Kilos solicitados</TableCell>
+              <TableCell>Kilos vendidos</TableCell>
+              <TableCell>Kilos asignados del inventario</TableCell>
+              <TableCell>Kilos pendientes por producir</TableCell>
             </TableRow>
           </TableHead>
           <TableBody>
-            {rows.map((row, rowIndex) => (
-              <TableRow key={'row' + rowIndex}>
-                {row.map((item, rowItemIndex) => {
-                  return (<TableCell key={'rowItem' + rowIndex + '' + rowItemIndex}>{item}</TableCell>)
-                })}
-              </TableRow>
-            ))}
+            {
+              rows.map(row => {
+                return (
+                  <TableRow key={row.product_id + '' + row.order_request_id}>
+                    <TableCell>&nbsp;</TableCell>
+                    <TableCell>{row.order_code}</TableCell>
+                    <TableCell>{row.client_name}</TableCell>
+                    <TableCell>{row.priority}</TableCell>
+                    <TableCell>{row.product_description}</TableCell>
+                    <TableCell>{row.order_request_date}</TableCell>
+                    <TableCell>{row.order_request_kilos}</TableCell>
+                    <TableCell>{row.order_sale_delivered_kilos}</TableCell>
+                    <TableCell>{row.given_inventory_kilos}</TableCell>
+                    <TableCell>{row.pending_to_produce}</TableCell>
+                  </TableRow>
+                )
+              })
+            }
           </TableBody>
         </Table>
       </TableContainer>

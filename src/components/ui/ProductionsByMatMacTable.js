@@ -89,8 +89,6 @@ function ProductionsByMatMacTable(props) {
     }
   }, [product, productions])
 
-  console.log(rows)
-
   return (
     <>
       <Grid

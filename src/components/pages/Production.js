@@ -7,6 +7,7 @@ import useFetch from '../../helpers/useFetch'
 import apiUrl from '../../helpers/apiUrl'
 import ProductionsByMatMacTable from '../ui/ProductionsByMatMacTable'
 import OrderRequestsDataTable from '../ui/datatables/OrderRequestsDataTable'
+import RequestsProductsTable from '../ui/RequestsProductsTable'
 
 const useStyles = makeStyles((theme) => {
   return {
@@ -21,7 +22,7 @@ const useStyles = makeStyles((theme) => {
 })
 
 
-export default function Production () {
+export default function Production (props) {
 
   const classes = useStyles()
   const theme = useTheme()
@@ -29,6 +30,7 @@ export default function Production () {
   const matchesXS = useMediaQuery(theme.breakpoints.down('md'))
 
   const productions = useFetch(apiUrl + 'analytics/production?dateGroup=none&entityGroup=material|product|machine')
+  const requestProducts = useFetch(apiUrl + 'stats/requestProducts')
 
   return (
     <Grid
@@ -62,6 +64,16 @@ export default function Production () {
         container
         className={classes.rowContainer}
         style={{marginTop: '2em'}}
+      >
+        <Grid item xs>
+          <RequestsProductsTable requestProducts={requestProducts} />
+        </Grid>
+      </Grid>
+      <Grid
+        item
+        container
+        className={classes.rowContainer}
+        style={{marginTop: '2em', marginBottom: '2em'}}
       >
         <Grid item xs>
           <OrderRequestsDataTable />
