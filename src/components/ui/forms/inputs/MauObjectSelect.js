@@ -48,7 +48,20 @@ export default function MauObjectSelect (props) {
           )
         }}
         name={props.name}
-        rules={props.rules}
+        rules={
+          {
+            ...props.rules,
+            validate: (value) => {
+              let isRequired = props.rules && props.rules.required
+              let isNull = (value === 'null' || value === null)
+              let isEmpty = value === ''
+              if (isRequired) {
+                console.log(value)
+              }
+              return isRequired ? !(isNull || isEmpty) : true
+            }
+          }
+        }
         control={props.control}
         defaultValue={props.defaultValue}
       />

@@ -733,10 +733,7 @@ const ExpenseForm = (props) => {
             displayName={'name'}
             rules={
               {
-                required: true,
-                validate: (value) => {
-                  return value !== 'null'
-                }
+                required: true
               }
             }
             control={control}
@@ -759,10 +756,7 @@ const ExpenseForm = (props) => {
             name={'expense_invoice_payment_method_id'}
             rules={
               {
-                required: isInvoice,
-                validate: (value) => {
-                  return value !== 'null'
-                }
+                required: isInvoice
               }
             }
             control={control}
@@ -784,10 +778,7 @@ const ExpenseForm = (props) => {
             name={'expense_invoice_payment_form_id'}
             rules={
               {
-                required: isInvoice,
-                validate: (value) => {
-                  return value !== 'null'
-                }
+                required: isInvoice
               }
             }
             control={control}
@@ -809,10 +800,7 @@ const ExpenseForm = (props) => {
             name={'expense_money_source_id'}
             rules={
               {
-                required: isInvoice,
-                validate: (value) => {
-                  return value !== 'null'
-                }
+                required: isInvoice
               }
             }
             control={control}
@@ -834,10 +822,7 @@ const ExpenseForm = (props) => {
             name={'expense_invoice_cdfi_use_id'}
             rules={
               {
-                required: isInvoice,
-                validate: (value) => {
-                  return value !== 'null'
-                }
+                required: isInvoice
               }
             }
             control={control}
@@ -976,10 +961,7 @@ const ExpenseForm = (props) => {
                             name={`expense_items[${index}].branch_id`}
                             rules={
                               {
-                                required: "this is required",
-                                validate: (value) => {
-                                  return value !== 'null'
-                                }
+                                required: "this is required"
                               }
                             }
                             control={control}

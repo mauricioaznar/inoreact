@@ -18,7 +18,7 @@ import useMediaQuery from '@material-ui/core/useMediaQuery'
 import Slide from '@material-ui/core/Slide'
 import TextField from '@material-ui/core/TextField'
 import Autocomplete from '@material-ui/lab/Autocomplete'
-import {localization, tableIcons} from './common/common'
+import {localization, tableIcons, mainEntityPromise, subEntitiesPromises} from './common/common'
 import MaterialTableDate from './common/MaterialTableDate'
 import MaterialTableText from './common/MaterialTableText'
 
@@ -246,7 +246,7 @@ function ExpenseDataTable(props) {
     }, {}));
 
   const handleFilters = (field, value) => {
-    const newFilters = {...filters, focus: false}
+    const newFilters = [...filters].map()
     const foundFilter = newFilters[field]
     foundFilter.value = value
     foundFilter.focus = true
@@ -263,76 +263,37 @@ function ExpenseDataTable(props) {
   };
 
   const handleOnSubmit = (expense, callback) => {
-    let promises = []
-    let expensePromise
-    if (expense.id) {
-      expensePromise = axios.put(apiUrl + 'expense/' + expense.id, {...expense}, {headers: {...authHeader()}})
-    } else {
-      expensePromise = axios.post(apiUrl + 'expense', {...expense}, {headers: {...authHeader()}})
-    }
+    let expensePromise = mainEntityPromise(expense, 'expense')
     expensePromise.then(result => {
       let expenseId = result.data.data.id
-
-      let deletedExpenseItems = expense.defaultValues.expense_items
-      expense.expense_items.forEach(expenseItem => {
-        if (expenseItem.id !== '') {
-          promises.push(axios.put(apiUrl + 'expenseItem/' + expenseItem.id, {...expenseItem}, {headers: {...authHeader()}}))
-          deletedExpenseItems = deletedExpenseItems.filter(initialExpenseItem => {
-            return String(initialExpenseItem.id) !== expenseItem.id
-          })
-        } else {
-          promises.push(axios.post(apiUrl + 'expenseItem', {...expenseItem, expense_id: expenseId}, {headers: {...authHeader()}}))
+      const subEntitiesConfs = [
+        {
+          initialSubEntities: expense.defaultValues.expense_items,
+          subEntities: expense.expense_items,
+          path: 'expenseItem'
+        },
+        {
+          initialSubEntities: expense.defaultValues.expense_invoice_complements,
+          subEntities: expense.expense_invoice_complements,
+          path: 'expenseInvoiceComplement'
+        },
+        {
+          initialSubEntities: expense.defaultValues.expense_products,
+          subEntities: expense.expense_products,
+          path: 'expenseProduct'
+        },
+        {
+          initialSubEntities: expense.defaultValues.expense_credit_notes,
+          subEntities: expense.expense_credit_notes,
+          path: 'expenseCreditNote'
         }
-      })
-      deletedExpenseItems.forEach(expenseItem => {
-        promises.push(axios.put(apiUrl + 'expenseItem/' + expenseItem.id, {active: -1}, {headers: {...authHeader()}}))
-      })
-
-      let deletedExpenseComplements = expense.defaultValues.expense_invoice_complements
-      expense.expense_invoice_complements.forEach(complement => {
-        if (complement.id !== '') {
-          promises.push(axios.put(apiUrl + 'expenseInvoiceComplement/' + complement.id, {...complement}, {headers: {...authHeader()}}))
-          deletedExpenseComplements = deletedExpenseComplements.filter(initialComplement => {
-            return String(initialComplement.id) !== complement.id
-          })
-        } else {
-          promises.push(axios.post(apiUrl + 'expenseInvoiceComplement', {...complement, expense_id: expenseId}, {headers: {...authHeader()}}))
-        }
-      })
-      deletedExpenseComplements.forEach(complement => {
-        promises.push(axios.put(apiUrl + 'expenseInvoiceComplement/' + complement.id, {active: -1}, {headers: {...authHeader()}}))
-      })
-
-      let deletedExpenseProducts = expense.defaultValues.expense_products
-      expense.expense_products.forEach(expenseProduct => {
-        if (expenseProduct.id !== '') {
-          promises.push(axios.put(apiUrl + 'expenseProduct/' + expenseProduct.id, {...expenseProduct}, {headers: {...authHeader()}}))
-          deletedExpenseProducts = deletedExpenseProducts.filter(initialExpenseProduct => {
-            return String(initialExpenseProduct.id) !== expenseProduct.id
-          })
-        } else {
-          promises.push(axios.post(apiUrl + 'expenseProduct', {...expenseProduct, expense_id: expenseId}, {headers: {...authHeader()}}))
-        }
-      })
-      deletedExpenseProducts.forEach(expenseProduct => {
-        promises.push(axios.put(apiUrl + 'expenseProduct/' + expenseProduct.id, {active: -1}, {headers: {...authHeader()}}))
-      })
-
-      let deletedExpenseCreditNotes = expense.defaultValues.expense_credit_notes
-      expense.expense_credit_notes.forEach(creditNote => {
-        if (creditNote.id !== '') {
-          promises.push(axios.put(apiUrl + 'expenseCreditNote/' + creditNote.id, {...creditNote}, {headers: {...authHeader()}}))
-          deletedExpenseCreditNotes = deletedExpenseCreditNotes.filter(initialExpenseCreditNote => {
-            return String(initialExpenseCreditNote.id) !== creditNote.id
-          })
-        } else {
-          promises.push(axios.post(apiUrl + 'expenseCreditNote', {...creditNote, expense_id: expenseId}, {headers: {...authHeader()}}))
-        }
-      })
-      deletedExpenseCreditNotes.forEach(creditNote => {
-        promises.push(axios.put(apiUrl + 'expenseCreditNote/' + creditNote.id, {active: -1}, {headers: {...authHeader()}}))
-      })
-      return Promise.all(promises)
+      ]
+      const mainEntityConf = {
+        id: expenseId,
+        propertyName: 'expense_id'
+      }
+      let expenseSubEntitiesPromises = subEntitiesPromises(subEntitiesConfs, mainEntityConf)
+      return Promise.all(expenseSubEntitiesPromises)
     }).then(results => {
       callback(true)
       tableRef.current && tableRef.current.onQueryChange()

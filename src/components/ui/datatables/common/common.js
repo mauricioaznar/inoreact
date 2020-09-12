@@ -14,6 +14,9 @@ import Search from '@material-ui/icons/Search'
 import ArrowDownward from '@material-ui/icons/ArrowDownward'
 import Remove from '@material-ui/icons/Remove'
 import ViewColumn from '@material-ui/icons/ViewColumn'
+import apiUrl from '../../../../helpers/apiUrl'
+import authHeader from '../../../../helpers/authHeader'
+import axios from 'axios'
 
 export const tableIcons = {
   Add: forwardRef((props, ref) => <AddBox {...props} ref={ref}
@@ -85,6 +88,39 @@ export const tableIcons = {
                                                      fontSize={'small'}
   />)
 };
+
+export const mainEntityPromise = (mainEntity, path) => {
+  let mainEntityPromise
+  if (mainEntity.id) {
+    mainEntityPromise = axios.put(apiUrl  + path + '/' + mainEntity.id, {...mainEntity}, {headers: {...authHeader()}})
+  } else {
+    mainEntityPromise = axios.post(apiUrl + path, {...mainEntity}, {headers: {...authHeader()}})
+  }
+  return mainEntityPromise
+}
+
+export const subEntitiesPromises = (subEntitiesConfs, mainEntityConf) => {
+  const promises = []
+  const {mainEntityId} = mainEntityConf
+  subEntitiesConfs.forEach(subEntityConf => {
+    const {subEntities, initialSubEntities, path} = subEntityConf
+    let deletedSubEntities = initialSubEntities
+    subEntities.forEach(subEntity => {
+      if (subEntity.id !== '') {
+        promises.push(axios.put(apiUrl + path + '/' + subEntity.id, {...subEntity}, {headers: {...authHeader()}}))
+        deletedSubEntities = deletedSubEntities.filter(initialSubEntity => {
+          return String(initialSubEntity.id) !== subEntity.id
+        })
+      } else {
+        promises.push(axios.post(apiUrl + path, {...subEntity, expense_id: mainEntityId}, {headers: {...authHeader()}}))
+      }
+    })
+    deletedSubEntities.forEach(initialSubEntity => {
+      promises.push(axios.put(apiUrl + path + '/' + initialSubEntity.id, {active: -1}, {headers: {...authHeader()}}))
+    })
+  })
+  return promises
+}
 
 export const localization = {
   body: {

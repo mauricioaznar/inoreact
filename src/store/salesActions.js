@@ -40,3 +40,17 @@ export const setOrderSaleCollectionStatuses = (collectionStatuses) => {
     collectionStatuses
   }
 }
+
+export const setOrderRequestStatuses = (requestStatuses) => {
+  return {
+    type: 'SET_ORDER_REQUEST_STATUSES',
+    requestStatuses
+  }
+}
+
+export const setClients = (clients) => {
+  return {
+    type: 'SET_CLIENTS',
+    clients
+  }
+}
