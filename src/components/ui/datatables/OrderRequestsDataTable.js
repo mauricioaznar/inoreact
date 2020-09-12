@@ -236,7 +236,7 @@ function OrderRequestsDataTable(props) {
         >
           <MaterialTable
             icons={tableIcons}
-            title="Gastos"
+            title="Pedidos"
             tableRef={tableRef}
             localization={localization}
             editable={{
