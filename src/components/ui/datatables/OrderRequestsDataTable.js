@@ -103,10 +103,15 @@ function OrderRequestsDataTable(props) {
         )
       },
       editComponent: (editProps) => {
+        let selectedOption = editProps.rowData.order_request_status
+        let value = props.requestStatuses.find(requestStatus => {
+          return requestStatus.id === editProps.value
+        })
         return (
           <Autocomplete
             options={props.requestStatuses}
-            value={editProps.value}
+            value={value}
+            defaultValue={selectedOption}
             getOptionLabel={option => {
               return option['name']
             }}
