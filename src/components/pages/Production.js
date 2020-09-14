@@ -8,6 +8,7 @@ import apiUrl from '../../helpers/apiUrl'
 import ProductionsByMatMacTable from '../ui/ProductionsByMatMacTable'
 import OrderRequestsDataTable from '../ui/datatables/OrderRequestsDataTable'
 import RequestsProductsTable from '../ui/RequestsProductsTable'
+import ProductionsByMatEmpTable from '../ui/ProductionsByMatEmpTable'
 
 const useStyles = makeStyles((theme) => {
   return {
@@ -29,7 +30,8 @@ export default function Production (props) {
 
   const matchesXS = useMediaQuery(theme.breakpoints.down('md'))
 
-  const productions = useFetch(apiUrl + 'analytics/production?dateGroup=none&entityGroup=material|product|machine')
+  const machineProductions = useFetch(apiUrl + 'analytics/production?dateGroup=none&entityGroup=material|product|machine')
+  const employeeProductions = useFetch(apiUrl + 'analytics/production?dateGroup=none&entityGroup=material|product|employee')
   const requestProducts = useFetch(apiUrl + 'stats/requestProducts')
 
   return (
@@ -56,7 +58,17 @@ export default function Production (props) {
         style={{marginTop: '2em'}}
       >
         <Grid item xs>
-          <ProductionsByMatMacTable productions={productions}/>
+          <ProductionsByMatMacTable productions={machineProductions}/>
+        </Grid>
+      </Grid>
+      <Grid
+        item
+        container
+        className={classes.rowContainer}
+        style={{marginTop: '2em'}}
+      >
+        <Grid item xs>
+          <ProductionsByMatEmpTable productions={employeeProductions}/>
         </Grid>
       </Grid>
       <Grid
@@ -73,8 +85,18 @@ export default function Production (props) {
         item
         container
         className={classes.rowContainer}
-        style={{marginTop: '2em', marginBottom: '2em'}}
+        style={{marginTop: '2em'}}
       >
+        <Grid item xs>
+          <OrderRequestsDataTable />
+        </Grid>
+      </Grid>
+      <Grid
+        item
+        container
+        className={classes.rowContainer}
+        style={{marginTop: '2em', marginBottom: '2em'}}
+        >
         <Grid item xs>
           <OrderRequestsDataTable />
         </Grid>

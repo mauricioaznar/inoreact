@@ -41,6 +41,13 @@ export const setBranches = (branches) => {
   }
 }
 
+export const setEmployees = (employees) => {
+  return {
+    type: 'SET_EMPLOYEES',
+    employees: employees
+  }
+}
+
 export const getApiEntities = () => {
   return (dispatch, getState) => {
     dispatch(setAreEntitiesLoading())
@@ -66,7 +73,8 @@ export const getApiEntities = () => {
         expense_money_sources: moneySources,
         order_sale_collection_statuses: collectionStatuses,
         order_request_statuses: requestStatuses,
-        clients
+        clients,
+        employees
       } = result[1].data.data
       // dispatch(setOrderProductions(orderProductions))
       dispatch(setInventory(inventory))
@@ -86,6 +94,7 @@ export const getApiEntities = () => {
       dispatch(setOrderSaleCollectionStatuses(collectionStatuses))
       dispatch(setOrderRequestStatuses(requestStatuses))
       dispatch(setClients(clients))
+      dispatch(setEmployees(employees))
     }).finally(() => {
       dispatch(unsetAreEntitiesLoading())
     })
