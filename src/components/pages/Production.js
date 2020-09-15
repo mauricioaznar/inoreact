@@ -93,19 +93,6 @@ export default function Production(props) {
           <OrderRequestsDataTable/>
         </Grid>
       </Grid>
-      <Grid
-        item
-        container
-        className={classes.rowContainer}
-        style={{marginTop: '2em', marginBottom: '2em'}}
-      >
-        <Grid
-          item
-          xs
-        >
-          <OrderRequestsDataTable/>
-        </Grid>
-      </Grid>
     </Grid>
   )
 }
