@@ -15,16 +15,19 @@ import Grid from '@material-ui/core/Grid'
 import Autocomplete from '../ui/inputs/Autocomplete'
 import moment from 'moment'
 import * as ss from 'simple-statistics'
+import Box from '@material-ui/core/Box'
+import Collapse from '@material-ui/core/Collapse'
+import CircularProgress from '@material-ui/core/CircularProgress'
+import IconButton from '@material-ui/core/IconButton'
+import ImportExport from '@material-ui/icons/ImportExport'
 
 
 const useStyles = makeStyles({
   table: {
     minWidth: 400,
     overflow: 'auto'
-  },
+  }
 });
-
-
 
 
 const formatNumber = (x, digits = 2) => {
@@ -45,20 +48,21 @@ function ProductionsByMatMacTable(props) {
 
   const classes = useStyles();
 
+  let loading = !props.machineProductions && !props.employeeProductions
+
   React.useEffect(() => {
-    if (props.productions && product) {
+    if (props.machineProductions && props.employeeProductions && product) {
+
+      console.log(props.machineProductions)
+
       let machines = props.machines
         .map(machine => {
-          return {
-          machine_id: machine.id,
-          machine_name: machine.name,
-          machine_type_id: machine.machine_type_id,
-          data: props.productions
+
+          let machineData = props.machineProductions
             .filter((production, index) => {
-              if (index === 0) {
-                console.log(production)
-              }
-              return production.machine_id === machine.id && product.id === production.product_id
+              return production.machine_id === machine.id &&
+                product.id === production.product_id &&
+                production.production_events === 0
             })
             .map((production, index) => {
               let startDateTime = moment(production.start_date_time, 'YYYY-MM-DD HH:mm:ss')
@@ -69,21 +73,81 @@ function ProductionsByMatMacTable(props) {
             .filter(kiloPerHour => {
               return kiloPerHour > 10
             })
+
+          let preEmployeeProductions = props.employeeProductions
+            .filter((production, index) => {
+              return production.machine_id === machine.id &&
+                product.id === production.product_id &&
+                production.production_events === 0
+            })
+
+          let employees = props.employees
+            .map(employee => {
+              let employeeData = preEmployeeProductions
+                .filter((production, index) => {
+                  return production.employee_id === employee.id
+                })
+                .map((production, index) => {
+                  let startDateTime = moment(production.start_date_time, 'YYYY-MM-DD HH:mm:ss')
+                  let endDateTime = moment(production.end_date_time, 'YYYY-MM-DD HH:mm:ss')
+                  let durationAsHours = moment.duration(endDateTime.diff(startDateTime)).asHours()
+                  return production.kilos / durationAsHours
+                })
+                .filter(kiloPerHour => {
+                  return kiloPerHour > 10
+                })
+              return {
+                employee_id: employee.id,
+                employee_fullname: employee.fullname,
+                employeeData: employeeData
+              }
+            })
+            .filter(employee => {
+              return employee.employeeData.length > 2
+            })
+            .map(employee => {
+              let mean = ss.mean(employee.employeeData)
+              let standardDeviation = ss.sampleStandardDeviation(employee.employeeData)
+              return {
+                ...employee,
+                mean: mean.toFixed(2),
+                sampleStandardDeviation: standardDeviation.toFixed(2),
+                n: employee.employeeData.length,
+                eightHours: (mean * 8).toFixed(2)
+              }
+            })
+            .sort((a, b) => {
+              return Number(a.eightHours) > Number(b.eightHours) ? -1
+                : Number(a.eightHours) === Number(b.eightHours) ? 0
+                  : 1
+            })
+
+          return {
+            machine_id: machine.id,
+            machine_name: machine.name,
+            machine_type_id: machine.machine_type_id,
+            employees: employees,
+            machineData: machineData
           }
         })
         .filter(machine => {
-          return machine.data.length > 2
+          return machine.machineData.length > 2
         })
         .map(machine => {
-          let mean = ss.mean(machine.data)
-          let standardDeviation = ss.sampleStandardDeviation(machine.data)
+          let mean = ss.mean(machine.machineData)
+          let standardDeviation = ss.sampleStandardDeviation(machine.machineData)
           return {
             ...machine,
             mean: mean.toFixed(2),
             sampleStandardDeviation: standardDeviation.toFixed(2),
-            n: machine.data.length,
+            n: machine.machineData.length,
             eightHours: (mean * 8).toFixed(2)
           }
+        })
+        .sort((a, b) => {
+          return Number(a.eightHours) > Number(b.eightHours) ? -1
+            : Number(a.eightHours) === Number(b.eightHours) ? 0
+              : 1
         })
       setRows(machines)
     }
@@ -100,14 +164,18 @@ function ProductionsByMatMacTable(props) {
           xs={12}
           sm={4}
         >
-          <Autocomplete
-            options={props.products}
-            displayName={'description'}
-            value={product}
-            onChange={(e, data) => {
-              setProduct(data)
-            }}
-          />
+          {
+            loading
+              ? <CircularProgress size={40} style={{marginLeft: '.5em'}}/>
+              : <Autocomplete
+                  options={props.products}
+                  displayName={'description'}
+                  value={product}
+                  onChange={(e, data) => {
+                    setProduct(data)
+                  }}
+                />
+          }
         </Grid>
         <Grid
           item
@@ -126,25 +194,53 @@ function ProductionsByMatMacTable(props) {
               <TableHead>
                 <TableRow>
                   <TableCell style={{width: '5%'}}>&nbsp;</TableCell>
-                  <TableCell style={{width: '20%'}}>Maquina</TableCell>
-                  <TableCell>N</TableCell>
-                  <TableCell>Promedio</TableCell>
-                  <TableCell>Muestra de la desviacion estandar</TableCell>
-                  <TableCell>Produccion en 8 horas</TableCell>
+                  <TableCell style={{width: '20%'}}>Maquina/Empleado</TableCell>
+                  <TableCell style={{width: '15%'}}>n</TableCell>
+                  <TableCell style={{width: '15%'}}>Promedio</TableCell>
+                  <TableCell style={{width: '15%'}}>Desviacion estandar de la muestra</TableCell>
+                  <TableCell style={{width: '15%'}}>Produccion en 8 horas</TableCell>
                 </TableRow>
               </TableHead>
               <TableBody>
                 {
                   rows.map(row => {
                     return (
-                      <TableRow key={row.machine_id}>
-                        <TableCell>&nbsp;</TableCell>
-                        <TableCell>{row.machine_name}</TableCell>
-                        <TableCell>{row.n}</TableCell>
-                        <TableCell>{row.mean}</TableCell>
-                        <TableCell>{row.sampleStandardDeviation}</TableCell>
-                        <TableCell>{row.eightHours}</TableCell>
-                      </TableRow>
+                      <React.Fragment>
+                        <TableRow>
+                          <TableCell>&nbsp;</TableCell>
+                          <TableCell>{row.machine_name}</TableCell>
+                          <TableCell>{row.n}</TableCell>
+                          <TableCell>{row.mean}</TableCell>
+                          <TableCell>{row.sampleStandardDeviation}</TableCell>
+                          <TableCell>{row.eightHours}</TableCell>
+                        </TableRow>
+                        <TableRow>
+                          <TableCell
+                            colSpan={6}
+                          >
+                            <Table size={'small'}>
+                              <Box>
+                                <Table
+                                  aria-label="purchases"
+                                >
+                                  <TableBody>
+                                    {row.employees.map((employee, index) => (
+                                      <TableRow key={employee.employee_id}>
+                                        <TableCell style={{width: '5%'}}>&nbsp;</TableCell>
+                                        <TableCell style={{width: '20%'}}>{employee.employee_fullname}</TableCell>
+                                        <TableCell style={{width: '15%'}}>{employee.n}</TableCell>
+                                        <TableCell style={{width: '15%'}}>{employee.mean}</TableCell>
+                                        <TableCell style={{width: '15%'}}>{employee.sampleStandardDeviation}</TableCell>
+                                        <TableCell style={{width: '15%'}}>{employee.eightHours}</TableCell>
+                                      </TableRow>
+                                    ))}
+                                  </TableBody>
+                                </Table>
+                              </Box>
+                            </Table>
+                          </TableCell>
+                        </TableRow>
+                      </React.Fragment>
                     )
                   })
                 }
@@ -158,12 +254,12 @@ function ProductionsByMatMacTable(props) {
 }
 
 
-
 const mapStateToProps = (state, ownProps) => {
   return {
     branches: state.general.branches,
     products: state.production.products,
     machines: state.production.machines,
+    employees: state.general.employees,
     material: state.production.materials
   }
 }

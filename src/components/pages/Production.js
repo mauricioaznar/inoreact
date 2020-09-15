@@ -23,7 +23,7 @@ const useStyles = makeStyles((theme) => {
 })
 
 
-export default function Production (props) {
+export default function Production(props) {
 
   const classes = useStyles()
   const theme = useTheme()
@@ -57,8 +57,14 @@ export default function Production (props) {
         className={classes.rowContainer}
         style={{marginTop: '2em'}}
       >
-        <Grid item xs>
-          <ProductionsByMatMacTable productions={machineProductions}/>
+        <Grid
+          item
+          xs
+        >
+          <ProductionsByMatMacTable
+            machineProductions={machineProductions}
+            employeeProductions={employeeProductions}
+          />
         </Grid>
       </Grid>
       <Grid
@@ -67,8 +73,11 @@ export default function Production (props) {
         className={classes.rowContainer}
         style={{marginTop: '2em'}}
       >
-        <Grid item xs>
-          <ProductionsByMatEmpTable productions={employeeProductions}/>
+        <Grid
+          item
+          xs
+        >
+          <RequestsProductsTable requestProducts={requestProducts}/>
         </Grid>
       </Grid>
       <Grid
@@ -77,18 +86,11 @@ export default function Production (props) {
         className={classes.rowContainer}
         style={{marginTop: '2em'}}
       >
-        <Grid item xs>
-          <RequestsProductsTable requestProducts={requestProducts} />
-        </Grid>
-      </Grid>
-      <Grid
-        item
-        container
-        className={classes.rowContainer}
-        style={{marginTop: '2em'}}
-      >
-        <Grid item xs>
-          <OrderRequestsDataTable />
+        <Grid
+          item
+          xs
+        >
+          <OrderRequestsDataTable/>
         </Grid>
       </Grid>
       <Grid
@@ -96,9 +98,12 @@ export default function Production (props) {
         container
         className={classes.rowContainer}
         style={{marginTop: '2em', marginBottom: '2em'}}
+      >
+        <Grid
+          item
+          xs
         >
-        <Grid item xs>
-          <OrderRequestsDataTable />
+          <OrderRequestsDataTable/>
         </Grid>
       </Grid>
     </Grid>
