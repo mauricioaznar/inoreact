@@ -39,6 +39,46 @@ const formatNumber = (x, digits = 2) => {
 
 const dateFormat = 'YYYY-MM-DD'
 
+const filterProductions = (production, machine, product) => {
+  return production.machine_id === machine.id &&
+    product.id === production.product_id &&
+    production.production_events === 0
+}
+
+const processProductionsForSD = (production, index) => {
+  let startDateTime = moment(production.start_date_time, 'YYYY-MM-DD HH:mm:ss')
+  let endDateTime = moment(production.end_date_time, 'YYYY-MM-DD HH:mm:ss')
+  let durationAsHours = moment.duration(endDateTime.diff(startDateTime)).asHours()
+  return production.kilos / durationAsHours
+}
+
+const cleanSDData = kiloPerHour => {
+  return kiloPerHour > 10
+}
+
+
+const filterForStandardDeviation = entity => {
+  return entity.data.length > 2
+}
+
+const calculateStandardDeviation = (entity) => {
+  let mean = ss.mean(entity.data)
+  let standardDeviation = ss.sampleStandardDeviation(entity.data)
+  return {
+    ...entity,
+    mean: mean.toFixed(2),
+    sampleStandardDeviation: standardDeviation.toFixed(2),
+    n: entity.data.length,
+    eightHours: (mean * 8).toFixed(2)
+  }
+}
+
+
+const sortStandardDeviation = (a, b) => {
+  return Number(a.eightHours) > Number(b.eightHours) ? -1
+    : Number(a.eightHours) === Number(b.eightHours) ? 0
+      : 1
+}
 
 function ProductionsByMatMacTable(props) {
   const [product, setProduct] = React.useState(null)
@@ -53,33 +93,16 @@ function ProductionsByMatMacTable(props) {
   React.useEffect(() => {
     if (props.machineProductions && props.employeeProductions && product) {
 
-      console.log(props.machineProductions)
-
       let machines = props.machines
         .map(machine => {
 
           let machineData = props.machineProductions
-            .filter((production, index) => {
-              return production.machine_id === machine.id &&
-                product.id === production.product_id &&
-                production.production_events === 0
-            })
-            .map((production, index) => {
-              let startDateTime = moment(production.start_date_time, 'YYYY-MM-DD HH:mm:ss')
-              let endDateTime = moment(production.end_date_time, 'YYYY-MM-DD HH:mm:ss')
-              let durationAsHours = moment.duration(endDateTime.diff(startDateTime)).asHours()
-              return production.kilos / durationAsHours
-            })
-            .filter(kiloPerHour => {
-              return kiloPerHour > 10
-            })
+            .filter(productions => filterProductions(productions, machine, product))
+            .map(processProductionsForSD)
+            .filter(cleanSDData)
 
           let preEmployeeProductions = props.employeeProductions
-            .filter((production, index) => {
-              return production.machine_id === machine.id &&
-                product.id === production.product_id &&
-                production.production_events === 0
-            })
+            .filter(productions => filterProductions(productions, machine, product))
 
           let employees = props.employees
             .map(employee => {
@@ -87,68 +110,30 @@ function ProductionsByMatMacTable(props) {
                 .filter((production, index) => {
                   return production.employee_id === employee.id
                 })
-                .map((production, index) => {
-                  let startDateTime = moment(production.start_date_time, 'YYYY-MM-DD HH:mm:ss')
-                  let endDateTime = moment(production.end_date_time, 'YYYY-MM-DD HH:mm:ss')
-                  let durationAsHours = moment.duration(endDateTime.diff(startDateTime)).asHours()
-                  return production.kilos / durationAsHours
-                })
-                .filter(kiloPerHour => {
-                  return kiloPerHour > 10
-                })
+                .map(processProductionsForSD)
+                .filter(cleanSDData)
+
               return {
                 employee_id: employee.id,
                 employee_fullname: employee.fullname,
-                employeeData: employeeData
+                data: employeeData
               }
             })
-            .filter(employee => {
-              return employee.employeeData.length > 2
-            })
-            .map(employee => {
-              let mean = ss.mean(employee.employeeData)
-              let standardDeviation = ss.sampleStandardDeviation(employee.employeeData)
-              return {
-                ...employee,
-                mean: mean.toFixed(2),
-                sampleStandardDeviation: standardDeviation.toFixed(2),
-                n: employee.employeeData.length,
-                eightHours: (mean * 8).toFixed(2)
-              }
-            })
-            .sort((a, b) => {
-              return Number(a.eightHours) > Number(b.eightHours) ? -1
-                : Number(a.eightHours) === Number(b.eightHours) ? 0
-                  : 1
-            })
+            .filter(filterForStandardDeviation)
+            .map(calculateStandardDeviation)
+            .sort(sortStandardDeviation)
 
           return {
             machine_id: machine.id,
             machine_name: machine.name,
             machine_type_id: machine.machine_type_id,
             employees: employees,
-            machineData: machineData
+            data: machineData
           }
         })
-        .filter(machine => {
-          return machine.machineData.length > 2
-        })
-        .map(machine => {
-          let mean = ss.mean(machine.machineData)
-          let standardDeviation = ss.sampleStandardDeviation(machine.machineData)
-          return {
-            ...machine,
-            mean: mean.toFixed(2),
-            sampleStandardDeviation: standardDeviation.toFixed(2),
-            n: machine.machineData.length,
-            eightHours: (mean * 8).toFixed(2)
-          }
-        })
-        .sort((a, b) => {
-          return Number(a.eightHours) > Number(b.eightHours) ? -1
-            : Number(a.eightHours) === Number(b.eightHours) ? 0
-              : 1
-        })
+        .filter(filterForStandardDeviation)
+        .map(calculateStandardDeviation)
+        .sort(sortStandardDeviation)
       setRows(machines)
     }
   }, [product, productions])
