@@ -118,7 +118,6 @@ const ExpenseForm = (props) => {
 
   const defaultValues = {
     id: props.expense ? props.expense.id : '',
-    description: props.expense ? props.expense.description : '',
     expense_items: props.expense ? props.expense.expense_items : [],
     expense_invoice_complements: props.expense ? props.expense.expense_invoice_complements.map(complement => {
       return {...complement, delivered: complement.delivered === 1}
@@ -628,28 +627,6 @@ const ExpenseForm = (props) => {
           item
           xs={12}
           className={classes.rowContainer}
-          style={{marginTop: '2em'}}
-        >
-          <FormControl
-            fullWidth
-          >
-            <TextField
-              inputRef={register({required: true})}
-              name="description"
-              label="Descripcion"
-              error={!!errors.description}
-              placeholder="Se compro 'x' porque 'y' "
-              InputLabelProps={{
-                shrink: true
-              }}
-            />
-          </FormControl>
-        </Grid>
-
-        <Grid
-          item
-          xs={12}
-          className={classes.rowContainer}
           style={{marginTop: '2em', display: isInvoice ? 'inherit' : 'none'}}
         >
           <FormControl
@@ -971,8 +948,18 @@ const ExpenseForm = (props) => {
                         </TableCell>
                         <TableCell>
                           <TextField
+                            id="standard-description"
+                            label="Descripcion"
+                            type="text"
+                            name={`expense_items[${index}].description`}
+                            defaultValue={`${expenseItem.description}`}
+                            inputRef={register({required: true})}
+                          />
+                        </TableCell>
+                        <TableCell>
+                          <TextField
                             id="standard-number"
-                            label="Number"
+                            label="Importe"
                             type="number"
                             name={`expense_items[${index}].subtotal`}
                             defaultValue={`${expenseItem.subtotal}`}
