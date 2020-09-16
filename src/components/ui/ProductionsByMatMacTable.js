@@ -106,6 +106,7 @@ function ProductionsByMatMacTable(props) {
 
           let employees = props.employees
             .map(employee => {
+
               let employeeData = preEmployeeProductions
                 .filter((production, index) => {
                   return production.employee_id === employee.id
