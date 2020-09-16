@@ -246,7 +246,7 @@ function ExpenseDataTable(props) {
     }, {}));
 
   const handleFilters = (field, value) => {
-    const newFilters = [...filters].map()
+    const newFilters = {...filters}
     const foundFilter = newFilters[field]
     foundFilter.value = value
     foundFilter.focus = true
