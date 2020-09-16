@@ -34,14 +34,7 @@ const useStyles = makeStyles((theme) => {
       zIndex: theme.zIndex.modal + 1
     },
     toolbarMargin: {
-      ...theme.mixins.toolbar,
-      marginBottom: '3em',
-      [theme.breakpoints.down('md')]: {
-        marginBottom: '2em'
-      },
-      [theme.breakpoints.down('xs')]: {
-        marginBottom: '1.25em'
-      }
+      ...theme.mixins.toolbar
     },
     logo: {
       height: "8em",

@@ -84,14 +84,13 @@ function ProductionsByMatMacTable(props) {
   const [product, setProduct] = React.useState(null)
   const [rows, setRows] = React.useState([])
 
-  const {productions} = props
-
   const classes = useStyles();
 
   let loading = !props.machineProductions && !props.employeeProductions
 
   React.useEffect(() => {
     if (props.machineProductions && props.employeeProductions && product) {
+
 
       let machines = props.machines
         .map(machine => {
@@ -137,7 +136,7 @@ function ProductionsByMatMacTable(props) {
         .sort(sortStandardDeviation)
       setRows(machines)
     }
-  }, [product, productions])
+  }, [product, props.employeeProductions, props.machineProductions])
 
   return (
     <>
