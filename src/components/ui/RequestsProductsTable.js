@@ -35,7 +35,9 @@ function RequestsProductsTable(props) {
   let rows = []
 
   if (props.requestProducts) {
+
     let {requestProducts, inventory: inventoryForCalcs} = props
+
     rows = requestProducts
       .sort((a, b) => {
         let aRequestDate = moment(a.order_request_date, dateFormat)
@@ -73,6 +75,7 @@ function RequestsProductsTable(props) {
           given_inventory_kilos: givenInventoryKilos
         }
       })
+
   }
 
   return (
