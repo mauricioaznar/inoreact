@@ -82,25 +82,6 @@ function ExpenseDataTable(props) {
       }
     },
     {
-      title: 'Fecha de provision',
-      field: 'invoice_provision_date',
-      type: 'date',
-      dateSetting: {locale: 'en-ca'},
-      filterComponent: (filterProps) => {
-        return (
-          <>
-            <MaterialTableDate
-              value={filters['invoice_provision_date'].value}
-              onChange={(momentDate) => {
-                handleFilters( 'invoice_provision_date', momentDate !== null && momentDate.isValid() ?
-                  momentDate.format('YYYY-MM-DD') : null)
-              }}
-            />
-          </>
-        )
-      }
-    },
-    {
       title: 'Fecha de emision',
       field: 'date_emitted',
       type: 'date',
@@ -164,21 +145,6 @@ function ExpenseDataTable(props) {
             )}
             onChange={(e, data) => {
               handleFilters( 'supplier_id', data)
-            }}
-          />
-        )
-      }
-    },
-    {
-      title: 'Descripcion',
-      field: 'description',
-      filterComponent: (filterProps) => {
-        return (
-          <MaterialTableText
-            focus={filters['description'].focus}
-            value={filters['description'].value}
-            onChange={(text) => {
-              handleFilters( 'description', text)
             }}
           />
         )
@@ -289,8 +255,7 @@ function ExpenseDataTable(props) {
         }
       ]
       const mainEntityConf = {
-        id: expenseId,
-        propertyName: 'expense_id'
+        'expense_id': expenseId
       }
       let expenseSubEntitiesPromises = subEntitiesPromises(subEntitiesConfs, mainEntityConf)
       return Promise.all(expenseSubEntitiesPromises)

@@ -101,7 +101,6 @@ export const mainEntityPromise = (mainEntity, path) => {
 
 export const subEntitiesPromises = (subEntitiesConfs, mainEntityConf) => {
   const promises = []
-  const {mainEntityId} = mainEntityConf
   subEntitiesConfs.forEach(subEntityConf => {
     const {subEntities, initialSubEntities, path} = subEntityConf
     let deletedSubEntities = initialSubEntities
@@ -112,7 +111,7 @@ export const subEntitiesPromises = (subEntitiesConfs, mainEntityConf) => {
           return String(initialSubEntity.id) !== subEntity.id
         })
       } else {
-        promises.push(axios.post(apiUrl + path, {...subEntity, expense_id: mainEntityId}, {headers: {...authHeader()}}))
+        promises.push(axios.post(apiUrl + path, {...subEntity, ...mainEntityConf}, {headers: {...authHeader()}}))
       }
     })
     deletedSubEntities.forEach(initialSubEntity => {
