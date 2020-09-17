@@ -117,13 +117,21 @@ function RequestsProductsTable(props) {
       material.kilos += product.pending_to_produce
     })
 
-    widthAndCaliberGroups = widthAndCaliberGroups.sort((a, b) => {
-      return a.kilos > b.kilos ? -1 : a.kilos < b.kilos ? 1
-        : a.width > b.width ? -1 : a.width < b.width ? 1 : 0
-    })
+    widthAndCaliberGroups = widthAndCaliberGroups
+      .sort((a, b) => {
+        return a.kilos > b.kilos ? -1 : a.kilos < b.kilos ? 1
+          : a.width > b.width ? -1 : a.width < b.width ? 1 : 0
+      })
+      .filter(item => item.kilos !== 0)
 
-    console.log(materials)
+    materials = materials
+      .sort((a, b) => {
+        return a.kilos > b.kilos ? -1 : a.kilos < b.kilos ? 1 : 0
+      })
+      .filter(material => material.kilos !== 0)
 
+    productsByPriority = productsByPriority
+      .filter(product => product.pending_to_produce !== 0)
   }
 
 
