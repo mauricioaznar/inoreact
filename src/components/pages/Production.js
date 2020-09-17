@@ -82,10 +82,10 @@ export default function Production() {
           aria-label="scrollable auto tabs example"
         >
           <Tab label="Promedios" {...a11yProps(0)} />
-          <Tab label="Por producir" {...a11yProps(1)} />
-          <Tab label="Pedidos" {...a11yProps(2)} />
-          <Tab label="Item Four" {...a11yProps(3)} />
-          <Tab label="Item Five" {...a11yProps(4)} />
+          <Tab label="Por producir (productos)" {...a11yProps(1)} />
+          <Tab label="Por producir (extrusion)" {...a11yProps(2)} />
+          <Tab label="Por producir (subtipos)" {...a11yProps(3)} />
+          <Tab label="Pedidos" {...a11yProps(4)} />
           <Tab label="Item Six" {...a11yProps(5)} />
           <Tab label="Item Seven" {...a11yProps(6)} />
         </Tabs>
@@ -97,16 +97,16 @@ export default function Production() {
         />
       </TabPanel>
       <TabPanel value={value} index={1}>
-          <RequestsProductsTable requestProducts={requestProducts}/>
+          <RequestsProductsTable type={'products'} requestProducts={requestProducts}/>
       </TabPanel>
       <TabPanel value={value} index={2}>
-          <OrderRequestsDataTable />
+          <RequestsProductsTable type={'extrusion'} requestProducts={requestProducts}/>
       </TabPanel>
       <TabPanel value={value} index={3}>
-          Item Four
+          <RequestsProductsTable type={'materials'} requestProducts={requestProducts}/>
       </TabPanel>
       <TabPanel value={value} index={4}>
-          Item Five
+          <OrderRequestsDataTable />
       </TabPanel>
       <TabPanel value={value} index={5}>
           Item Six
