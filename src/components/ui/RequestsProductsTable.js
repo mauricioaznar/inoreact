@@ -178,7 +178,7 @@ function RequestsProductsTable(props) {
 
 
   const MaterialTable = (
-    <TableContainer className={classes.table} style={{maxHeight: 800}}>
+    <TableContainer className={classes.table}>
       <Table aria-label="simple table" stickyHeader>
         <TableHead>
           <TableRow>
@@ -210,7 +210,7 @@ function RequestsProductsTable(props) {
 
 
   const WidthAndCaliberTable = (
-    <TableContainer className={classes.table} style={{maxHeight: 800}}>
+    <TableContainer className={classes.table}>
       <Table aria-label="simple table" stickyHeader>
         <TableHead>
           <TableRow>
@@ -246,7 +246,7 @@ function RequestsProductsTable(props) {
 
 
   const ProductsOrderByPriorityTable = (
-    <TableContainer className={classes.table} style={{maxHeight: 800}}>
+    <TableContainer className={classes.table}>
       <Table aria-label="simple table" stickyHeader>
         <TableHead>
           <TableRow>
@@ -268,7 +268,7 @@ function RequestsProductsTable(props) {
           {
             productsByPriority.map(product => {
               return (
-                <TableRow key={product.product_id + '' + product.order_request_id}>
+                <TableRow key={product.order_request_product_id}>
                   <TableCell>&nbsp;</TableCell>
                   <TableCell>{product.order_code}</TableCell>
                   <TableCell>{product.client_name}</TableCell>

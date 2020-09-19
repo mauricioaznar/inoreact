@@ -169,7 +169,6 @@ function ProductionsByMatMacTable(props) {
         >
           <TableContainer
             component={Paper}
-            style={{maxHeight: 550}}
           >
             <Table
               className={classes.table}

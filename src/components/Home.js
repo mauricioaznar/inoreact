@@ -1,14 +1,16 @@
 import React, {useEffect, useState} from 'react'
 import {makeStyles} from '@material-ui/core/styles'
 import {connect} from 'react-redux'
-import {getApiEntities} from '../store/generalActions'
+import {getApiEntities, setAreEntitiesLoading} from '../store/generalActions'
 import {Switch, Route} from 'react-router-dom'
 import Navbar from './ui/Navbar'
 import Equilibrium from './pages/Equilibrium'
 import Production from './pages/Production'
-import InventoryDrawer from './ui/InventoryDrawer'
 import Expenses from './pages/Expenses'
 import Sales from './pages/Sales'
+import {loginUser} from '../store/authActions'
+import useFetch from '../helpers/useFetch'
+import apiUrl from '../helpers/apiUrl'
 
 
 const useStyles = makeStyles((theme) => ({
@@ -18,11 +20,36 @@ const useStyles = makeStyles((theme) => ({
 const Home = (props) => {
   const classes = useStyles()
 
-  useEffect(() => {
-    props.getApiEntities()
-  }, [])
+  //Correct permanent session logic with dates, token invalidation and token creation
+  // Could check on intervals to execute this function
 
-  if (props.areEntitiesLoading) { //props.areEntitiesLoading
+  const user = useFetch(apiUrl + 'auth/user')
+
+
+  let userValid = user && user.id && user.active === 1
+
+
+  props.setAreEntitiesLoading()
+
+
+  const programmaticLoginUser = () => {
+    const {email, password} = window.localStorage.getItem('loginForm') ? JSON.parse(window.localStorage.getItem('loginForm')) : {}
+    const initialEmail = email || ''
+    const initialPassword = password || ''
+    if (initialEmail !== '' && initialPassword !== '') {
+      props.loginUser(initialEmail, initialPassword)
+    }
+  }
+
+  React.useEffect(() => {
+    if (userValid) {
+      props.getApiEntities()
+    } else if (user !== null && !userValid) {
+      programmaticLoginUser()
+    }
+  }, [user])
+
+  if (props.areEntitiesLoading && !userValid) { //props.areEntitiesLoading
     return (
       <div>
         Loading...
@@ -38,7 +65,6 @@ const Home = (props) => {
           <Route path={'/expenses'} component={() => <Expenses />}/>
           <Route path={'/sales'} component={() => <Sales />}/>
         </Switch>
-        <InventoryDrawer/>
       </div>
     )
   }
@@ -46,7 +72,9 @@ const Home = (props) => {
 
 const mapDispatchToProps = (dispatch, ownProps) => {
   return {
-    getApiEntities: () => {dispatch(getApiEntities())}
+    getApiEntities: () => {dispatch(getApiEntities())},
+    setAreEntitiesLoading: () => {dispatch(setAreEntitiesLoading())},
+    loginUser: (email, password) => {dispatch(loginUser(email, password))}
   }
 }
 

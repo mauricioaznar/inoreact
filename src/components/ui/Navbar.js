@@ -115,7 +115,7 @@ function Navbar(props) {
 
   const routes = [
     {name: 'Punto de equilibrio', link: '/'},
-    {name: 'Produccion', link: '/production'},
+    {name: 'Producción', link: '/production'},
     {name: 'Gastos', link: '/expenses'},
     {name: 'Ventas', link: '/sales'}
   ]

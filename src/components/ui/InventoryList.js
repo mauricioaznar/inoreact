@@ -25,9 +25,7 @@ import Switch from '@material-ui/core/Switch'
 const useStyles = makeStyles((theme) => ({
   root: {
     width: 400,
-    height: '100%',
-    backgroundColor: theme.palette.background.paper,
-    overflowY: 'scroll'
+    height: '100%'
   },
   secondaryClass: {
     width: '100%'
@@ -35,7 +33,7 @@ const useStyles = makeStyles((theme) => ({
 }));
 
 
-const InventoryDrawer = (props) => {
+const InventoryList = (props) => {
 
 
   // props.inventory.map(product => {
@@ -86,13 +84,6 @@ const InventoryDrawer = (props) => {
   };
 
   return (
-    <Drawer
-      anchor={'right'}
-      open={props.openDrawer}
-      onClose={() => {
-        props.setOpenDrawer(false)
-      }}
-    >
       <List
         component="nav"
         aria-labelledby="nested-list-subheader"
@@ -186,7 +177,6 @@ const InventoryDrawer = (props) => {
           })
         }
       </List>
-    </Drawer>
   )
 }
 
@@ -209,4 +199,4 @@ const mapDispatchToProps = (dispatch, ownProps) => {
   }
 }
 
-export default connect(mapStateToProps, mapDispatchToProps)(InventoryDrawer)
+export default connect(mapStateToProps, mapDispatchToProps)(InventoryList)
