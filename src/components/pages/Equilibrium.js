@@ -47,7 +47,7 @@ export default function Equilibrium(props) {
   const classes = useStyles()
   const theme = useTheme()
 
-  const matchesXS = useMediaQuery(theme.breakpoints.down('md'))
+  const matchesXS = useMediaQuery(theme.breakpoints.down('xs'))
 
   //check usages with ctl + v
   const expensesEstimation = useFetch(apiUrl + 'analytics/expensesEstimation?dateGroup=month')
