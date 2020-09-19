@@ -2,7 +2,7 @@ import React from 'react'
 import axios from 'axios'
 import authHeader from './authHeader'
 
-export default function useFetch (url, deps) {
+export default function useFetch (url) {
   const [data, setData] = React.useState(null);
 
   // empty array as second argument equivalent to componentDidMount
@@ -22,7 +22,7 @@ export default function useFetch (url, deps) {
     return () => {
       unmounted = true
     };
-  }, [url].concat(...deps));
+  }, [url]);
 
   return data;
 };
