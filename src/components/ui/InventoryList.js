@@ -24,8 +24,8 @@ import Switch from '@material-ui/core/Switch'
 
 const useStyles = makeStyles((theme) => ({
   root: {
-    width: 400,
-    height: '100%'
+    height: '100%',
+    width: '100%'
   },
   secondaryClass: {
     width: '100%'

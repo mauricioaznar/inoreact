@@ -21,19 +21,13 @@ function TabPanel(props) {
   const {children, value, index, classes, ...other} = props;
 
   return (
-    <div
-      role="tabpanel"
-      hidden={value !== index}
-      id={`simple-tabpanel-${index}`}
-      aria-labelledby={`simple-tab-${index}`}
-      {...other}
-    >
+    <>
       {value === index && (
         <>
           {children}
         </>
       )}
-    </div>
+    </>
   );
 }
 
@@ -101,52 +95,39 @@ export default function Production() {
       <Grid
         container
         direction={'column'}
+        className={classes.rowContainer}
+        style={{marginTop: '2em', marginBottom: '2em'}}
       >
         <Grid
           item
-          container
-          className={classes.rowContainer}
-          style={{marginTop: '2em', marginBottom: '2em'}}
+          xs={12}
         >
-          <Grid
-            item
-            container
-            className={classes.rowContainer}
-          >
-            <Grid item>
-              <TabPanel value={value} index={0}>
-                <InventoryList />
-              </TabPanel>
-              <TabPanel value={value} index={1}>
-                <RequestsProductsTable type={'products'} requestProducts={requestProducts}/>
-              </TabPanel>
-              <TabPanel value={value} index={2}>
-                <RequestsProductsTable type={'extrusion'} requestProducts={requestProducts}/>
-              </TabPanel>
-              <TabPanel value={value} index={3}>
-                <RequestsProductsTable type={'materials'} requestProducts={requestProducts}/>
-              </TabPanel>
-              <TabPanel value={value} index={4}>
-                <OrderRequestsDataTable />
-              </TabPanel>
-              <TabPanel value={value} index={5}>
-                <ProductionsByMatMacTable
-                  machineProductions={machineProductions}
-                  employeeProductions={employeeProductions}
-                />
-              </TabPanel>
-              <TabPanel value={value} index={6}>
-                Item Seven
-              </TabPanel>
-            </Grid>
-
-          </Grid>
-
-
+          <TabPanel value={value} index={0}>
+            <InventoryList />
+          </TabPanel>
+          <TabPanel value={value} index={1}>
+            <RequestsProductsTable type={'products'} requestProducts={requestProducts}/>
+          </TabPanel>
+          <TabPanel value={value} index={2}>
+            <RequestsProductsTable type={'extrusion'} requestProducts={requestProducts}/>
+          </TabPanel>
+          <TabPanel value={value} index={3}>
+            <RequestsProductsTable type={'materials'} requestProducts={requestProducts}/>
+          </TabPanel>
+          <TabPanel value={value} index={4}>
+            <OrderRequestsDataTable />
+          </TabPanel>
+          <TabPanel value={value} index={5}>
+            <ProductionsByMatMacTable
+              machineProductions={machineProductions}
+              employeeProductions={employeeProductions}
+            />
+          </TabPanel>
+          <TabPanel value={value} index={6}>
+            Item Seven
+          </TabPanel>
         </Grid>
-
       </Grid>
-
     </div>
   );
 }
