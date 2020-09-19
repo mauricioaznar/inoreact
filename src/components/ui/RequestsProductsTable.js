@@ -53,11 +53,13 @@ function RequestsProductsTable(props) {
       .sort((a, b) => {
         let aRequestDate = moment(a.order_request_date, dateFormat)
         let bRequestDate = moment(b.order_request_date, dateFormat)
-        return a.priority > b.priority ? -1
-          : a.priority < b.priority ? 1
-            : aRequestDate.isBefore(bRequestDate) ? -1
-              : aRequestDate.isAfter(bRequestDate) ? 1
-                : 0
+        return a.order_request_status_id > b.order_request_status_id ? -1
+          : a.order_request_status_id < b.order_request_status_id ? 1
+            : a.priority > b.priority ? -1
+              : a.priority < b.priority ? 1
+                : aRequestDate.isBefore(bRequestDate) ? -1
+                  : aRequestDate.isAfter(bRequestDate) ? 1
+                    : 0
       })
       .map((requestProduct) => {
         let inventoryProduct = inventoryForCalcs.find(product => {
@@ -81,7 +83,9 @@ function RequestsProductsTable(props) {
           givenInventoryKilos = 0
         }
         let pendingToProduceKilos = requestNetKilos - givenInventoryKilos
-        return {...requestProduct,
+        return {
+          ...requestProduct,
+
           pending_to_produce: pendingToProduceKilos,
           given_inventory_kilos: givenInventoryKilos
         }
@@ -89,38 +93,75 @@ function RequestsProductsTable(props) {
 
     props.products.forEach(product => {
       if (product.product_type_id === 1 || product.product_type_id === 2) {
+        let material= props.materials.find(material => {
+          return material.id === product.material_id
+        })
         let isAlreadyInGroup = widthAndCaliberGroups.find(item => {
           return item.width === product.width
+            && item.calibre === product.calibre
+            && item.material_name === material ? material.name : ''
         })
         if (!isAlreadyInGroup) {
-          widthAndCaliberGroups.push({width: product.width, kilos: 0})
+          widthAndCaliberGroups.push({
+            width: product.width,
+            calibre: product.calibre,
+            material_name: material.name,
+            kilos: 0,
+            kilos_in_prod: 0,
+            kilos_pending: 0
+          })
         }
       }
     })
 
     materials = props.materials
+      .filter(material => {
+        return material.product_type_id === 1 || material.product_type_id === 2
+      })
       .map(material => {
         return {
           ...material,
-          kilos: 0
+          kilos: 0,
+          kilos_in_prod: 0,
+          kilos_pending: 0
         }
       })
 
     productsByPriority.forEach(product => {
-      let item =  widthAndCaliberGroups.find(item => {
-        return item.width === product.product_width
-      })
-      let material = materials.find(mat => {
-        return mat.id === product.material_id
-      })
-      item.kilos += product.pending_to_produce
-      material.kilos += product.pending_to_produce
+      if (product.product_type_id === 1 || product.product_type_id === 2) {
+        let wcGroup =  widthAndCaliberGroups.find(item => {
+          return item.width === product.product_width
+            && item.calibre === product.product_calibre
+            && item.material_name === product.material_name
+        })
+        let material = materials.find(mat => {
+          return mat.id === product.material_id
+        })
+        if (wcGroup) {
+          wcGroup.kilos += product.pending_to_produce
+          if (product.order_request_status_id === 1) {
+            wcGroup.kilos_pending += product.pending_to_produce
+          } else if (product.order_request_status_id === 2) {
+            wcGroup.kilos_in_prod += product.pending_to_produce
+          }
+        }
+        if (material) {
+          material.kilos += product.pending_to_produce
+          if (product.order_request_status_id === 1) {
+            material.kilos_pending += product.pending_to_produce
+          } else if (product.order_request_status_id === 2) {
+            material.kilos_in_prod += product.pending_to_produce
+          }
+        }
+      }
     })
 
     widthAndCaliberGroups = widthAndCaliberGroups
       .sort((a, b) => {
-        return a.kilos > b.kilos ? -1 : a.kilos < b.kilos ? 1
-          : a.width > b.width ? -1 : a.width < b.width ? 1 : 0
+        return a.width > b.width ? -1 : a.width < b.width ? 1
+        : a.calibre > b.calibre ? -1 : a.calibre < b.calibre ? 1
+          : a.material_name > b.material_name ? -1 : a.material_name < b.material_name ? 1
+            : a.kilos > b.kilos ? -1 : a.kilos < b.kilos ? 1 : 0
       })
       .filter(item => item.kilos !== 0)
 
@@ -143,6 +184,8 @@ function RequestsProductsTable(props) {
           <TableRow>
             <TableCell style={{width: '5%'}}>&nbsp;</TableCell>
             <TableCell>Subtipo</TableCell>
+            <TableCell>Kilos en prod</TableCell>
+            <TableCell>Kilos pendientes</TableCell>
             <TableCell>Kilos por producir</TableCell>
           </TableRow>
         </TableHead>
@@ -153,7 +196,9 @@ function RequestsProductsTable(props) {
                 <TableRow key={material.id}>
                   <TableCell>&nbsp;</TableCell>
                   <TableCell>{material.name}</TableCell>
-                  <TableCell>{formatNumber(material.kilos)}</TableCell>
+                  <TableCell align={'right'}>{formatNumber(material.kilos_in_prod)}</TableCell>
+                  <TableCell align={'right'}>{formatNumber(material.kilos_pending)}</TableCell>
+                  <TableCell align={'right'}>{formatNumber(material.kilos)}</TableCell>
                 </TableRow>
               )
             })
@@ -171,6 +216,10 @@ function RequestsProductsTable(props) {
           <TableRow>
             <TableCell style={{width: '5%'}}>&nbsp;</TableCell>
             <TableCell>Ancho</TableCell>
+            <TableCell>Calibre</TableCell>
+            <TableCell>Material</TableCell>
+            <TableCell>Kilos en prod</TableCell>
+            <TableCell>Kilos pendientes</TableCell>
             <TableCell>Kilos por extruir</TableCell>
           </TableRow>
         </TableHead>
@@ -181,7 +230,11 @@ function RequestsProductsTable(props) {
                 <TableRow key={item.width}>
                   <TableCell>&nbsp;</TableCell>
                   <TableCell>{item.width}</TableCell>
-                  <TableCell>{formatNumber(item.kilos)}</TableCell>
+                  <TableCell>{item.calibre}</TableCell>
+                  <TableCell>{item.material_name}</TableCell>
+                  <TableCell align={'right'}>{formatNumber(item.kilos_in_prod)}</TableCell>
+                  <TableCell align={'right'}>{formatNumber(item.kilos_pending)}</TableCell>
+                  <TableCell align={'right'}>{formatNumber(item.kilos)}</TableCell>
                 </TableRow>
               )
             })
@@ -200,6 +253,7 @@ function RequestsProductsTable(props) {
             <TableCell style={{width: '5%'}}>&nbsp;</TableCell>
             <TableCell>Folio</TableCell>
             <TableCell>Cliente</TableCell>
+            <TableCell>Status</TableCell>
             <TableCell>Prioridad</TableCell>
             <TableCell>Producto</TableCell>
             <TableCell>Fecha de solicitud</TableCell>
@@ -217,6 +271,7 @@ function RequestsProductsTable(props) {
                   <TableCell>&nbsp;</TableCell>
                   <TableCell>{product.order_code}</TableCell>
                   <TableCell>{product.client_name}</TableCell>
+                  <TableCell>{product.order_request_status_name}</TableCell>
                   <TableCell>{product.priority}</TableCell>
                   <TableCell>{product.product_description}</TableCell>
                   <TableCell>{product.order_request_date}</TableCell>
