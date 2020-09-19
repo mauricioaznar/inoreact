@@ -256,6 +256,7 @@ function RequestsProductsTable(props) {
             <TableCell>Status</TableCell>
             <TableCell>Prioridad</TableCell>
             <TableCell>Producto</TableCell>
+            <TableCell>Material</TableCell>
             <TableCell>Fecha de solicitud</TableCell>
             <TableCell>Kilos solicitados</TableCell>
             <TableCell>Kilos vendidos</TableCell>
@@ -274,6 +275,7 @@ function RequestsProductsTable(props) {
                   <TableCell>{product.order_request_status_name}</TableCell>
                   <TableCell>{product.priority}</TableCell>
                   <TableCell>{product.product_description}</TableCell>
+                  <TableCell>{product.material_name}</TableCell>
                   <TableCell>{product.order_request_date}</TableCell>
                   <TableCell>{product.order_request_kilos}</TableCell>
                   <TableCell>{product.order_sale_delivered_kilos}</TableCell>
