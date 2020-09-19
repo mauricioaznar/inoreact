@@ -23,33 +23,12 @@ const Home = (props) => {
   //Correct permanent session logic with dates, token invalidation and token creation
   // Could check on intervals to execute this function
 
-  const user = useFetch(apiUrl + 'auth/user')
-
-
-  let userValid = user && user.id && user.active === 1
-
-
-  props.setAreEntitiesLoading()
-
-
-  const programmaticLoginUser = () => {
-    const {email, password} = window.localStorage.getItem('loginForm') ? JSON.parse(window.localStorage.getItem('loginForm')) : {}
-    const initialEmail = email || ''
-    const initialPassword = password || ''
-    if (initialEmail !== '' && initialPassword !== '') {
-      props.loginUser(initialEmail, initialPassword)
-    }
-  }
-
   React.useEffect(() => {
-    if (userValid) {
-      props.getApiEntities()
-    } else if (user !== null && !userValid) {
-      programmaticLoginUser()
-    }
-  }, [user])
+    props.getApiEntities()
+  }, [])
 
-  if (props.areEntitiesLoading && !userValid) { //props.areEntitiesLoading
+
+  if (props.areEntitiesLoading) { //props.areEntitiesLoading
     return (
       <div>
         Loading...
@@ -72,9 +51,7 @@ const Home = (props) => {
 
 const mapDispatchToProps = (dispatch, ownProps) => {
   return {
-    getApiEntities: () => {dispatch(getApiEntities())},
-    setAreEntitiesLoading: () => {dispatch(setAreEntitiesLoading())},
-    loginUser: (email, password) => {dispatch(loginUser(email, password))}
+    getApiEntities: () => {dispatch(getApiEntities())}
   }
 }
 

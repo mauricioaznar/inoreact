@@ -2,8 +2,14 @@ import React from 'react'
 import axios from 'axios'
 import authHeader from './authHeader'
 
-export default function useFetch (url) {
+export default function useFetch (url, deps) {
   const [data, setData] = React.useState(null);
+
+  let watchArray = []
+
+  if (deps) {
+    watchArray.concat(...deps)
+  }
 
   // empty array as second argument equivalent to componentDidMount
   React.useEffect(() => {
@@ -22,7 +28,7 @@ export default function useFetch (url) {
     return () => {
       unmounted = true
     };
-  }, [url]);
+  }, [url].concat(...watchArray));
 
   return data;
 };
