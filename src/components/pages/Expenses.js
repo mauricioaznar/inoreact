@@ -115,7 +115,7 @@ export default function Expenses(props) {
       const fileExtension = '.xlsx';
       let workbook = xlsx.utils.book_new()
       let paidInvoicedExcel = xlsx.utils.json_to_sheet(exportedExpenses.paidInvoices)
-      xlsx.utils.book_append_sheet(workbook, paidInvoicedExcel, 'Facturas pagadas')
+      xlsx.utils.book_append_sheet(workbook, paidInvoicedExcel, 'Egresos pagadas')
       let provisionedInvoicedExcel = xlsx.utils.json_to_sheet(exportedExpenses.provisionedInvoices)
       xlsx.utils.book_append_sheet(workbook, provisionedInvoicedExcel, 'Facturas provisionadas')
       let pendingPaidInvoicesExcel = xlsx.utils.json_to_sheet(exportedExpenses.pendingPaidInvoices)

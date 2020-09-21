@@ -35,7 +35,6 @@ import FormLabel from '@material-ui/core/FormLabel'
 import Tooltip from '@material-ui/core/Tooltip'
 import IconButton from '@material-ui/core/IconButton'
 import Toolbar from '@material-ui/core/Toolbar'
-import MauObjectSelect from './inputs/MauObjectSelect'
 import MauAutocomplete from './inputs/MauAutocomplete'
 
 
@@ -250,10 +249,10 @@ const ExpenseForm = (props) => {
       expense_invoice_complements: complements,
       expense_products: isExpenseProductsRequired() ? data.expense_products : [],
       expense_credit_notes: isInvoice && data.expense_credit_notes ? data.expense_credit_notes : [],
-      expense_invoice_payment_method_id: isInvoice ? String(props.expense.expense_invoice_payment_method_id) : 'null',
-      expense_invoice_payment_form_id: isInvoice ? String(props.expense.expense_invoice_payment_form_id) : 'null',
-      expense_invoice_cdfi_use_id: isInvoice ? String(props.expense.expense_invoice_cdfi_use_id) : 'null',
-      expense_money_source_id: isInvoice ? String(props.expense.expense_money_source_id) : 'null',
+      expense_invoice_payment_method_id: isInvoice ? String(data.expense_invoice_payment_method_id) : 'null',
+      expense_invoice_payment_form_id: isInvoice ? String(data.expense_invoice_payment_form_id) : 'null',
+      expense_invoice_cdfi_use_id: isInvoice ? String(data.expense_invoice_cdfi_use_id) : 'null',
+      expense_money_source_id: isInvoice ? String(data.expense_money_source_id) : 'null',
       defaultValues
     }
 
@@ -675,7 +674,7 @@ const ExpenseForm = (props) => {
         {/*  className={classes.rowContainer}*/}
         {/*  style={{marginTop: '2em'}}*/}
         {/*>*/}
-        {/*  <MauObjectSelect*/}
+        {/*  <MauAutocomplete*/}
         {/*    error={!!errors.supplier_id}*/}
         {/*    label={'Proveedor'}*/}
         {/*    id={'supplierLabel'}*/}
@@ -725,12 +724,13 @@ const ExpenseForm = (props) => {
           className={classes.rowContainer}
           style={{marginTop: '2em', display: isInvoice ? 'inherit' : 'none'}}
         >
-          <MauObjectSelect
+          <MauAutocomplete
             error={!!errors.expense_invoice_payment_method_id}
             label={'Metodo de pago'}
             id={'paymentMethodLabel'}
             options={props.paymentMethods}
             name={'expense_invoice_payment_method_id'}
+            displayName={'name'}
             rules={
               {
                 required: isInvoice
@@ -747,12 +747,13 @@ const ExpenseForm = (props) => {
           className={classes.rowContainer}
           style={{marginTop: '2em', display: isInvoice ? 'inherit' : 'none'}}
         >
-          <MauObjectSelect
+          <MauAutocomplete
             error={!!errors.expense_invoice_payment_form_id}
             label={'Forma de pago'}
             id={'paymentFrom'}
             options={props.paymentForms}
             name={'expense_invoice_payment_form_id'}
+            displayName={'name'}
             rules={
               {
                 required: isInvoice
@@ -769,12 +770,13 @@ const ExpenseForm = (props) => {
           className={classes.rowContainer}
           style={{marginTop: '2em', display: isInvoice ? 'inherit' : 'none'}}
         >
-          <MauObjectSelect
+          <MauAutocomplete
             error={!!errors.expense_money_source_id}
             label={'Banco'}
             id={'moneySource'}
             options={props.moneySources}
             name={'expense_money_source_id'}
+            displayName={'name'}
             rules={
               {
                 required: isInvoice
@@ -791,12 +793,13 @@ const ExpenseForm = (props) => {
           className={classes.rowContainer}
           style={{marginTop: '2em', display: isInvoice ? 'inherit' : 'none'}}
         >
-          <MauObjectSelect
+          <MauAutocomplete
             error={!!errors.expense_invoice_cdfi_use_id}
             label={'Usos del cdfi'}
             id={'cdfiUses'}
             options={props.cdfiUses}
             name={'expense_invoice_cdfi_use_id'}
+            displayName={'name'}
             rules={
               {
                 required: isInvoice
@@ -806,40 +809,6 @@ const ExpenseForm = (props) => {
             defaultValue={`${defaultValues.expense_invoice_cdfi_use_id}`}
           />
         </Grid>
-
-        {/*<Grid*/}
-        {/*  item*/}
-        {/*  xs={12}*/}
-        {/*  className={classes.rowContainer}*/}
-        {/*  style={{marginTop: '2em'}}*/}
-        {/*>*/}
-        {/*  <FormControl*/}
-        {/*    fullWidth*/}
-        {/*  >*/}
-
-        {/*    <Autocomplete*/}
-        {/*      options={props.expenseSubcategories}*/}
-        {/*      multiple*/}
-        {/*      getOptionLabel={option => option.name}*/}
-        {/*      defaultValue={initialExpenseSubcategories}*/}
-        {/*      groupBy={option => {*/}
-        {/*        return option.expense_category_id*/}
-        {/*      }}*/}
-        {/*      onChange={handleAutocompleteChange}*/}
-        {/*      renderInput={params => {*/}
-        {/*        return (*/}
-        {/*          <TextField*/}
-        {/*            {...params}*/}
-        {/*            label={"Resolution Code"}*/}
-        {/*            variant="standard"*/}
-        {/*            name={"resolutionCode"}*/}
-        {/*            fullWidth*/}
-        {/*          />*/}
-        {/*        );*/}
-        {/*      }}*/}
-        {/*    />*/}
-        {/*  </FormControl>*/}
-        {/*</Grid>*/}
 
         <Grid
           item
@@ -930,7 +899,7 @@ const ExpenseForm = (props) => {
                         </TableCell>
                         <TableCell>
 
-                          <MauObjectSelect
+                          <MauAutocomplete
                             error={!!errors.branch_id}
                             label={'Sucursal'}
                             id={'branchLabel'}
@@ -1188,7 +1157,7 @@ const ExpenseForm = (props) => {
                           />
                         </TableCell>
                         <TableCell>
-                          <MauObjectSelect
+                          <MauAutocomplete
                             error={!!errors.expense_products && !!errors.expense_products[index].product_id}
                             label={'Producto'}
                             id={'productLabel'}
