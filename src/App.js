@@ -27,8 +27,8 @@ function App(props) {
 
   React.useEffect(() => {
     if (user !== null && !userValid) {
-      programmaticLoginUser()
       props.unsetToken()
+      programmaticLoginUser()
     }
   }, [user])
 
