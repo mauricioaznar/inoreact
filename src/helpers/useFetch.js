@@ -2,14 +2,10 @@ import React from 'react'
 import axios from 'axios'
 import authHeader from './authHeader'
 
-export default function useFetch (url, deps) {
+export default function useFetch (url, dependencies = []) {
   const [data, setData] = React.useState(null);
 
-  let watchArray = []
-
-  if (deps) {
-    watchArray.concat(...deps)
-  }
+  console.log(url)
 
   // empty array as second argument equivalent to componentDidMount
   React.useEffect(() => {
@@ -34,7 +30,7 @@ export default function useFetch (url, deps) {
     return () => {
       unmounted = true
     };
-  }, [url].concat(...watchArray));
+  }, [url, JSON.stringify(dependencies)]);
 
   return data;
 };

@@ -11,8 +11,7 @@ import apiUrl from './helpers/apiUrl'
 
 function App(props) {
 
-
-  const user = useFetch(apiUrl + 'auth/user', [props.isTokenLoading, props.token])
+  const user = useFetch(apiUrl + 'auth/user', [props.isTokenLoading])
 
   let userValid = user && user.id && user.active === 1
 
@@ -27,7 +26,6 @@ function App(props) {
 
   React.useEffect(() => {
     if (user !== null && !userValid) {
-      props.unsetToken()
       programmaticLoginUser()
     }
   }, [user])
@@ -47,15 +45,13 @@ function App(props) {
 const mapStateToProps = (state, ownProps) => {
   return {
     authenticated: state.auth.authenticated,
-    isTokenLoading: state.auth.isTokenLoading,
-    token: state.auth.token
+    isTokenLoading: state.auth.isTokenLoading
   }
 }
 
 const mapDispatchToProps = (dispatch, getState) => {
   return {
-    loginUser: (email, password) => {dispatch(loginUser(email, password))},
-    unsetToken: () => {dispatch(unsetToken())}
+    loginUser: (email, password) => {dispatch(loginUser(email, password))}
   }
 }
 
