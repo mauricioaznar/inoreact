@@ -3,7 +3,7 @@ import './App.css';
 import LoginForm from './components/LoginForm'
 import Home from './components/Home'
 import {connect} from 'react-redux'
-import {loginUser} from './store/authActions'
+import {loginUser, unsetToken} from './store/authActions'
 import useFetch from './helpers/useFetch'
 import apiUrl from './helpers/apiUrl'
 
@@ -12,7 +12,7 @@ import apiUrl from './helpers/apiUrl'
 function App(props) {
 
 
-  const user = useFetch(apiUrl + 'auth/user', [props.isTokenLoading])
+  const user = useFetch(apiUrl + 'auth/user', [props.isTokenLoading, props.token])
 
   let userValid = user && user.id && user.active === 1
 
@@ -28,6 +28,7 @@ function App(props) {
   React.useEffect(() => {
     if (user !== null && !userValid) {
       programmaticLoginUser()
+      props.unsetToken()
     }
   }, [user])
 
@@ -46,13 +47,15 @@ function App(props) {
 const mapStateToProps = (state, ownProps) => {
   return {
     authenticated: state.auth.authenticated,
-    isTokenLoading: state.auth.isTokenLoading
+    isTokenLoading: state.auth.isTokenLoading,
+    token: state.auth.token
   }
 }
 
 const mapDispatchToProps = (dispatch, getState) => {
   return {
-    loginUser: (email, password) => {dispatch(loginUser(email, password))}
+    loginUser: (email, password) => {dispatch(loginUser(email, password))},
+    unsetToken: () => {dispatch(unsetToken())}
   }
 }
 
