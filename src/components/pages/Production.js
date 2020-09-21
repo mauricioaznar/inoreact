@@ -4,18 +4,14 @@ import {makeStyles, useTheme} from '@material-ui/core/styles';
 import AppBar from '@material-ui/core/AppBar';
 import Tabs from '@material-ui/core/Tabs';
 import Tab from '@material-ui/core/Tab';
-import Typography from '@material-ui/core/Typography';
-import Box from '@material-ui/core/Box';
 import ProductionsByMatMacTable from '../ui/ProductionsByMatMacTable'
 import useFetch from '../../helpers/useFetch'
 import RequestsProductsTable from '../ui/RequestsProductsTable'
 import OrderRequestsDataTable from '../ui/datatables/OrderRequestsDataTable'
 import apiUrl from '../../helpers/apiUrl'
-import Paper from '@material-ui/core/Paper'
-import Container from '@material-ui/core/Container'
 import Grid from '@material-ui/core/Grid'
 import useMediaQuery from '@material-ui/core/useMediaQuery'
-import InventoryList from '../ui/InventoryList'
+import InventoryTable from '../ui/InventoryTable'
 
 function TabPanel(props) {
   const {children, value, index, classes, ...other} = props;
@@ -103,7 +99,14 @@ export default function Production() {
           xs={12}
         >
           <TabPanel value={value} index={0}>
-            <InventoryList />
+            <Grid container direction={'column'}>
+              <Grid item  style={{marginBottom: '3em'}}>
+                <InventoryTable type={'material'}/>
+              </Grid>
+              <Grid item>
+                <InventoryTable type={'product'}/>
+              </Grid>
+            </Grid>
           </TabPanel>
           <TabPanel value={value} index={1}>
             <RequestsProductsTable type={'products'} requestProducts={requestProducts}/>
