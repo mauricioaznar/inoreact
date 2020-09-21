@@ -12,7 +12,9 @@ import apiUrl from './helpers/apiUrl'
 function App(props) {
 
 
-  const user = useFetch(apiUrl + 'auth/user', [props.isTokenLoading])
+  const [hasProgrammaticLoggedIn, setHasProgrammaticLoggedIn] = React.useState(false)
+
+  const user = useFetch(apiUrl + 'auth/user', [props.isTokenLoading, props.authenticated, hasProgrammaticLoggedIn])
 
   let userValid = user && user.id && user.active === 1
 
@@ -22,6 +24,7 @@ function App(props) {
     const initialPassword = password || ''
     if (initialEmail !== '' && initialPassword !== '') {
       props.loginUser(initialEmail, initialPassword)
+      setHasProgrammaticLoggedIn(true)
     }
   }
 

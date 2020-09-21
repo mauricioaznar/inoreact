@@ -15,15 +15,21 @@ export default function useFetch (url, deps) {
   React.useEffect(() => {
     let unmounted = false
 
-    async function fetchData() {
-      const response = await axios.get(url, {headers: {...authHeader()}});
-      if (!unmounted) {
-        setData(response.data.data)
-      }
-    }
+    const getPromise = axios.get(url, {headers: {...authHeader()}})
 
     if (!unmounted) {
-      fetchData();
+      getPromise
+        .then(response => {
+          if (!unmounted) {
+            setData(response.data.data)
+          }
+        })
+        .catch(error => {
+          if (!unmounted) {
+            setData('Error')
+          }
+        })
+      ;
     }
     return () => {
       unmounted = true

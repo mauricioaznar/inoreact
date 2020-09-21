@@ -9,6 +9,8 @@ export const loginUser = (email, password) => {
       dispatch(setToken(token))
     }).catch(e => {
       console.log(e)
+    }).finally((token) => {
+      dispatch(unsetIsTokenLoading())
     })
   }
 }
