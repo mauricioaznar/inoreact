@@ -49,7 +49,7 @@ function RequestsProductsTable(props) {
 
     let {requestProducts, inventory} = props
 
-    let inventoryForCalcs = [...inventory]
+    let inventoryForCalcs = JSON.parse(JSON.stringify(inventory))
 
     productsByPriority = requestProducts
       .sort((a, b) => {
