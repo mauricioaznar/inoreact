@@ -47,7 +47,9 @@ function RequestsProductsTable(props) {
 
   if (props.requestProducts) {
 
-    let {requestProducts, inventory: inventoryForCalcs} = props
+    let {requestProducts, inventory} = props
+
+    let inventoryForCalcs = [...inventory]
 
     productsByPriority = requestProducts
       .sort((a, b) => {
