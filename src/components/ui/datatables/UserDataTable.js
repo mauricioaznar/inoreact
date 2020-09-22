@@ -72,7 +72,10 @@ function ExpenseDataTable(props) {
     mainEntityPromise(user, 'user')
       .then(result => {
         let userId = result.data.data.id
-        return axios.put(apiUrl + 'user/password/' + userId , {password: 'pass123'}, {headers: {...authHeader()}})
+        if (user.password === '') {
+          return true
+        }
+        return axios.put(apiUrl + 'user/password/' + userId , {password: user.password}, {headers: {...authHeader()}})
       })
       .then(result => {
         callback(true)

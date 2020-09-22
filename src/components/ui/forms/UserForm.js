@@ -12,6 +12,7 @@ import Fab from '@material-ui/core/Fab';
 import CheckIcon from '@material-ui/icons/Check';
 import SaveIcon from '@material-ui/icons/Save';
 import TextField from '@material-ui/core/TextField'
+import MauAutocomplete from './inputs/MauAutocomplete'
 
 
 const useStyles = makeStyles((theme) => {
@@ -76,7 +77,8 @@ const UserForm = (props) => {
     id: props.user ? props.user.id : '',
     email: props.user ? props.user.email : '',
     first_name: props.user ? props.user.first_name : '',
-    last_name: props.user ? props.user.last_name : ''
+    last_name: props.user ? props.user.last_name : '',
+    role_id: props.user ? String(props.user.role_id) : 'null'
   }
 
   const {register, unregister, handleSubmit, reset, watch, control, setValue, getValues, errors} = useForm({
@@ -91,6 +93,7 @@ const UserForm = (props) => {
 
     let finalSubmitted = {
       ...data,
+      password: data.password1,
       defaultValues
     }
 
@@ -204,6 +207,80 @@ const UserForm = (props) => {
               }}
             />
           </FormControl>
+        </Grid>
+
+
+        <Grid
+          item
+          xs={12}
+          className={classes.rowContainer}
+          style={{marginTop: '2em'}}
+        >
+          <FormControl
+            fullWidth
+          >
+            <TextField
+              inputRef={register({
+                  required: !props.user
+                })}
+              type={'password'}
+              name="password1"
+              label="Contraseña"
+              InputLabelProps={{
+                shrink: true
+              }}
+            />
+          </FormControl>
+        </Grid>
+
+        <Grid
+          item
+          xs={12}
+          className={classes.rowContainer}
+          style={{marginTop: '2em'}}
+        >
+          <FormControl
+            fullWidth
+          >
+            <TextField
+              inputRef={register({
+                required: !props.user,
+                validate: (value) => {
+                  return value === watch('password1');
+                }
+              })}
+              type={'password'}
+              name="password2"
+              label="Contraseña"
+              InputLabelProps={{
+                shrink: true
+              }}
+            />
+          </FormControl>
+        </Grid>
+
+        <Grid
+          item
+          xs={12}
+          className={classes.rowContainer}
+          style={{marginTop: '2em'}}
+        >
+          <MauAutocomplete
+            error={!!errors.role_id}
+            label={'Rol'}
+            placeholder={'Rol x'}
+            id={'rolLabel'}
+            options={props.roles}
+            name={'role_id'}
+            displayName={'name'}
+            rules={
+              {
+                required: true
+              }
+            }
+            control={control}
+            defaultValue={`${defaultValues.role_id}`}
+          />
         </Grid>
 
 
