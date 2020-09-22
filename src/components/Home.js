@@ -8,9 +8,7 @@ import Equilibrium from './pages/Equilibrium'
 import Production from './pages/Production'
 import Expenses from './pages/Expenses'
 import Sales from './pages/Sales'
-import {loginUser} from '../store/authActions'
-import useFetch from '../helpers/useFetch'
-import apiUrl from '../helpers/apiUrl'
+import PrivateRoute from './ui/PrivateRoute'
 
 
 const useStyles = makeStyles((theme) => ({
@@ -39,10 +37,10 @@ const Home = (props) => {
       <div>
         <Navbar/>
         <Switch>
-          <Route path={'/'} exact component={() => <Equilibrium />}/>
+          <PrivateRoute authed={props.isAdmin} path={'/'} exact component={() => <Equilibrium />}/>
           <Route path={'/production'} component={() => <Production />}/>
-          <Route path={'/expenses'} component={() => <Expenses />}/>
-          <Route path={'/sales'} component={() => <Sales />}/>
+          <PrivateRoute authed={props.isExpenses || props.isAdmin} path={'/expenses'} component={() => <Expenses />}/>
+          <PrivateRoute authed={props.isSales || props.isAdmin} path={'/sales'} component={() => <Sales />}/>
         </Switch>
       </div>
     )
@@ -58,7 +56,12 @@ const mapDispatchToProps = (dispatch, ownProps) => {
 
 const mapStateToProps = (state, ownProps) => {
   return {
-    areEntitiesLoading: state.general.areEntitiesLoading
+    areEntitiesLoading: state.general.areEntitiesLoading,
+    isAdmin: state.auth.isAdmin,
+    isSuperAdmin: state.auth.isSuperAdmin,
+    isProduction: state.auth.isProduction,
+    isExpenses: state.auth.isExpenses,
+    isSales: state.auth.isSales
   }
 }
 

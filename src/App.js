@@ -3,7 +3,7 @@ import './App.css';
 import LoginForm from './components/LoginForm'
 import Home from './components/Home'
 import {connect} from 'react-redux'
-import {loginUser, unsetToken} from './store/authActions'
+import {loginUser, setRole, unsetToken} from './store/authActions'
 import useFetch from './helpers/useFetch'
 import apiUrl from './helpers/apiUrl'
 
@@ -28,6 +28,9 @@ function App(props) {
     if (user !== null && !userValid) {
       programmaticLoginUser()
     }
+    if (userValid) {
+      props.setRole(user)
+    }
   }, [user])
 
   return (
@@ -51,7 +54,8 @@ const mapStateToProps = (state, ownProps) => {
 
 const mapDispatchToProps = (dispatch, getState) => {
   return {
-    loginUser: (email, password) => {dispatch(loginUser(email, password))}
+    loginUser: (email, password) => {dispatch(loginUser(email, password))},
+    setRole: (user) => {dispatch(setRole(user))}
   }
 }
 

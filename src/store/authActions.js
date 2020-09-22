@@ -27,6 +27,18 @@ export const unsetIsTokenLoading = () => {
   }
 }
 
+export const setRole = (user) => {
+  return {
+    type: 'SET_ROLE',
+    roleId: user.role_id
+  }
+}
+
+export const unsetRole = () => {
+  return {
+    type: 'UNSET_ROLE'
+  }
+}
 export const setToken = (token) => {
   window.localStorage.setItem('auth', JSON.stringify({token: token}))
   return {

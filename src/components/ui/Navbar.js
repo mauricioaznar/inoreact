@@ -2,7 +2,7 @@ import React, {useState} from 'react'
 import {AppBar, Button, Grid, Toolbar, Tab, Tabs} from '@material-ui/core'
 import {Link, useLocation} from 'react-router-dom'
 import {connect} from 'react-redux'
-import {unsetToken} from '../../store/authActions'
+import {unsetRole, unsetToken} from '../../store/authActions'
 import {setInventoryDrawerOpen} from '../../store/generalActions'
 import useMediaQuery from '@material-ui/core/useMediaQuery'
 import useTheme from '@material-ui/core/styles/useTheme'
@@ -114,10 +114,26 @@ function Navbar(props) {
   const location = useLocation()
 
   const routes = [
-    {name: 'Punto de equilibrio', link: '/'},
-    {name: 'Producción', link: '/production'},
-    {name: 'Gastos', link: '/expenses'},
-    {name: 'Ventas', link: '/sales'}
+    {
+      name: 'Punto de equilibrio',
+      link: '/',
+      authed: props.isAdmin
+    },
+    {
+      name: 'Producción',
+      link: '/production',
+      authed: true
+    },
+    {
+      name: 'Gastos',
+      link: '/expenses',
+      authed: props.isAdmin || props.isExpenses
+    },
+    {
+      name: 'Ventas',
+      link: '/sales',
+      authed: props.isAdmin || props.isSales
+    }
   ]
 
   const tabs = (
@@ -130,6 +146,7 @@ function Navbar(props) {
           routes.map(route => {
             return (
               <Tab
+                style={{display: route.authed ? 'inherit' : 'none'}}
                 label={route.name}
                 component={Link}
                 to={route.link}
@@ -162,6 +179,7 @@ function Navbar(props) {
             routes.map(route => {
               return (
                 <ListItem
+                  style={{display: route.authed ? 'inherit' : 'none'}}
                   key={route.link}
                   onClick={() => {
                     setOpenDrawer(false)
@@ -243,6 +261,7 @@ const mapDispatchToProps = (dispatch, ownProps) => {
   return {
     signOutUser: () => {
       dispatch(unsetToken())
+      dispatch(unsetRole())
     },
     setOpenDrawer: () => {
       dispatch(setInventoryDrawerOpen(true))
@@ -250,4 +269,14 @@ const mapDispatchToProps = (dispatch, ownProps) => {
   }
 }
 
-export default connect(null, mapDispatchToProps)(Navbar)
+const matchStateToProps = (state) => {
+  return {
+    isAdmin: state.auth.isAdmin,
+    isSuperAdmin: state.auth.isSuperAdmin,
+    isProduction: state.auth.isProduction,
+    isExpenses: state.auth.isExpenses,
+    isSales: state.auth.isSales
+  }
+}
+
+export default connect(matchStateToProps, mapDispatchToProps)(Navbar)
