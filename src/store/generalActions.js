@@ -48,6 +48,13 @@ export const setEmployees = (employees) => {
   }
 }
 
+export const setRoles = (roles) => {
+  return {
+    type: 'SET_ROLES',
+    roles: roles
+  }
+}
+
 export const getApiEntities = () => {
   return (dispatch, getState) => {
     dispatch(setAreEntitiesLoading())
@@ -74,7 +81,8 @@ export const getApiEntities = () => {
         order_sale_collection_statuses: collectionStatuses,
         order_request_statuses: requestStatuses,
         clients,
-        employees
+        employees,
+        roles
       } = result[1].data.data
       // dispatch(setOrderProductions(orderProductions))
       dispatch(setInventory(inventory))
@@ -95,6 +103,7 @@ export const getApiEntities = () => {
       dispatch(setOrderRequestStatuses(requestStatuses))
       dispatch(setClients(clients))
       dispatch(setEmployees(employees))
+      dispatch(setRoles(roles))
     }).finally(() => {
       dispatch(unsetAreEntitiesLoading())
     })

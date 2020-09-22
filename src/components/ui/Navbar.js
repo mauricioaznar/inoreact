@@ -133,6 +133,11 @@ function Navbar(props) {
       name: 'Ventas',
       link: '/sales',
       authed: props.isAdmin || props.isSales
+    },
+    {
+      name: 'Administracion',
+      link: '/admin',
+      authed: props.isSuperAdmin
     }
   ]
 
@@ -219,7 +224,7 @@ function Navbar(props) {
     <>
       <ElevationScroll>
         <AppBar
-          position="fixed"
+          position="static"
           color="default"
           className={classes.appbar}
         >
@@ -252,7 +257,6 @@ function Navbar(props) {
           </Toolbar>
         </AppBar>
       </ElevationScroll>
-      <div className={classes.toolbarMargin} />
     </>
   )
 }

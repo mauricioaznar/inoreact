@@ -2,8 +2,8 @@ const general = (state = {
   inventory: [],
   branches: [],
   employees: [],
+  roles: [],
   areEntitiesLoading: false,
-  inventoryDrawerOpen: false
 }, action) => {
   switch (action.type) {
     case 'SET_INVENTORY':
@@ -16,8 +16,8 @@ const general = (state = {
       return {...state, areEntitiesLoading: true}
     case 'UNSET_ARE_ENTITIES_LOADING':
       return {...state, areEntitiesLoading: false}
-    case 'SET_INVENTORY_DRAWER_OPEN':
-      return {...state, inventoryDrawerOpen: action.inventoryDrawerOpen}
+    case 'SET_ROLES':
+      return {...state, roles: action.roles}
     default:
       return state
   }

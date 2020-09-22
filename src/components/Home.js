@@ -1,7 +1,7 @@
 import React, {useEffect, useState} from 'react'
 import {makeStyles} from '@material-ui/core/styles'
 import {connect} from 'react-redux'
-import {getApiEntities, setAreEntitiesLoading} from '../store/generalActions'
+import {getApiEntities} from '../store/generalActions'
 import {Switch, Route} from 'react-router-dom'
 import Navbar from './ui/Navbar'
 import Equilibrium from './pages/Equilibrium'
@@ -9,6 +9,7 @@ import Production from './pages/Production'
 import Expenses from './pages/Expenses'
 import Sales from './pages/Sales'
 import PrivateRoute from './ui/PrivateRoute'
+import Admin from './pages/Admin'
 
 
 const useStyles = makeStyles((theme) => ({
@@ -35,12 +36,13 @@ const Home = (props) => {
   } else {
     return (
       <div>
-        <Navbar/>
+        <Navbar />
         <Switch>
           <PrivateRoute authed={props.isAdmin} path={'/'} exact component={() => <Equilibrium />}/>
           <Route path={'/production'} component={() => <Production />}/>
           <PrivateRoute authed={props.isExpenses || props.isAdmin} path={'/expenses'} component={() => <Expenses />}/>
           <PrivateRoute authed={props.isSales || props.isAdmin} path={'/sales'} component={() => <Sales />}/>
+          <PrivateRoute authed={props.isSuperAdmin} path={'/admin'} component={() => <Admin />}/>
         </Switch>
       </div>
     )
