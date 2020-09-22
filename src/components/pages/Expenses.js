@@ -35,17 +35,23 @@ const mapExpenseToInvoice = expense => {
   expense.expense_items.forEach(expenseItem => {
     total += expenseItem.subtotal
   })
+  let expenseMoneySource = expense.expense_money_source ? expense.expense_money_source.name : ''
+  let expenseInternalCode = expense.internal_code
+  let expenseInvoicePaymentForm = expense.expense_invoice_payment_form ? expense.expense_invoice_payment_form.name : ''
+  let expenseInvoicePaymentFormAbb = expense.expense_invoice_payment_form ? expense.expense_invoice_payment_form.name.substring(0, 6) : ''
+  let abbreviation = expenseMoneySource + ' ' + expenseInvoicePaymentFormAbb + ' ' + expenseInternalCode
   return {
+    '#': abbreviation,
     'Proveedor': expense.supplier.name,
     'Fecha de pago': expense.date_paid,
     'Fecha de emision': expense.date_emitted,
-    'Banco': expense.expense_money_source ? expense.expense_money_source.name : '',
-    'Forma de pago': expense.expense_invoice_payment_form ? expense.expense_invoice_payment_form.name : '',
+    'Banco': expenseMoneySource,
+    'Forma de pago': expenseInvoicePaymentForm,
     'Estado de la factura': expense.expense_invoice_status.name,
     'Total': total,
     'Iva': expense.tax,
     'Isr': +(total - expense.tax).toFixed(2),
-    'Codigo interno': expense.internal_code,
+    'Codigo interno': expenseInternalCode,
     'Codigo de la factura': expense.invoice_code,
     'ISR retenido': expense.invoice_isr_retained,
     'IVA retenido': expense.invoice_tax_retained,
