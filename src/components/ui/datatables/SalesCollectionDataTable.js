@@ -14,10 +14,10 @@ import authHeader from '../../../helpers/authHeader'
 import MaterialTable from 'material-table'
 import useMediaQuery from '@material-ui/core/useMediaQuery'
 import {localization, tableIcons} from './common/common'
-import {KeyboardDatePicker, MuiPickersUtilsProvider} from '@material-ui/pickers'
-import DateMomentUtils from '@date-io/moment'
+import {DatePicker} from '@material-ui/pickers'
 import Autocomplete from '@material-ui/lab/Autocomplete'
 import TextField from '@material-ui/core/TextField'
+import MaterialTableDate from './common/MaterialTableDate'
 
 const useStyles = makeStyles((theme) => {
   return {
@@ -123,24 +123,14 @@ function SalesCollectionDataTable(props) {
                 defaultFilter: moment().subtract(1, 'month').format('YYYY-MM'),
                 filterComponent: (filterProps) => {
                   return (
-                    <MuiPickersUtilsProvider utils={DateMomentUtils}>
-                      <KeyboardDatePicker
-                        clearable
-                        autoOk={true}
-                        views={["month"]}
-                        minDate={new Date("2018-01-01")}
-                        maxDate={new Date("2021-12-31")}
-                        value={filterProps.columnDef.tableData.filterValue}
-                        variant={'dialog'}
-                        format={'YYYY-MM'}
-                        onChange={(momentDate) => {
-                          filterProps.onFilterChanged(
-                            filterProps.columnDef.tableData.id,
-                            momentDate !== null && momentDate.isValid() ? momentDate.format('YYYY-MM-DD') : null)
-                        }}
-                        animateYearScrolling
-                      />
-                    </MuiPickersUtilsProvider>
+                    <MaterialTableDate
+                      value={filterProps.columnDef.tableData.filterValue}
+                      onChange={(momentDate) => {
+                        filterProps.onFilterChanged(
+                          filterProps.columnDef.tableData.id,
+                          momentDate)
+                      }}
+                    />
                   )
                 }
               },

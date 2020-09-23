@@ -10,15 +10,12 @@ import ImportExport from '@material-ui/icons/ImportExport'
 import xlsx from 'xlsx'
 import fileSaver from 'file-saver'
 import axios from 'axios'
-import {KeyboardDatePicker, MuiPickersUtilsProvider} from '@material-ui/pickers'
-import DateMomentUtils from '@date-io/moment'
+import {DatePicker} from '@material-ui/pickers'
 import {makeStyles, useTheme} from '@material-ui/core/styles'
 import IconButton from '@material-ui/core/IconButton'
 import FormControl from '@material-ui/core/FormControl'
-import InputLabel from '@material-ui/core/InputLabel'
-import Select from '@material-ui/core/Select'
-import MenuItem from '@material-ui/core/MenuItem'
 import useMediaQuery from '@material-ui/core/useMediaQuery'
+import TextField from '@material-ui/core/TextField'
 
 const useStyles = makeStyles((theme) => {
   return {
@@ -224,27 +221,25 @@ export default function Expenses(props) {
           md={2}
         >
           <FormControl>
-            <MuiPickersUtilsProvider utils={DateMomentUtils}>
-              <KeyboardDatePicker
-                value={date}
-                variant={'inline'}
-                format={'YYYY-MM'}
-                clearable
-                autoOk={true}
-                views={["month"]}
-                minDate={new Date("2018-01-01")}
-                maxDate={new Date("2021-12-31")}
-                onChange={(momentDate) => {
-                  setDate(momentDate !== null && momentDate.isValid() ?
-                    momentDate.format('YYYY-MM-DD') : '0000-00-00')
-                }}
-                animateYearScrolling
-                PopoverProps={{
-                  anchorOrigin: {horizontal: "left", vertical: "bottom"},
-                  transformOrigin: {horizontal: "left", vertical: "top"}
-                }}
-              />
-            </MuiPickersUtilsProvider>
+            <DatePicker
+              value={date}
+              variant={'inline'}
+              inputFormat={'yyyy-MM'}
+              clearable
+              renderInput={(props) => <TextField {...props} helperText={null}/>}
+              autoOk={true}
+              views={["month"]}
+              minDate={new Date("2018-01-01")}
+              maxDate={new Date("2021-12-31")}
+              onChange={(momentDate) => {
+                setDate(momentDate)
+              }}
+              animateYearScrolling
+              PopoverProps={{
+                anchorOrigin: {horizontal: "left", vertical: "bottom"},
+                transformOrigin: {horizontal: "left", vertical: "top"}
+              }}
+            />
           </FormControl>
         </Grid>
         <Grid

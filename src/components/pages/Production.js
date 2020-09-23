@@ -12,6 +12,7 @@ import apiUrl from '../../helpers/apiUrl'
 import Grid from '@material-ui/core/Grid'
 import useMediaQuery from '@material-ui/core/useMediaQuery'
 import InventoryTable from '../ui/InventoryTable'
+import EmployeePerformanceTable from '../ui/EmployeePerformanceTable'
 
 function TabPanel(props) {
   const {children, value, index, classes, ...other} = props;
@@ -86,6 +87,7 @@ export default function Production() {
           <Tab label="Por producir (subtipos)" {...a11yProps(3)} />
           <Tab label="Pedidos" {...a11yProps(4)} />
           <Tab label="Promedios" {...a11yProps(5)} />
+          <Tab label="Empleados" {...a11yProps(6)} />
         </Tabs>
       </AppBar>
       <Grid
@@ -127,7 +129,7 @@ export default function Production() {
             />
           </TabPanel>
           <TabPanel value={value} index={6}>
-            Item Seven
+            <EmployeePerformanceTable employeeProductions={employeeProductions} />
           </TabPanel>
         </Grid>
       </Grid>

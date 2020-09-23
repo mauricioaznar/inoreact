@@ -23,8 +23,6 @@ const formatNumber = (x, digits = 2) => {
   return x.toFixed(digits).toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",")
 }
 
-const dateFormat = 'YYYY-MM-DD'
-
 const useStyles = makeStyles({
   table: {
     minWidth: 400,

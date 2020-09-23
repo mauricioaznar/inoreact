@@ -73,8 +73,7 @@ function ExpenseDataTable(props) {
             <MaterialTableDate
               value={filters['date_paid'].value}
               onChange={(momentDate) => {
-                handleFilters( 'date_paid', momentDate !== null && momentDate.isValid() ?
-                  momentDate.format('YYYY-MM-DD') : null)
+                handleFilters( 'date_paid', momentDate)
               }}
             />
           </>
@@ -92,8 +91,7 @@ function ExpenseDataTable(props) {
             <MaterialTableDate
               value={filters['date_emitted'].value}
               onChange={(momentDate) => {
-                handleFilters( 'date_emitted', momentDate !== null && momentDate.isValid() ?
-                  momentDate.format('YYYY-MM-DD') : null)
+                handleFilters( 'date_emitted', momentDate)
               }}
             />
           </>

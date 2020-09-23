@@ -1,11 +1,10 @@
 import React from 'react'
-import DateMomentUtils from '@date-io/moment';
 import {
-  KeyboardDatePicker,
-  MuiPickersUtilsProvider
+  DatePicker
 } from '@material-ui/pickers';
 import FormControl from '@material-ui/core/FormControl'
 import {Controller} from 'react-hook-form'
+import TextField from '@material-ui/core/TextField'
 
 function MauDatePicker (props) {
   return (
@@ -13,27 +12,27 @@ function MauDatePicker (props) {
       fullWidth
     >
       <Controller
-        render={renderProps => (
-          <MuiPickersUtilsProvider utils={DateMomentUtils}>
-            <KeyboardDatePicker
+        render={renderProps => {
+          console.log(renderProps.value)
+          return (
+            <DatePicker
               label={props.label}
               value={renderProps.value}
-              variant={'inline'}
-              format={'YYYY-MM-DD'}
+              renderInput={(props) => <TextField {...props} helperText={null}/>}
               error={props.error}
-              helperText={props.helperText}
-              onChange={(momentDate) => {
-                renderProps.onChange(momentDate !== null && momentDate.isValid() ?
-                  momentDate.format('YYYY-MM-DD') : '0000-00-00')
+              onChange={(date) => {
+                console.log(date)
+                renderProps.onChange(date)
               }}
+              inputFormat={'YYYY-MM-DD'}
               animateYearScrolling
               PopoverProps={{
                 anchorOrigin: { horizontal: "left", vertical: "bottom" },
                 transformOrigin: { horizontal: "left", vertical: "top"}
               }}
             />
-          </MuiPickersUtilsProvider>
-        )}
+          )
+        }}
         name={props.name}
         control={props.control}
         defaultValue={props.defaultValue && props.defaultValue !== '0000-00-00' ? props.defaultValue : null}
