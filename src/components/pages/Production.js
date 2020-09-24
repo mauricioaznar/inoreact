@@ -130,7 +130,7 @@ export default function Production() {
             />
           </TabPanel>
           <TabPanel value={value} index={6}>
-            <EmployeePerformanceTable employeeProductions={employeePerformances} />
+            <EmployeePerformanceTable employeePerformances={employeePerformances} />
           </TabPanel>
         </Grid>
       </Grid>

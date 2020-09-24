@@ -14,14 +14,17 @@ import TableHead from '@material-ui/core/TableHead'
 import TableRow from '@material-ui/core/TableRow'
 import TableCell from '@material-ui/core/TableCell'
 import TableBody from '@material-ui/core/TableBody'
+import CircularProgress from '@material-ui/core/CircularProgress'
 
 function EmployeePerformanceTable(props) {
   const [selectedDate, handleDateChange] = React.useState([null, null]);
   const [rows, setRows] = React.useState([])
   const [datesObj, setDatesObj] = React.useState({})
 
+  let loading = !props.employeePerformances
+
   React.useEffect(() => {
-    if (props.employeeProductions && selectedDate[0] !== null && selectedDate[1] !== null) {
+    if (props.employeePerformances && selectedDate[0] !== null && selectedDate[1] !== null) {
       let aMoment = selectedDate[0]
       let bMoment = selectedDate[1]
       let employees = []
@@ -37,23 +40,23 @@ function EmployeePerformanceTable(props) {
           ...JSON.parse(JSON.stringify(dates))
         }
       })
-      props.employeeProductions
-        .filter(empProduction => {
-          let startDateTimeMoment = moment(empProduction.start_date_time)
+      props.employeePerformances
+        .filter(empPerformance => {
+          let startDateTimeMoment = moment(empPerformance.start_date_time)
           return startDateTimeMoment.isBetween(aMoment, bMoment, null, '[]')
         })
-        .map(empProduction => {
-          let startDateTimeMoment = moment(empProduction.start_date_time).format(dateFormat)
+        .map(empPerformance => {
+          let startDateTimeMoment = moment(empPerformance.start_date_time).format(dateFormat)
           let employee = employees
             .find(employee => {
-              return employee.id === empProduction.employee_id
+              return employee.id === empPerformance.employee_id
             })
           if (employee) {
-            employee[startDateTimeMoment].sum += empProduction.performance
+            employee[startDateTimeMoment].sum += empPerformance.performance
             employee[startDateTimeMoment].count += 1
             employee[startDateTimeMoment].avg = Math.trunc(employee[startDateTimeMoment].sum / employee[startDateTimeMoment].count)
             employee.count += 1
-            employee.sum += empProduction.performance
+            employee.sum += empPerformance.performance
             employee.avg = Math.trunc(employee.sum / employee.count)
           }
         })
@@ -63,70 +66,72 @@ function EmployeePerformanceTable(props) {
         }))
       setDatesObj(dates)
     }
-  }, [props.employeeProductions, selectedDate])
+  }, [props.employeePerformances, selectedDate])
 
-
-  console.log(rows)
 
   return (
-    <Grid container direction={'column'}>
-      <Grid item>
-        <DateRangePicker
-          startText="Inicio"
-          endText="Fin"
-          value={selectedDate}
-          inputFormat={'YYYY-MM-DD'}
-          onChange={date => handleDateChange(date)}
-          renderInput={(startProps, endProps) => (
-            <>
-          <TextField {...startProps} helperText={null} />
-          <DateRangeDelimiter> a </DateRangeDelimiter>
-          <TextField {...endProps} helperText={null} />
-        </>
-          )}
-        />
-      </Grid>
-      <Grid item>
-        <TableContainer>
-          <Table aria-label="simple table">
-            <TableHead>
-              <TableRow>
-                <TableCell>Empleado</TableCell>
-                {
-                  Object.keys(datesObj).map((date, i) => {
-                    return (
-                      <TableCell>
-                        {date}
-                      </TableCell>
-                    )
-                  })
-                }
-                <TableCell>Promedio</TableCell>
-              </TableRow>
-            </TableHead>
-            <TableBody>
-              {rows.map((employee) => (
-                <TableRow key={employee.id}>
-                  <TableCell >
-                    {employee.fullname}
-                  </TableCell>
+    loading
+      ? <CircularProgress size={40} style={{marginLeft: '.5em'}}/>
+      :
+      <Grid container direction={'column'}>
+        <Grid item>
+          <DateRangePicker
+            startText="Inicio"
+            endText="Fin"
+            calendars={1}
+            value={selectedDate}
+            inputFormat={'YYYY-MM-DD'}
+            onChange={date => handleDateChange(date)}
+            renderInput={(startProps, endProps) => (
+              <>
+            <TextField {...startProps} helperText={null} />
+            <DateRangeDelimiter> a </DateRangeDelimiter>
+            <TextField {...endProps} helperText={null} />
+          </>
+            )}
+          />
+        </Grid>
+        <Grid item>
+          <TableContainer>
+            <Table aria-label="simple table" stickyHeader>
+              <TableHead>
+                <TableRow>
+                  <TableCell>Empleado</TableCell>
                   {
                     Object.keys(datesObj).map((date, i) => {
                       return (
                         <TableCell>
-                          {employee[date].avg}
+                          {moment(date).format('DD')}
                         </TableCell>
                       )
                     })
                   }
-                  <TableCell>{employee.avg}</TableCell>
+                  <TableCell>Promedio</TableCell>
                 </TableRow>
-              ))}
-            </TableBody>
-          </Table>
-        </TableContainer>
+              </TableHead>
+              <TableBody>
+                {rows.map((employee) => (
+                  <TableRow key={employee.id}>
+                    <TableCell >
+                      {employee.fullname}
+                    </TableCell>
+                    {
+                      Object.keys(datesObj).map((date, i) => {
+                        return (
+                          <TableCell>
+                            {employee[date].avg}
+                          </TableCell>
+                        )
+                      })
+                    }
+                    <TableCell>{employee.avg}</TableCell>
+                  </TableRow>
+                ))}
+              </TableBody>
+            </Table>
+          </TableContainer>
+        </Grid>
       </Grid>
-    </Grid>
   );
 }
 

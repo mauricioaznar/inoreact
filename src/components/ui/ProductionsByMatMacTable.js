@@ -139,101 +139,101 @@ function ProductionsByMatMacTable(props) {
   }, [product, props.employeeProductions, props.machineProductions])
 
   return (
-    <>
-      <Grid
-        container
-        direction={'column'}
-      >
+    loading
+      ? <CircularProgress size={40} style={{marginLeft: '.5em'}}/>
+      : <>
         <Grid
-          item
-          xs={12}
-          sm={4}
+          container
+          direction={'column'}
         >
-          {
-            loading
-              ? <CircularProgress size={40} style={{marginLeft: '.5em'}}/>
-              : <Autocomplete
-                  options={props.products}
-                  displayName={'description'}
-                  value={product}
-                  onChange={(e, data) => {
-                    setProduct(data)
-                  }}
-                />
-          }
-        </Grid>
-        <Grid
-          item
-          xs
-          style={{marginTop: '2em'}}
-        >
-          <TableContainer
-            component={Paper}
+          <Grid
+            item
+            xs={12}
+            sm={4}
           >
-            <Table
-              className={classes.table}
-              aria-label="spanning table"
-              stickyHeader
+            {
+             <Autocomplete
+                options={props.products}
+                displayName={'description'}
+                value={product}
+                onChange={(e, data) => {
+                  setProduct(data)
+                }}
+              />
+            }
+          </Grid>
+          <Grid
+            item
+            xs
+            style={{marginTop: '2em'}}
+          >
+            <TableContainer
+              component={Paper}
             >
-              <TableHead>
-                <TableRow>
-                  <TableCell style={{width: '5%'}}>&nbsp;</TableCell>
-                  <TableCell style={{width: '20%'}}>Maquina/Empleado</TableCell>
-                  <TableCell style={{width: '15%'}}>n</TableCell>
-                  <TableCell style={{width: '15%'}}>Promedio</TableCell>
-                  <TableCell style={{width: '15%'}}>Desviacion estandar de la muestra</TableCell>
-                  <TableCell style={{width: '15%'}}>Produccion en 8 horas</TableCell>
-                </TableRow>
-              </TableHead>
-              <TableBody>
-                {
-                  rows.map(row => {
-                    return (
-                      <React.Fragment>
-                        <TableRow>
-                          <TableCell>&nbsp;</TableCell>
-                          <TableCell>{row.machine_name}</TableCell>
-                          <TableCell>{row.n}</TableCell>
-                          <TableCell>{row.mean}</TableCell>
-                          <TableCell>{row.sampleStandardDeviation}</TableCell>
-                          <TableCell>{row.eightHours}</TableCell>
-                        </TableRow>
-                        <TableRow>
-                          <TableCell
-                            colSpan={6}
-                          >
-                            <Table size={'small'}>
-                              <Box>
-                                <Table
-                                  aria-label="purchases"
-                                >
-                                  <TableBody>
-                                    {row.employees.map((employee, index) => (
-                                      <TableRow key={employee.employee_id}>
-                                        <TableCell style={{width: '5%'}}>&nbsp;</TableCell>
-                                        <TableCell style={{width: '20%'}}>{employee.employee_fullname}</TableCell>
-                                        <TableCell style={{width: '15%'}}>{employee.n}</TableCell>
-                                        <TableCell style={{width: '15%'}}>{employee.mean}</TableCell>
-                                        <TableCell style={{width: '15%'}}>{employee.sampleStandardDeviation}</TableCell>
-                                        <TableCell style={{width: '15%'}}>{employee.eightHours}</TableCell>
-                                      </TableRow>
-                                    ))}
-                                  </TableBody>
-                                </Table>
-                              </Box>
-                            </Table>
-                          </TableCell>
-                        </TableRow>
-                      </React.Fragment>
-                    )
-                  })
-                }
-              </TableBody>
-            </Table>
-          </TableContainer>
+              <Table
+                className={classes.table}
+                aria-label="spanning table"
+                stickyHeader
+              >
+                <TableHead>
+                  <TableRow>
+                    <TableCell style={{width: '5%'}}>&nbsp;</TableCell>
+                    <TableCell style={{width: '20%'}}>Maquina/Empleado</TableCell>
+                    <TableCell style={{width: '15%'}}>n</TableCell>
+                    <TableCell style={{width: '15%'}}>Promedio</TableCell>
+                    <TableCell style={{width: '15%'}}>Desviacion estandar de la muestra</TableCell>
+                    <TableCell style={{width: '15%'}}>Produccion en 8 horas</TableCell>
+                  </TableRow>
+                </TableHead>
+                <TableBody>
+                  {
+                    rows.map(row => {
+                      return (
+                        <React.Fragment>
+                          <TableRow>
+                            <TableCell>&nbsp;</TableCell>
+                            <TableCell>{row.machine_name}</TableCell>
+                            <TableCell>{row.n}</TableCell>
+                            <TableCell>{row.mean}</TableCell>
+                            <TableCell>{row.sampleStandardDeviation}</TableCell>
+                            <TableCell>{row.eightHours}</TableCell>
+                          </TableRow>
+                          <TableRow>
+                            <TableCell
+                              colSpan={6}
+                            >
+                              <Table size={'small'}>
+                                <Box>
+                                  <Table
+                                    aria-label="purchases"
+                                  >
+                                    <TableBody>
+                                      {row.employees.map((employee, index) => (
+                                        <TableRow key={employee.employee_id}>
+                                          <TableCell style={{width: '5%'}}>&nbsp;</TableCell>
+                                          <TableCell style={{width: '20%'}}>{employee.employee_fullname}</TableCell>
+                                          <TableCell style={{width: '15%'}}>{employee.n}</TableCell>
+                                          <TableCell style={{width: '15%'}}>{employee.mean}</TableCell>
+                                          <TableCell style={{width: '15%'}}>{employee.sampleStandardDeviation}</TableCell>
+                                          <TableCell style={{width: '15%'}}>{employee.eightHours}</TableCell>
+                                        </TableRow>
+                                      ))}
+                                    </TableBody>
+                                  </Table>
+                                </Box>
+                              </Table>
+                            </TableCell>
+                          </TableRow>
+                        </React.Fragment>
+                      )
+                    })
+                  }
+                </TableBody>
+              </Table>
+            </TableContainer>
+          </Grid>
         </Grid>
-      </Grid>
-    </>
+      </>
   );
 }
 
