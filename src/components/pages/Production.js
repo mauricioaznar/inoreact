@@ -63,6 +63,7 @@ export default function Production() {
 
   const machineProductions = useFetch(apiUrl + 'analytics/production?dateGroup=none&entityGroup=material|product|machine')
   const employeeProductions = useFetch(apiUrl + 'analytics/production?dateGroup=none&entityGroup=material|product|employee')
+  const employeePerformances = useFetch(apiUrl + 'analytics/production?dateGroup=none&entityGroup=employee')
   const requestProducts = useFetch(apiUrl + 'stats/requestProducts')
 
   const handleChange = (event, newValue) => {
@@ -129,7 +130,7 @@ export default function Production() {
             />
           </TabPanel>
           <TabPanel value={value} index={6}>
-            <EmployeePerformanceTable employeeProductions={employeeProductions} />
+            <EmployeePerformanceTable employeePerformances={employeePerformances} />
           </TabPanel>
         </Grid>
       </Grid>
