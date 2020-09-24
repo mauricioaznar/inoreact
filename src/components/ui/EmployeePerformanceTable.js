@@ -48,7 +48,7 @@ function EmployeePerformanceTable(props) {
             .find(employee => {
               return employee.id === empProduction.employee_id
             })
-          if (employee) {
+          if (employee && empProduction.performance !== 0) {
             employee[startDateTimeMoment].sum += empProduction.performance
             employee[startDateTimeMoment].count += 1
             employee[startDateTimeMoment].avg = Math.trunc(employee[startDateTimeMoment].sum / employee[startDateTimeMoment].count)
