@@ -42,7 +42,7 @@ function EmployeePerformanceTable(props) {
       })
       props.employeePerformances
         .filter(empPerformance => {
-          let startDateTimeMoment = moment(empPerformance.start_date_time)
+          let startDateTimeMoment = moment(empPerformance.start_date_time).format(dateFormat)
           return startDateTimeMoment.isBetween(aMoment, bMoment, null, '[]')
         })
         .map(empPerformance => {
