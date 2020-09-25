@@ -115,9 +115,16 @@ const ExpenseForm = (props) => {
   //   return initialExpenseSubcategoriesIds.includes(expenseSubcategory.id)
   // })
 
+  const defaultExpenseItem = {
+    expense_subcategory_id: '',
+    subtotal: "0",
+    branch_id: '',
+    description: ''
+  }
+
   const defaultValues = {
     id: props.expense ? props.expense.id : '',
-    expense_items: props.expense ? props.expense.expense_items : [],
+    expense_items: props.expense ? props.expense.expense_items : [defaultExpenseItem],
     expense_invoice_complements: props.expense ? props.expense.expense_invoice_complements.map(complement => {
       return {...complement, delivered: complement.delivered === 1}
     }) : [],
@@ -269,11 +276,7 @@ const ExpenseForm = (props) => {
   }
 
   const handleAddExpenseItem = () => {
-    expenseItems.append({
-      expense_subcategory_id: '',
-      subtotal: "0",
-      branch_id: ''
-    })
+    expenseItems.append(defaultExpenseItem)
   }
 
   const handleRemoveExpenseItem = (index) => {
@@ -853,15 +856,17 @@ const ExpenseForm = (props) => {
                     <TableRow>
                       <TableCell style={{display: 'none'}}>Id</TableCell>
                       <TableCell style={{width: '40%'}}>Rubro</TableCell>
-                      <TableCell style={{width: '20%'}}>Sucursal</TableCell>
-                      <TableCell style={{width: '15%'}}>Total</TableCell>
-                      <TableCell style={{width: '15%'}}>Cantidad</TableCell>
-                      <TableCell style={{width: '10%'}}>&nbsp;</TableCell>
+                      <TableCell style={{width: '12%'}}>Sucursal</TableCell>
+                      <TableCell style={{width: '12%'}}>Descripción</TableCell>
+                      <TableCell style={{width: '12%'}}>Importe (neto)</TableCell>
+                      <TableCell style={{width: '12%'}}>Cantidad</TableCell>
+                      <TableCell style={{width: '12%'}}>&nbsp;</TableCell>
                     </TableRow>
                   </TableHead>
                   <TableBody>
                     {expenseItems.fields.map((expenseItem, index) => (
                       <TableRow key={index + '' + expenseItem.expense_subcategory_id}>
+
                         <TableCell style={{display: 'none'}}>
                           <TextField
                             id="standard-number"
@@ -872,10 +877,9 @@ const ExpenseForm = (props) => {
                             inputRef={register()}
                           />
                         </TableCell>
+
                         <TableCell>
-
                           <FormControl fullWidth>
-
                             <ExpenseSubcategoriesSelect
                               name={`expense_items[${index}].expense_subcategory_id`}
                               label={'Rubro'}
@@ -884,21 +888,10 @@ const ExpenseForm = (props) => {
                               defaultValue={`${expenseItem.expense_subcategory_id}`}
 
                             />
-
                           </FormControl>
-
-                          {/*<TextField*/}
-                          {/*  id="standard-number"*/}
-                          {/*  label="Number"*/}
-                          {/*  type="number"*/}
-                          {/*  disabled*/}
-                          {/*  name={`expense_items[${index}].expense_subcategory_id`}*/}
-                          {/*  defaultValue={`${expenseItem.expense_subcategory_id}`}*/}
-                          {/*  inputRef={register({ required: true })}*/}
-                          {/*/>*/}
                         </TableCell>
-                        <TableCell>
 
+                        <TableCell>
                           <MauAutocomplete
                             error={!!errors.branch_id}
                             label={'Sucursal'}
@@ -913,8 +906,8 @@ const ExpenseForm = (props) => {
                             control={control}
                             defaultValue={`${expenseItem.branch_id}`}
                           />
-
                         </TableCell>
+
                         <TableCell>
                           <TextField
                             id="standard-description"
@@ -925,6 +918,7 @@ const ExpenseForm = (props) => {
                             inputRef={register({required: true})}
                           />
                         </TableCell>
+
                         <TableCell>
                           <TextField
                             id="standard-number"
@@ -938,6 +932,7 @@ const ExpenseForm = (props) => {
                             }}
                           />
                         </TableCell>
+
                         <TableCell>
                           <TextField
                             style={{display: isQuantityRequired(index) ? 'inherit' : 'none'}}
@@ -952,6 +947,7 @@ const ExpenseForm = (props) => {
                             })}
                           />
                         </TableCell>
+
                         <TableCell align={'right'}>
                           {
                             index !== 0 ?
@@ -964,8 +960,8 @@ const ExpenseForm = (props) => {
                               </IconButton> : ' '
                           }
                         </TableCell>
-                      </TableRow>
 
+                      </TableRow>
                     ))}
                   </TableBody>
                 </Table>
