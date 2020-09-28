@@ -214,26 +214,6 @@ const ExpenseForm = (props) => {
     isInvoice = true
   }
 
-  //this use effect will be used to validate more general stuff
-  // useEffect(() => {
-  //   register({name: "_total", type: "custom"},
-  //     {
-  //       validate: () => {
-  //         console.log(total)
-  //         return total > 100 ? true : 'Total no es mayor papooooooooooooooo'
-  //       }
-  //     });
-  // }, [total]);
-
-
-  // useEffect(() => {
-  //   register({name: "expense_subcategories"},
-  //     {
-  //       required: true,
-  //       validate: (value) => {return value.length > 0}
-  //     });
-  // }, []);
-
   const onSubmit = data => {
     setSuccess(false);
     setLoading(true);
@@ -271,6 +251,8 @@ const ExpenseForm = (props) => {
   }
 
   const onSubmitCallback = (isValid) => {
+    console.log('On submit callback')
+    console.log(isValid)
     setSuccess(true);
     setLoading(false);
   }

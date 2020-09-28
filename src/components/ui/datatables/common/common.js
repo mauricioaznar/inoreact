@@ -103,7 +103,7 @@ export const subEntitiesPromises = (subEntitiesConfs, mainEntityConf) => {
   const promises = []
   subEntitiesConfs.forEach(subEntityConf => {
     const {subEntities, initialSubEntities, path} = subEntityConf
-    let deletedSubEntities = initialSubEntities
+    let deletedSubEntities = initialSubEntities.filter(subEntity => subEntity.id)
     subEntities.forEach(subEntity => {
       if (subEntity.id !== '') {
         promises.push(axios.put(apiUrl + path + '/' + subEntity.id, {...subEntity}, {headers: {...authHeader()}}))

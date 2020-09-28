@@ -1,5 +1,4 @@
-import React, {useEffect, useState} from 'react'
-import {makeStyles} from '@material-ui/core/styles'
+import React from 'react'
 import {connect} from 'react-redux'
 import {getApiEntities} from '../store/generalActions'
 import {Switch, Route} from 'react-router-dom'
@@ -11,13 +10,7 @@ import Sales from './pages/Sales'
 import PrivateRoute from './ui/PrivateRoute'
 import Admin from './pages/Admin'
 
-
-const useStyles = makeStyles((theme) => ({
-  toolbarMargin: theme.mixins.toolbar
-}));
-
 const Home = (props) => {
-  const classes = useStyles()
 
   //Correct permanent session logic with dates, token invalidation and token creation
   // Could check on intervals to execute this function

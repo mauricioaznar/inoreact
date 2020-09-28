@@ -32,7 +32,6 @@ const mapExpenseToInvoice = expense => {
   expense.expense_items.forEach(expenseItem => {
     total += expenseItem.subtotal
   })
-  console.log(expense)
   let expenseMoneySource = expense.expense_money_source ? expense.expense_money_source.name : ''
   let expenseInternalCode = expense.internal_code
   let expenseInvoicePaymentForm = expense.expense_invoice_payment_form ? expense.expense_invoice_payment_form.name : ''

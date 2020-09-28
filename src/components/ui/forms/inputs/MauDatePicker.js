@@ -13,7 +13,6 @@ function MauDatePicker (props) {
     >
       <Controller
         render={renderProps => {
-          console.log(renderProps.value)
           return (
             <DatePicker
               label={props.label}
@@ -21,7 +20,6 @@ function MauDatePicker (props) {
               renderInput={(props) => <TextField {...props} helperText={null}/>}
               error={props.error}
               onChange={(date) => {
-                console.log(date)
                 renderProps.onChange(date)
               }}
               inputFormat={'YYYY-MM-DD'}

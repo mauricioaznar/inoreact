@@ -5,8 +5,6 @@ import authHeader from './authHeader'
 export default function useFetch (url, dependencies = []) {
   const [data, setData] = React.useState(null);
 
-  console.log(url)
-
   // empty array as second argument equivalent to componentDidMount
   React.useEffect(() => {
     let unmounted = false
