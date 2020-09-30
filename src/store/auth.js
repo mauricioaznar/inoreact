@@ -12,6 +12,7 @@ const auth = (state = {
   isSales: false,
   isExpenses: false,
   isMaintenance: false,
+  isRoleSet: false,
 }, action) => {
   switch (action.type) {
     case 'SET_TOKEN':
@@ -25,21 +26,22 @@ const auth = (state = {
     case 'SET_ROLE':
       switch (action.roleId) {
         case 1:
-          return {...state, isAdmin: true, isSuperAdmin: true}
+          return {...state, isRoleSet: true, isAdmin: true, isSuperAdmin: true}
         case 2:
-          return {...state, isAdmin: true}
+          return {...state, isRoleSet: true, isAdmin: true}
         case 3:
-          return {...state, isExpenses: true}
+          return {...state, isRoleSet: true, isExpenses: true}
         case 4:
-          return {...state, isProduction: true}
+          return {...state, isRoleSet: true, isProduction: true}
         case 5:
-          return {...state, isSales: true}
+          return {...state, isRoleSet: true, isSales: true}
         default:
           return state
       }
     case 'UNSET_ROLE':
       return {
         ...state,
+        isRoleSet: false,
         isSuperAdmin: false,
         isAdmin: false,
         isProduction: false,

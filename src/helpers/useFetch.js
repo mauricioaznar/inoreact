@@ -12,6 +12,7 @@ export default function useFetch (url, dependencies = []) {
     const getPromise = axios.get(url, {headers: {...authHeader()}})
 
     if (!unmounted) {
+      setData(null)
       getPromise
         .then(response => {
           if (!unmounted) {

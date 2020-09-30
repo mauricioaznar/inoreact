@@ -12,6 +12,8 @@ import Fab from '@material-ui/core/Fab';
 import CheckIcon from '@material-ui/icons/Check';
 import SaveIcon from '@material-ui/icons/Save';
 import AddIcon from '@material-ui/icons/Add';
+import VisibilityIcon from '@material-ui/icons/Visibility';
+import VisibilityOffIcon from '@material-ui/icons/VisibilityOff';
 import DeleteIcon from '@material-ui/icons/Delete'
 import TextField from '@material-ui/core/TextField'
 import TableContainer from '@material-ui/core/TableContainer'
@@ -36,6 +38,8 @@ import Tooltip from '@material-ui/core/Tooltip'
 import IconButton from '@material-ui/core/IconButton'
 import Toolbar from '@material-ui/core/Toolbar'
 import MauAutocomplete from './inputs/MauAutocomplete'
+import useFetch from '../../../helpers/useFetch'
+import apiUrl from '../../../helpers/apiUrl'
 
 
 const useStyles = makeStyles((theme) => {
@@ -97,6 +101,8 @@ const ExpenseForm = (props) => {
   const [isProvisionDateRequired, setIsProvisionDateRequired] = React.useState(
     props.expense ? moment(props.expense.invoice_provision_date).isValid() : false
   );
+
+  const [isSupplierTableVisible, setIsSupplierTableVisible] = React.useState(false)
 
   const classes = useStyles()
 
@@ -192,6 +198,16 @@ const ExpenseForm = (props) => {
   const watchExpenseType = watch('expense_type_id')
   const watchPaymentMethod = watch('expense_invoice_payment_method_id')
   const watchExpenseProducts = watch('expense_products')
+  const watchSupplierId = watch('supplier_id')
+
+  const supplierId = isNaN(watchSupplierId) ? 0 : watchSupplierId
+
+  const supplierExpenses = useFetch(apiUrl +
+    'expense/list?paginate=false&filter_exact_1=supplier_id&filter_exact_value_1=' +
+    supplierId) || []
+
+  console.log(supplierExpenses)
+
 
   let isDifferedPaymentMethod = false
 
@@ -653,31 +669,6 @@ const ExpenseForm = (props) => {
           </FormControl>
         </Grid>
 
-        {/*<Grid*/}
-        {/*  item*/}
-        {/*  xs={12}*/}
-        {/*  className={classes.rowContainer}*/}
-        {/*  style={{marginTop: '2em'}}*/}
-        {/*>*/}
-        {/*  <MauAutocomplete*/}
-        {/*    error={!!errors.supplier_id}*/}
-        {/*    label={'Proveedor'}*/}
-        {/*    id={'supplierLabel'}*/}
-        {/*    options={props.suppliers}*/}
-        {/*    name={'supplier_id'}*/}
-        {/*    rules={*/}
-        {/*      {*/}
-        {/*        required: "this is required",*/}
-        {/*        validate: (value) => {*/}
-        {/*          return value !== 'null'*/}
-        {/*        }*/}
-        {/*      }*/}
-        {/*    }*/}
-        {/*    control={control}*/}
-        {/*    defaultValue={`${props.expense.supplier_id}`}*/}
-        {/*  />*/}
-        {/*</Grid>*/}
-
         <Grid
           item
           xs={12}
@@ -700,6 +691,115 @@ const ExpenseForm = (props) => {
             control={control}
             defaultValue={`${defaultValues.supplier_id}`}
           />
+        </Grid>
+
+        <Grid
+          item
+          xs={12}
+          className={classes.rowContainer}
+          style={{marginTop: '2em'}}
+        >
+          <Grid
+            container
+            direction={'column'}
+          >
+            <Grid
+              item
+              xs={12}
+            >
+              <Toolbar>
+                <Grid
+                  container
+                  justify={'space-between'}
+                >
+                  <Grid item>
+                    <Typography
+                      className={classes.tableTitle}
+                      variant="h6"
+                      id="tableTitle"
+                      component="div"
+                    >
+                      Gastos previos del proveedor
+                    </Typography>
+                  </Grid>
+                  <Grid item>
+                    <Tooltip title="Filter list">
+                      <IconButton
+                        aria-label="filter list"
+                        onClick={() => {
+                          setIsSupplierTableVisible(!isSupplierTableVisible)
+                        }}
+                      >
+                        {
+                          isSupplierTableVisible ?
+                            <VisibilityOffIcon/> :
+                            <VisibilityIcon/>
+                        }
+                      </IconButton>
+                    </Tooltip>
+                  </Grid>
+                </Grid>
+              </Toolbar>
+            </Grid>
+            <Grid
+              item
+              xs={12}
+              style={{display: isSupplierTableVisible ? 'inherit' : 'none'}}
+            >
+              <TableContainer component={Paper}>
+                <Table
+                  aria-label="simple table"
+                  className={classes.table}
+                >
+                  <TableHead>
+                    <TableRow>
+                      <TableCell>Fecha de pago</TableCell>
+                      <TableCell>Tipo</TableCell>
+                      <TableCell>Rubros</TableCell>
+                      <TableCell>Importe (total)</TableCell>
+                      <TableCell>Descripciones</TableCell>
+                    </TableRow>
+                  </TableHead>
+                  <TableBody>
+                    {supplierExpenses.map((expense, index) => (
+                      <TableRow key={expense.id}>
+                        <TableCell>{expense.date_paid}</TableCell>
+                        <TableCell>{expense.expense_type.name}</TableCell>
+                        <TableCell>
+                          {
+                            expense.expense_items
+                            .reduce((acc, expenseItem, index) => {
+                              return acc + (index === 0 ?
+                                expenseItem.expense_subcategory.name :
+                                ', ' + expenseItem.expense_subcategory.name)
+                            }, '')
+                          }
+                        </TableCell>
+                        <TableCell>
+                          {
+                            expense.expense_items
+                              .reduce((acc, expenseItem, index) => {
+                                return acc + expenseItem.subtotal
+                              }, 0)
+                          }
+                        </TableCell>
+                        <TableCell>
+                          {
+                            expense.expense_items
+                              .reduce((acc, expenseItem, index) => {
+                                return acc + (index === 0 ?
+                                  expenseItem.description :
+                                  ', ' + expenseItem.description)
+                              }, '')
+                          }
+                        </TableCell>
+                      </TableRow>
+                    ))}
+                  </TableBody>
+                </Table>
+              </TableContainer>
+            </Grid>
+          </Grid>
         </Grid>
 
 
@@ -795,6 +895,7 @@ const ExpenseForm = (props) => {
           />
         </Grid>
 
+
         <Grid
           item
           xs={12}
@@ -810,25 +911,39 @@ const ExpenseForm = (props) => {
               xs={12}
             >
               <Toolbar>
-                <Typography
-                  className={classes.tableTitle}
-                  variant="h6"
-                  id="tableTitle"
-                  component="div"
+                <Grid
+                  container
+                  justify={'space-between'}
                 >
-                  Elementos del gasto
-                </Typography>
-                <Tooltip title="Filter list">
-                  <IconButton
-                    aria-label="filter list"
-                    onClick={() => {
-                      handleAddExpenseItem()
-                    }}
-                  >
-                    <AddIcon/>
-                  </IconButton>
-                </Tooltip>
+                  <Grid item>
+                    <Typography
+                      className={classes.tableTitle}
+                      variant="h6"
+                      id="tableTitle"
+                      component="div"
+                    >
+                      Elementos del gasto
+                    </Typography>
+                  </Grid>
+                  <Grid item>
+                    <Tooltip title="Filter list">
+                      <IconButton
+                        aria-label="filter list"
+                        onClick={() => {
+                          handleAddExpenseItem()
+                        }}
+                      >
+                        <AddIcon/>
+                      </IconButton>
+                    </Tooltip>
+                  </Grid>
+                </Grid>
               </Toolbar>
+            </Grid>
+            <Grid
+              item
+              xs={12}
+            >
               <TableContainer component={Paper}>
                 <Table
                   aria-label="simple table"

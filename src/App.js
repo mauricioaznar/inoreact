@@ -33,11 +33,13 @@ function App(props) {
     }
   }, [user])
 
+
   return (
     <div className="Auth">
       {
         !props.authenticated ? <LoginForm />
         : !userValid ? <div>Validating token...</div>
+        : !props.isRoleSet ? <div>Validating role...</div>
         : <Home />
 
       }
@@ -48,7 +50,8 @@ function App(props) {
 const mapStateToProps = (state, ownProps) => {
   return {
     authenticated: state.auth.authenticated,
-    isTokenLoading: state.auth.isTokenLoading
+    isTokenLoading: state.auth.isTokenLoading,
+    isRoleSet: state.auth.isRoleSet
   }
 }
 
