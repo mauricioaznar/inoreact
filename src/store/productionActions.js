@@ -33,3 +33,10 @@ export const setProductTypes = (productTypes) => {
     productTypes: productTypes
   }
 }
+
+export const setOrderProductionTypes = (orderProductionTypes) => {
+  return {
+    type: 'SET_ORDER_PRODUCTION_TYPES',
+    orderProductionTypes: orderProductionTypes
+  }
+}

@@ -9,7 +9,7 @@ import {
 } from './expensesActions'
 import {
   setMachines,
-  setMaterials,
+  setMaterials, setOrderProductionTypes,
   setProducts,
   setProductTypes
 } from './productionActions'
@@ -82,7 +82,8 @@ export const getApiEntities = () => {
         order_request_statuses: requestStatuses,
         clients,
         employees,
-        roles
+        roles,
+        order_production_type: orderProductionTypes
       } = result[1].data.data
       // dispatch(setOrderProductions(orderProductions))
       dispatch(setInventory(inventory))
@@ -104,6 +105,7 @@ export const getApiEntities = () => {
       dispatch(setClients(clients))
       dispatch(setEmployees(employees))
       dispatch(setRoles(roles))
+      dispatch(setOrderProductionTypes(orderProductionTypes))
     }).finally(() => {
       dispatch(unsetAreEntitiesLoading())
     })
