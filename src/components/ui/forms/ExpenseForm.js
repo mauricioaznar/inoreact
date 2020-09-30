@@ -40,6 +40,7 @@ import Toolbar from '@material-ui/core/Toolbar'
 import MauAutocomplete from './inputs/MauAutocomplete'
 import useFetch from '../../../helpers/useFetch'
 import apiUrl from '../../../helpers/apiUrl'
+import formatNumber from '../../../helpers/formatNumber'
 
 
 const useStyles = makeStyles((theme) => {
@@ -775,12 +776,12 @@ const ExpenseForm = (props) => {
                             }, '')
                           }
                         </TableCell>
-                        <TableCell>
+                        <TableCell align={'right'}>
                           {
-                            expense.expense_items
+                            formatNumber(expense.expense_items
                               .reduce((acc, expenseItem, index) => {
                                 return acc + expenseItem.subtotal
-                              }, 0)
+                              }, 0))
                           }
                         </TableCell>
                         <TableCell>
