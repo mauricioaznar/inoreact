@@ -84,6 +84,11 @@ function ProductionDataTable(props) {
             initialSubEntities: production.defaultValues.order_production_products,
             subEntities: production.order_production_products,
             path: 'orderProductionProduct'
+          },
+          {
+            initialSubEntities: production.defaultValues.order_production_employees,
+            subEntities: production.order_production_employees,
+            path: 'orderProductionEmployee'
           }
         ]
         const mainEntityConf = {

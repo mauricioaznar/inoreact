@@ -102,6 +102,7 @@ const ProductionForm = (props) => {
     start_date_time: props.production ? props.production.start_date_time : '0000-00-00 00:00:00',
     end_date_time: props.production ? props.production.end_date_time : '0000-00-00 00:00:00',
     id: props.production ? props.production.id : '',
+    order_production_employees: props.production ? props.production.order_production_employees : [],
     helper_employees: props.production ? props.production.order_production_employees
       .filter(productionEmployees => productionEmployees.is_leader !== 1)
       : [],
@@ -169,7 +170,7 @@ const ProductionForm = (props) => {
     }
 
     console.log(finalSubmitted)
-    // props.onSubmit(finalSubmitted, onSubmitCallback)
+    props.onSubmit(finalSubmitted, onSubmitCallback)
   };
 
   const onError = data => {
@@ -335,7 +336,7 @@ const ProductionForm = (props) => {
           <MauMultipleAutocomplete
             error={!!errors.helper_employees}
             label={'Ayudantes'}
-            placeholder={'Empleado x'}
+            placeholder={''}
             id={'helperEmployeesLabel'}
             fieldArray={helperEmployees}
             relationshipId={'employee_id'}
