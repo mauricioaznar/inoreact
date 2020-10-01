@@ -30,6 +30,11 @@ import TableRow from '@material-ui/core/TableRow'
 import TableCell from '@material-ui/core/TableCell'
 import TableBody from '@material-ui/core/TableBody'
 import DeleteIcon from '@material-ui/icons/Delete'
+import FormLabel from '@material-ui/core/FormLabel'
+import Switch from '@material-ui/core/Switch'
+import MauDatePicker from './inputs/MauDatePicker'
+import MauDateTimePicker from './inputs/MauDateTimePicker'
+import MauMultipleAutocomplete from './inputs/MauMultipleAutocomplete'
 
 
 const useStyles = makeStyles((theme) => {
@@ -77,7 +82,7 @@ const useStyles = makeStyles((theme) => {
 })
 
 
-const UserForm = (props) => {
+const ProductionForm = (props) => {
 
 
   const [loading, setLoading] = React.useState(false);
@@ -94,7 +99,14 @@ const UserForm = (props) => {
   const pelletProducts = props.products.filter(product => product.product_type_id === 3)
 
   const defaultValues = {
+    start_date_time: props.production ? props.production.start_date_time : '0000-00-00 00:00:00',
+    end_date_time: props.production ? props.production.end_date_time : '0000-00-00 00:00:00',
     id: props.production ? props.production.id : '',
+    helper_employees: props.production ? props.production.order_production_employees
+      .filter(productionEmployees => productionEmployees.is_leader !== 1)
+      : [],
+    leader_employee_id: props.production ? String(props.production.order_production_employees
+      .filter(productionEmployees => productionEmployees.is_leader === 1)[0].employee_id) : '',
     waste: props.production ? String(props.production.waste) : '',
     order_production_type_id: props.production ? String(props.production.order_production_type_id) : '',
     order_production_products: props.production ?
@@ -107,7 +119,8 @@ const UserForm = (props) => {
             group_weight: String(productionProduct.group_weight)
           }
         })
-      : []
+      : [],
+    
   }
   
 
@@ -125,19 +138,38 @@ const UserForm = (props) => {
     }
   );
 
-  console.log(productionProducts)
+  const helperEmployees = useFieldArray(
+    {
+      control,
+      name: "helper_employees"
+    }
+  );
+
 
   const onSubmit = data => {
     setSuccess(false);
     setLoading(true);
 
+    let order_production_employees = data.helper_employees
+
+    if (data.leader_employee_id !== '') {
+      let foundInitialLeaderProductionEmployee = props.production ? props.production.order_production_employees
+        .find(productionEmployee => productionEmployee.employee_id === data.leader_employee_id) : null
+      if (foundInitialLeaderProductionEmployee) {
+        order_production_employees.push({...foundInitialLeaderProductionEmployee})
+      } else {
+        order_production_employees.push({id: '', employee_id: data.leader_employee_id, is_leader: 1})
+      }
+    }
 
     let finalSubmitted = {
       ...data,
+      order_production_employees,
       defaultValues
     }
 
-    props.onSubmit(finalSubmitted, onSubmitCallback)
+    console.log(finalSubmitted)
+    // props.onSubmit(finalSubmitted, onSubmitCallback)
   };
 
   const onError = data => {
@@ -199,7 +231,6 @@ const UserForm = (props) => {
 
   const hasGroupWeight = (index) => {
     let productionProduct = watchProductionProducts[index]
-    console.log(productionProduct)
     return productionProduct &&
       (
         productionProduct.group_weight !== "0" &&
@@ -235,6 +266,41 @@ const UserForm = (props) => {
           </FormControl>
         </Grid>
 
+        <Grid
+          item
+          xs={12}
+          className={classes.rowContainer}
+          style={{marginTop: '2em'}}
+        >
+          <InputLabel
+            error={errors.order_production_type_id}
+          >
+            Tipo de produccion
+          </InputLabel>
+          <Controller
+            as={
+              <RadioGroup
+                aria-label="gender"
+              >
+                {props.orderProductionTypes.map(productionType => {
+                  return (
+                    <FormControlLabel
+                      key={productionType.id}
+                      value={String(productionType.id)}
+                      control={<Radio/>}
+                      label={productionType.name}
+                    />
+                  )
+                })}
+              </RadioGroup>
+            }
+            name="order_production_type_id"
+            control={control}
+            rules={{
+              required: true
+            }}
+          />
+        </Grid>
 
         <Grid
           item
@@ -258,6 +324,112 @@ const UserForm = (props) => {
               }}
             />
           </FormControl>
+        </Grid>
+
+        <Grid
+          item
+          xs={12}
+          className={classes.rowContainer}
+          style={{marginTop: '2em'}}
+        >
+          <MauMultipleAutocomplete
+            error={!!errors.helper_employees}
+            label={'Ayudantes'}
+            placeholder={'Empleado x'}
+            id={'helperEmployeesLabel'}
+            fieldArray={helperEmployees}
+            relationshipId={'employee_id'}
+            options={props.employees}
+            displayName={'fullname'}
+            rules={
+              {
+                required: true
+              }
+            }
+            register={register}
+            name={'helper_employees'}
+            defaultValue={defaultValues.helper_employees}
+          />
+        </Grid>
+
+        <Grid
+          item
+          xs={12}
+          className={classes.rowContainer}
+          style={{marginTop: '2em'}}
+        >
+          <MauAutocomplete
+            error={!!errors.leader_employee_id}
+            label={'Operador'}
+            placeholder={'Operador  x'}
+            id={'leaderEmployeeLabel'}
+            options={props.employees}
+            name={'leader_employee_id'}
+            displayName={'fullname'}
+            rules={
+              {
+                required: true
+              }
+            }
+            control={control}
+            defaultValue={`${defaultValues.leader_employee_id}`}
+          />
+        </Grid>
+
+        <Grid
+          item
+          container
+          xs={12}
+          className={classes.rowContainer}
+          direction={'column'}
+          style={{marginTop: '2em'}}
+        >
+          <Grid
+            item
+            xs
+            style={{
+              marginTop: '0.5em',
+              display: 'inherit'
+            }}
+          >
+            <MauDateTimePicker
+              name="start_date_time"
+              control={control}
+              rules={{required: true}}
+              error={!!errors.start_date_time}
+              helperText={errors.start_date_time && errors.start_date_time.message}
+              defaultValue={defaultValues.start_date_time}
+              label="Fecha de inicio"
+            />
+          </Grid>
+        </Grid>
+
+        <Grid
+          item
+          container
+          xs={12}
+          className={classes.rowContainer}
+          direction={'column'}
+          style={{marginTop: '2em'}}
+        >
+          <Grid
+            item
+            xs
+            style={{
+              marginTop: '0.5em',
+              display: 'inherit'
+            }}
+          >
+            <MauDateTimePicker
+              name="end_date_time"
+              control={control}
+              rules={{required: true}}
+              error={!!errors.end_date_time}
+              helperText={errors.end_date_time && errors.end_date_time.message}
+              defaultValue={defaultValues.end_date_time}
+              label="Fecha de fin"
+            />
+          </Grid>
         </Grid>
 
         <Grid
@@ -305,6 +477,7 @@ const UserForm = (props) => {
                   <TableHead>
                     <TableRow>
                       <TableCell style={{display: 'none'}}>Id</TableCell>
+                      <TableCell style={{width: '20%'}}>Maquina</TableCell>
                       <TableCell style={{width: '30%'}}>Producto</TableCell>
                       <TableCell>Bultos</TableCell>
                       <TableCell>Kilos</TableCell>
@@ -323,6 +496,26 @@ const UserForm = (props) => {
                             name={`order_production_products[${index}].id`}
                             defaultValue={`${productionProduct.id}`}
                             inputRef={register()}
+                          />
+                        </TableCell>
+                        <TableCell>
+                          <MauAutocomplete
+                            error={!!errors.order_production_products && !!errors.order_production_products[index].machine_id}
+                            label={'Maquina'}
+                            id={'machineLabel'}
+                            options={props.machines}
+                            displayName={'name'}
+                            name={`order_production_products[${index}].machine_id`}
+                            rules={
+                              {
+                                required: "this is required",
+                                validate: (value) => {
+                                  return value !== 'null'
+                                }
+                              }
+                            }
+                            control={control}
+                            defaultValue={`${productionProduct.machine_id}`}
                           />
                         </TableCell>
                         <TableCell>
@@ -413,42 +606,6 @@ const UserForm = (props) => {
         </Grid>
 
 
-        <Grid
-          item
-          xs={12}
-          className={classes.rowContainer}
-          style={{marginTop: '2em'}}
-        >
-          <InputLabel
-            error={errors.order_production_type_id}
-          >
-            Tipo de produccion
-          </InputLabel>
-          <Controller
-            as={
-              <RadioGroup
-                aria-label="gender"
-              >
-                {props.orderProductionTypes.map(productionType => {
-                  return (
-                    <FormControlLabel
-                      key={productionType.id}
-                      value={String(productionType.id)}
-                      control={<Radio/>}
-                      label={productionType.name}
-                    />
-                  )
-                })}
-              </RadioGroup>
-            }
-            name="order_production_type_id"
-            control={control}
-            rules={{
-              required: true
-            }}
-          />
-        </Grid>
-
 
         <Grid
           item
@@ -485,9 +642,10 @@ const mapStateToProps = (state) => {
     orderProductionTypes: state.production.orderProductionTypes,
     products: state.production.products,
     machines: state.production.machines,
-    productTypes: state.production.productTypes
+    productTypes: state.production.productTypes,
+    employees: state.general.employees
   }
 }
 
-export default connect(mapStateToProps, null)(UserForm)
+export default connect(mapStateToProps, null)(ProductionForm)
 

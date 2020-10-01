@@ -1,12 +1,12 @@
 import React from 'react'
 import {
-  DatePicker
+  DateTimePicker
 } from '@material-ui/pickers';
 import FormControl from '@material-ui/core/FormControl'
 import {Controller} from 'react-hook-form'
 import TextField from '@material-ui/core/TextField'
 
-function MauDatePicker (props) {
+function MauDateTimePicker (props) {
 
 
 
@@ -18,15 +18,18 @@ function MauDatePicker (props) {
       <Controller
         render={renderProps => {
           return (
-            <DatePicker
+            <DateTimePicker
               label={props.label}
               value={renderProps.value}
-              renderInput={(props) => <TextField {...props} helperText={null}/>}
-              error={props.error}
-              onChange={(date) => {
-                renderProps.onChange(date.format('YYYY-MM-DD'))
+              renderInput={(props) => {
+                return (<TextField {...props} helperText={null}/>)
               }}
-              inputFormat={'YYYY-MM-DD'}
+              error={props.error}
+              ampm={false}
+              onChange={(date) => {
+                renderProps.onChange(date.format('YYYY-MM-DD HH:mm:ss'))
+              }}
+              inputFormat={'YYYY-MM-DD HH:mm:ss'}
               animateYearScrolling
               PopoverProps={{
                 anchorOrigin: { horizontal: "left", vertical: "bottom" },
@@ -37,11 +40,11 @@ function MauDatePicker (props) {
         }}
         name={props.name}
         control={props.control}
-        defaultValue={props.defaultValue && props.defaultValue !== '0000-00-00' ? props.defaultValue : null}
+        defaultValue={props.defaultValue && props.defaultValue !== '0000-00-00 00:00:00' ? props.defaultValue : null}
         rules={{
           ...props.rules,
           validate: (value) => {
-            let isValid = props.rules && props.rules.required ? value !== '0000-00-00' : true
+            let isValid = props.rules && props.rules.required ? value !== '0000-00-00 00:00:00' : true
             return  isValid || `La ${props.label.toLowerCase()} es requerida`
           }
         }}
@@ -51,4 +54,4 @@ function MauDatePicker (props) {
 }
 
 
-export default MauDatePicker
+export default MauDateTimePicker
