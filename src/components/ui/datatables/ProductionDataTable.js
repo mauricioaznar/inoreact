@@ -74,15 +74,34 @@ function ProductionDataTable(props) {
     setOpen(false);
   };
 
-  const handleOnSubmit = (expense, callback) => {
-    let expensePromise = mainEntityPromise(expense, entityPath)
-    expensePromise.then(results => {
-      callback(true)
-      tableRef.current && tableRef.current.onQueryChange()
-      setOpen(false)
-    }).finally(() => {
-      props.setUpdates(props.updates + 1)
-    })
+  const handleOnSubmit = (production, callback) => {
+    let productionPromise = mainEntityPromise(production, entityPath)
+    productionPromise
+      .then(result => {
+        let productionId = result.data.data.id
+        const subEntitiesConfs = [
+          {
+            initialSubEntities: production.defaultValues.order_production_products,
+            subEntities: production.order_production_products,
+            path: 'orderProductionProduct'
+          }
+        ]
+        const mainEntityConf = {
+          'order_production_id': productionId
+        }
+        let productionSubEntitiesPromises = subEntitiesPromises(subEntitiesConfs, mainEntityConf)
+        return Promise.all(productionSubEntitiesPromises)
+      })
+      .then(results => {
+        callback(true)
+        tableRef.current && tableRef.current.onQueryChange()
+        setOpen(false)
+      })
+      .finally(() => {
+        if (props.setUpdates) {
+          props.setUpdates(props.updates + 1)
+        }
+      })
   }
 
   const handleRowDelete = (oldData) => {

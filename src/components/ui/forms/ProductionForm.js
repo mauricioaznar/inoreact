@@ -203,7 +203,10 @@ const UserForm = (props) => {
     return productionProduct &&
       (
         productionProduct.group_weight !== "0" &&
-        productionProduct.group_weight !== "null"
+        productionProduct.group_weight !== "null" &&
+        productionProduct.group_weight !== "" &&
+        !isNaN(productionProduct.group_weight) &&
+        Number(productionProduct.group_weight) > 0
       )
   }
   
@@ -317,14 +320,14 @@ const UserForm = (props) => {
                             id="standard-number"
                             label="Number"
                             type="number"
-                            name={`order_production_product[${index}].id`}
+                            name={`order_production_products[${index}].id`}
                             defaultValue={`${productionProduct.id}`}
                             inputRef={register()}
                           />
                         </TableCell>
                         <TableCell>
                           <MauAutocomplete
-                            error={!!errors.order_production_product && !!errors.order_production_product[index].product_id}
+                            error={!!errors.order_production_products && !!errors.order_production_products[index].product_id}
                             label={'Producto'}
                             id={'productLabel'}
                             options={props.products}
@@ -334,7 +337,7 @@ const UserForm = (props) => {
                               let productId = e.target.value
                               handleProductSelection(productId, productionProductId, index)
                             }}
-                            name={`order_production_product[${index}].product_id`}
+                            name={`order_production_products[${index}].product_id`}
                             rules={
                               {
                                 required: "this is required",
@@ -349,11 +352,11 @@ const UserForm = (props) => {
                         </TableCell>
                         <TableCell>
                           <TextField
-                            error={!!errors.order_production_product && !!errors.order_production_product[index].groups}
+                            error={!!errors.order_production_products && !!errors.order_production_products[index].groups}
                             id="groups"
                             label="Bultos"
                             type="number"
-                            name={`order_production_product[${index}].groups`}
+                            name={`order_production_products[${index}].groups`}
                             onChange={(e) => {
                               if (hasGroupWeight(index)) {
                                 calculateProductKilos(e, index)
@@ -365,22 +368,24 @@ const UserForm = (props) => {
                         </TableCell>
                         <TableCell>
                           <TextField
+                            error={!!errors.order_production_products && !!errors.order_production_products[index].kilos}
                             id="Kilos"
                             label="Kilos"
                             type="number"
                             disabled={hasGroupWeight(index)}
-                            name={`order_production_product[${index}].kilos`}
+                            name={`order_production_products[${index}].kilos`}
                             defaultValue={`${productionProduct.kilos}`}
                             inputRef={register({required: true, max: 10000000})}
                           />
                         </TableCell>
                         <TableCell>
                           <TextField
+                            error={!!errors.order_production_products && !!errors.order_production_products[index].group_weight}
                             id="group_weight"
                             label="Peso por kilo"
                             disabled
                             type="number"
-                            name={`order_production_product[${index}].group_weight`}
+                            name={`order_production_products[${index}].group_weight`}
                             defaultValue={`${productionProduct.group_weight}`}
                             inputRef={register({max: 10000000})}
                           />
