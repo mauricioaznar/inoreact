@@ -75,7 +75,7 @@ export default function MauMaterialTable (props) {
         }
       }
 
-    } else {
+    } else if (newColumn.type === 'text') {
 
       return {
         ...newColumn,
@@ -90,6 +90,12 @@ export default function MauMaterialTable (props) {
             />
           )
         }
+      }
+
+    } else {
+
+      return {
+        ...newColumn
       }
 
     }

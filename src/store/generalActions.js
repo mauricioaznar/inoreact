@@ -19,6 +19,7 @@ import {
   setOrderRequestStatuses,
   setOrderSaleCollectionStatuses
 } from './salesActions'
+import {setProductionEventTypes} from './maintenanceActions'
 
 export const setInventory = (inventory) => {
   return {
@@ -83,7 +84,8 @@ export const getApiEntities = () => {
         clients,
         employees,
         roles,
-        order_production_type: orderProductionTypes
+        order_production_type: orderProductionTypes,
+        production_event_type: productionEventTypes
       } = result[1].data.data
       // dispatch(setOrderProductions(orderProductions))
       dispatch(setInventory(inventory))
@@ -106,6 +108,7 @@ export const getApiEntities = () => {
       dispatch(setEmployees(employees))
       dispatch(setRoles(roles))
       dispatch(setOrderProductionTypes(orderProductionTypes))
+      dispatch(setProductionEventTypes(productionEventTypes))
     }).finally(() => {
       dispatch(unsetAreEntitiesLoading())
     })

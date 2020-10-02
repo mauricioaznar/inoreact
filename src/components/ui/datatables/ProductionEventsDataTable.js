@@ -13,6 +13,7 @@ import Slide from '@material-ui/core/Slide'
 import {tableIcons, mainEntityPromise, subEntitiesPromises} from './common/common'
 import ProductionForm from '../forms/ProductionForm'
 import MauMaterialTable from './common/MauMaterialTable'
+import ProductionEventForm from '../forms/ProductionEventForm'
 
 const Transition = React.forwardRef(function Transition(props, ref) {
   return <Slide direction="up" ref={ref} {...props} />;
@@ -28,10 +29,9 @@ function ProductionDataTable(props) {
 
   const tableRef = React.createRef();
 
-
   const theme = useTheme()
 
-  const entityPath = 'orderProduction'
+  const entityPath = 'productionEvent'
 
   const matchesXS = useMediaQuery(theme.breakpoints.down('md'))
 
@@ -50,22 +50,40 @@ function ProductionDataTable(props) {
       type: 'date_time'
     },
     {
-      title: 'Desperdicio',
-      field: 'waste',
-      type: 'text'
-    },
-    {
-      title: 'Desempeño',
-      field: 'performance',
-      type: 'text'
-    },
-    {
-      title: 'Tipo de produccion',
-      field: 'order_production_type_id',
+      title: 'Maquina',
+      field: 'machine_id',
       type: 'options',
-      options: props.orderProductionTypes,
+      options: props.machines,
       optionLabel: 'name'
-    }
+    },
+    {
+      title: 'Empleado que reporto',
+      field: 'report_employee_id',
+      type: 'options',
+      options: props.employees,
+      optionLabel: 'fullname'
+    },
+    {
+      title: 'Empleado que reparo',
+      field: 'maintenance_employee_id',
+      type: 'options',
+      options: props.employees,
+      optionLabel: 'fullname'
+    },
+    {
+      title: 'Eventos',
+      sorting: false,
+      render: (rawData) => {
+        let events = rawData.production_e_production_ets
+          .map((productionEProductionEt) => {
+            let productionEventTypeFound = props.productionEventTypes
+              .find(productionEventType => productionEventType.id === productionEProductionEt.production_event_type_id)
+            return productionEventTypeFound ? productionEventTypeFound.name : ''
+          })
+          .join(', ')
+        return <>{events}</>
+      }
+    },
   ]
 
   const handleClickOpen = () => {
@@ -83,18 +101,13 @@ function ProductionDataTable(props) {
         let productionId = result.data.data.id
         const subEntitiesConfs = [
           {
-            initialSubEntities: production.defaultValues.order_production_products,
-            subEntities: production.order_production_products,
-            path: 'orderProductionProduct'
-          },
-          {
-            initialSubEntities: production.defaultValues.order_production_employees,
-            subEntities: production.order_production_employees,
-            path: 'orderProductionEmployee'
+            initialSubEntities: production.defaultValues.production_e_production_ets,
+            subEntities: production.production_e_production_ets,
+            path: 'productionEProductionEt'
           }
         ]
         const mainEntityConf = {
-          'order_production_id': productionId
+          'production_event_id': productionId
         }
         let productionSubEntitiesPromises = subEntitiesPromises(subEntitiesConfs, mainEntityConf)
         return Promise.all(productionSubEntitiesPromises)
@@ -138,7 +151,7 @@ function ProductionDataTable(props) {
             tableRef={tableRef}
             icons={tableIcons}
             entityPath={entityPath}
-            title="Produccion"
+            title="Reportes de mantenimiento"
             onRowDelete={(oldData) => {
               return handleRowDelete(oldData)
             }}
@@ -162,7 +175,7 @@ function ProductionDataTable(props) {
         onClose={handleClose}
         aria-labelledby="form-dialog-title"
       >
-         <ProductionForm production={rowData} onSubmit={handleOnSubmit} />
+         <ProductionEventForm productionEvent={rowData} onSubmit={handleOnSubmit} />
       </Dialog>
     </>
   )
@@ -171,8 +184,9 @@ function ProductionDataTable(props) {
 const mapStateToProps = (state, ownProps) => {
   return {
     machines: state.production.machines,
+    employees: state.general.employees,
     productTypes: state.production.productTypes,
-    orderProductionTypes: state.production.orderProductionTypes
+    productionEventTypes: state.maintenance.productionEventTypes
   }
 }
 

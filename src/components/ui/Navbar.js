@@ -135,6 +135,11 @@ function Navbar(props) {
       authed: props.isAdmin || props.isSales
     },
     {
+      name: 'Mantenimiento',
+      link: '/maintenance',
+      authed: props.isAdmin || props.isProduction
+    },
+    {
       name: 'Administracion',
       link: '/admin',
       authed: props.isSuperAdmin

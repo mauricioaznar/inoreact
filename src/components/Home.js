@@ -9,6 +9,7 @@ import Expenses from './pages/Expenses'
 import Sales from './pages/Sales'
 import PrivateRoute from './ui/PrivateRoute'
 import Admin from './pages/Admin'
+import Maintenance from './pages/Maintenance'
 
 const Home = (props) => {
 
@@ -35,6 +36,7 @@ const Home = (props) => {
           <Route path={'/production'} component={() => <Production />}/>
           <PrivateRoute authed={props.isExpenses || props.isAdmin} path={'/expenses'} component={() => <Expenses />}/>
           <PrivateRoute authed={props.isSales || props.isAdmin} path={'/sales'} component={() => <Sales />}/>
+          <PrivateRoute authed={props.isAdmin || props.isProduction} path={'/maintenance'} component={() => <Maintenance />}/>
           <PrivateRoute authed={props.isSuperAdmin} path={'/admin'} component={() => <Admin />}/>
         </Switch>
       </div>
