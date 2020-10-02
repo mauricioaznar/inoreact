@@ -153,10 +153,9 @@ function ProductionDataTable(props) {
         </Grid>
       </Grid>
       <Dialog
-        maxWidth={!matchesXS ? 'lg' : null}
-        fullWidth={!matchesXS || null}
+        fullWidth
         open={open}
-        fullScreen={matchesXS}
+        fullScreen
         TransitionComponent={Transition}
         onClose={handleClose}
         aria-labelledby="form-dialog-title"

@@ -117,7 +117,8 @@ const ProductionForm = (props) => {
             ...productionProduct,
             kilos: String(productionProduct.kilos),
             groups: String(productionProduct.groups),
-            group_weight: String(productionProduct.group_weight)
+            group_weight: String(productionProduct.group_weight),
+            type: 'Corte'
           }
         })
       : [],
@@ -152,6 +153,12 @@ const ProductionForm = (props) => {
     setLoading(true);
 
     let order_production_employees = data.helper_employees
+      .map(helperEmployee => {
+        return {
+          ...helperEmployee,
+          is_leader: 0
+        }
+      })
 
     if (data.leader_employee_id !== '') {
       let foundInitialLeaderProductionEmployee = props.production ? props.production.order_production_employees
@@ -159,7 +166,11 @@ const ProductionForm = (props) => {
       if (foundInitialLeaderProductionEmployee) {
         order_production_employees.push({...foundInitialLeaderProductionEmployee})
       } else {
-        order_production_employees.push({id: '', employee_id: data.leader_employee_id, is_leader: 1})
+        order_production_employees.push({
+          id: '',
+          employee_id: data.leader_employee_id,
+          is_leader: 1
+        })
       }
     }
 
@@ -191,6 +202,7 @@ const ProductionForm = (props) => {
       kilos: "0",
       groups: "0",
       group_weight: "0",
+      type: 'corte'
     })
   }
 
@@ -267,115 +279,6 @@ const ProductionForm = (props) => {
           </FormControl>
         </Grid>
 
-        <Grid
-          item
-          xs={12}
-          className={classes.rowContainer}
-          style={{marginTop: '2em'}}
-        >
-          <InputLabel
-            error={errors.order_production_type_id}
-          >
-            Tipo de produccion
-          </InputLabel>
-          <Controller
-            as={
-              <RadioGroup
-                aria-label="gender"
-              >
-                {props.orderProductionTypes.map(productionType => {
-                  return (
-                    <FormControlLabel
-                      key={productionType.id}
-                      value={String(productionType.id)}
-                      control={<Radio/>}
-                      label={productionType.name}
-                    />
-                  )
-                })}
-              </RadioGroup>
-            }
-            name="order_production_type_id"
-            control={control}
-            rules={{
-              required: true
-            }}
-          />
-        </Grid>
-
-        <Grid
-          item
-          xs={12}
-          className={classes.rowContainer}
-          style={{marginTop: '2em'}}
-        >
-          <FormControl
-            fullWidth
-          >
-            <TextField
-              inputRef={register({
-                required: true
-              })}
-              name="waste"
-              label="Desperdicio"
-              type="number"
-              placeholder="'0'"
-              InputLabelProps={{
-                shrink: true
-              }}
-            />
-          </FormControl>
-        </Grid>
-
-        <Grid
-          item
-          xs={12}
-          className={classes.rowContainer}
-          style={{marginTop: '2em'}}
-        >
-          <MauMultipleAutocomplete
-            error={!!errors.helper_employees}
-            label={'Ayudantes'}
-            placeholder={''}
-            id={'helperEmployeesLabel'}
-            fieldArray={helperEmployees}
-            relationshipId={'employee_id'}
-            options={props.employees}
-            displayName={'fullname'}
-            rules={
-              {
-                required: true
-              }
-            }
-            register={register}
-            name={'helper_employees'}
-            defaultValue={defaultValues.helper_employees}
-          />
-        </Grid>
-
-        <Grid
-          item
-          xs={12}
-          className={classes.rowContainer}
-          style={{marginTop: '2em'}}
-        >
-          <MauAutocomplete
-            error={!!errors.leader_employee_id}
-            label={'Operador'}
-            placeholder={'Operador  x'}
-            id={'leaderEmployeeLabel'}
-            options={props.employees}
-            name={'leader_employee_id'}
-            displayName={'fullname'}
-            rules={
-              {
-                required: true
-              }
-            }
-            control={control}
-            defaultValue={`${defaultValues.leader_employee_id}`}
-          />
-        </Grid>
 
         <Grid
           item
@@ -437,6 +340,119 @@ const ProductionForm = (props) => {
           item
           xs={12}
           className={classes.rowContainer}
+          style={{marginTop: '2em'}}
+        >
+          <InputLabel
+            shrink
+            error={errors.order_production_type_id}
+          >
+            Tipo de produccion
+          </InputLabel>
+          <Controller
+            as={
+              <RadioGroup
+                aria-label="gender"
+              >
+                {props.orderProductionTypes.map(productionType => {
+                  return (
+                    <FormControlLabel
+                      key={productionType.id}
+                      value={String(productionType.id)}
+                      control={<Radio/>}
+                      label={productionType.name}
+                    />
+                  )
+                })}
+              </RadioGroup>
+            }
+            name="order_production_type_id"
+            control={control}
+            rules={{
+              required: true
+            }}
+          />
+        </Grid>
+
+        <Grid
+          item
+          xs={12}
+          className={classes.rowContainer}
+          style={{marginTop: '2em'}}
+        >
+          <FormControl
+            fullWidth
+          >
+            <TextField
+              inputRef={register({
+                required: true
+              })}
+              name="waste"
+              label="Desperdicio"
+              type="number"
+              placeholder="'0'"
+              InputLabelProps={{
+                shrink: true
+              }}
+            />
+          </FormControl>
+        </Grid>
+
+
+
+        <Grid
+          item
+          xs={12}
+          className={classes.rowContainer}
+          style={{marginTop: '2em'}}
+        >
+          <MauAutocomplete
+            error={!!errors.leader_employee_id}
+            label={'Operador'}
+            placeholder={'Operador  x'}
+            id={'leaderEmployeeLabel'}
+            options={props.employees}
+            name={'leader_employee_id'}
+            displayName={'fullname'}
+            rules={
+              {
+                required: true
+              }
+            }
+            control={control}
+            defaultValue={`${defaultValues.leader_employee_id}`}
+          />
+        </Grid>
+
+        <Grid
+          item
+          xs={12}
+          className={classes.rowContainer}
+          style={{marginTop: '2em'}}
+        >
+          <MauMultipleAutocomplete
+            error={!!errors.helper_employees}
+            label={'Ayudantes'}
+            placeholder={''}
+            id={'helperEmployeesLabel'}
+            fieldArray={helperEmployees}
+            relationshipId={'employee_id'}
+            options={props.employees}
+            displayName={'fullname'}
+            rules={
+              {
+                required: true
+              }
+            }
+            register={register}
+            name={'helper_employees'}
+            defaultValue={defaultValues.helper_employees}
+          />
+        </Grid>
+
+        <Grid
+          item
+          xs={12}
+          className={classes.rowContainer}
           style={{
             marginTop: '2em',
             display: 'inherit'
@@ -478,9 +494,10 @@ const ProductionForm = (props) => {
                   <TableHead>
                     <TableRow>
                       <TableCell style={{display: 'none'}}>Id</TableCell>
+                      <TableCell>Tipo</TableCell>
                       <TableCell style={{width: '20%'}}>Maquina</TableCell>
                       <TableCell style={{width: '30%'}}>Producto</TableCell>
-                      <TableCell>Bultos</TableCell>
+                      <TableCell>Bultos/rollos</TableCell>
                       <TableCell>Kilos</TableCell>
                       <TableCell>Peso</TableCell>
                       <TableCell>&nbsp;</TableCell>
@@ -496,6 +513,16 @@ const ProductionForm = (props) => {
                             type="number"
                             name={`order_production_products[${index}].id`}
                             defaultValue={`${productionProduct.id}`}
+                            inputRef={register()}
+                          />
+                        </TableCell>
+                        <TableCell>
+                          <TextField
+                            id="standard-number"
+                            label="Tipo"
+                            disabled
+                            name={`order_production_products[${index}].type`}
+                            defaultValue={`${productionProduct.type}`}
                             inputRef={register()}
                           />
                         </TableCell>

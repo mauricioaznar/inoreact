@@ -1,6 +1,6 @@
 import React from 'react'
 import {
-  DateTimePicker
+  MobileDateTimePicker
 } from '@material-ui/pickers';
 import FormControl from '@material-ui/core/FormControl'
 import {Controller} from 'react-hook-form'
@@ -18,14 +18,13 @@ function MauDateTimePicker (props) {
       <Controller
         render={renderProps => {
           return (
-            <DateTimePicker
+            <MobileDateTimePicker
               label={props.label}
               value={renderProps.value}
               renderInput={(props) => {
                 return (<TextField {...props} helperText={null}/>)
               }}
               error={props.error}
-              ampm={false}
               onChange={(date) => {
                 renderProps.onChange(date.format('YYYY-MM-DD HH:mm:ss'))
               }}
