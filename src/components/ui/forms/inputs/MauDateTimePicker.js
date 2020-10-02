@@ -26,7 +26,7 @@ function MauDateTimePicker (props) {
               }}
               error={props.error}
               onChange={(date) => {
-                renderProps.onChange(date.format('YYYY-MM-DD HH:mm:ss'))
+                renderProps.onChange(date.set({second: 0}).format('YYYY-MM-DD HH:mm:ss'))
               }}
               inputFormat={'YYYY-MM-DD HH:mm:ss'}
               animateYearScrolling
