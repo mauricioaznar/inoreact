@@ -75,8 +75,8 @@ const ProductionForm = (props) => {
   });
 
   const defaultValues = {
-    start_date_time: props.productionEvent ? props.productionEvent.start_date_time : '0000-00-00 00:00:00',
-    end_date_time: props.productionEvent ? props.productionEvent.end_date_time : '0000-00-00 00:00:00',
+    start_date_time: props.productionEvent ? props.productionEvent.start_date_time : null,
+    end_date_time: props.productionEvent ? props.productionEvent.end_date_time : null,
     maintenance_employee_id: props.productionEvent ? props.productionEvent.maintenance_employee_id : '',
     report_employee_id: props.productionEvent ? props.productionEvent.report_employee_id : '',
     machine_id: props.productionEvent ? props.productionEvent.machine_id : '',

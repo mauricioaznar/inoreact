@@ -156,7 +156,7 @@ function ProductionDataTable(props) {
               return handleRowDelete(oldData)
             }}
             onRowAdd={(event, rowData) => {
-              setRowData(rowData)
+              setRowData(null)
               setOpen(true)
             }}
             onRowEdit={(event, rowData) => {
