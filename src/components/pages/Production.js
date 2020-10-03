@@ -14,31 +14,14 @@ import useMediaQuery from '@material-ui/core/useMediaQuery'
 import InventoryTable from '../ui/InventoryTable'
 import EmployeePerformanceTable from '../ui/EmployeePerformanceTable'
 import ProductionDataTable from '../ui/datatables/ProductionDataTable'
-
-function TabPanel(props) {
-  const {children, value, index, classes, ...other} = props;
-
-  return (
-    <>
-      {value === index && (
-        <>
-          {children}
-        </>
-      )}
-    </>
-  );
-}
-
-TabPanel.propTypes = {
-  children: PropTypes.node,
-  index: PropTypes.any.isRequired,
-  value: PropTypes.any.isRequired,
-};
+import {connect} from 'react-redux'
+import {Route, Switch, Link, useLocation} from 'react-router-dom'
+import PrivateRoute from '../ui/PrivateRoute'
 
 function a11yProps(index) {
   return {
     id: `scrollable-auto-tab-${index}`,
-    'aria-controls': `scrollable-auto-tabpanel-${index}`,
+    'aria-controls': `scrollable-auto-tabpanel-${index}`
   };
 }
 
@@ -46,7 +29,7 @@ const useStyles = makeStyles((theme) => ({
   root: {
     flexGrow: 1,
     width: '100%',
-    backgroundColor: theme.palette.background.paper,
+    backgroundColor: theme.palette.background.paper
   },
   rowContainer: {
     paddingLeft: '2em',
@@ -54,11 +37,13 @@ const useStyles = makeStyles((theme) => ({
   }
 }));
 
-export default function Production() {
+function Production(props) {
   const classes = useStyles();
   const [value, setValue] = React.useState(0);
 
   const theme = useTheme()
+
+  const location = useLocation()
 
   const matchesXS = useMediaQuery(theme.breakpoints.down('md'))
 
@@ -67,32 +52,62 @@ export default function Production() {
   const employeePerformances = useFetch(apiUrl + 'analytics/production?dateGroup=none&entityGroup=employee')
   const requestProducts = useFetch(apiUrl + 'stats/requestProducts')
 
-  const handleChange = (event, newValue) => {
-    setValue(newValue);
-  };
+  const routes = [
+    {
+      name: 'Inicio',
+      link: '/production',
+      authed: props.isAdmin
+    },
+    {
+      name: 'Inventario',
+      link: '/production/inventory',
+      authed: props.isAdmin
+    },
+    {
+      name: 'Por producir',
+      link: '/production/toProduce',
+      authed: props.isAdmin || props.isProduction
+    },
+    {
+      name: 'Calculos',
+      link: '/production/calculations',
+      authed: props.isAdmin || props.isProduction
+    }
+  ]
 
   return (
     <div>
-      <AppBar position="static" color="default" style={{marginBottom: '2.0em'}}>
+      <AppBar
+        position="static"
+        color="default"
+        style={{marginBottom: '2.0em'}}
+      >
         <Tabs
-          value={value}
-          onChange={handleChange}
+          value={location.pathname}
           indicatorColor="primary"
           textColor="primary"
           variant="scrollable"
           scrollButtons="auto"
           aria-label="scrollable auto tabs example"
         >
-          <Tab label="Inventario" {...a11yProps(0)} />
-          <Tab label="Por producir (productos)" {...a11yProps(1)} />
-          <Tab label="Por producir (extrusion)" {...a11yProps(2)} />
-          <Tab label="Por producir (subtipos)" {...a11yProps(3)} />
-          <Tab label="Pedidos" {...a11yProps(4)} />
-          <Tab label="Promedios" {...a11yProps(5)} />
-          <Tab label="Empleados" {...a11yProps(6)} />
-          <Tab label="Produccion" {...a11yProps(7)} />
+
+          {
+            routes.map(route => {
+              return (
+                <Tab
+                  key={route.name}
+                  style={{display: route.authed ? 'inherit' : 'none'}}
+                  label={route.name}
+                  component={Link}
+                  to={route.link}
+                  value={route.link}
+                />
+              )
+            })
+          }
         </Tabs>
       </AppBar>
+
       <Grid
         container
         direction={'column'}
@@ -103,42 +118,142 @@ export default function Production() {
           item
           xs={12}
         >
-          <TabPanel value={value} index={0}>
-            <Grid container direction={'column'}>
-              <Grid item  style={{marginBottom: '3em'}}>
-                <InventoryTable type={'material'}/>
-              </Grid>
-              <Grid item>
-                <InventoryTable type={'product'}/>
-              </Grid>
-            </Grid>
-          </TabPanel>
-          <TabPanel value={value} index={1}>
-            <RequestsProductsTable type={'products'} requestProducts={requestProducts}/>
-          </TabPanel>
-          <TabPanel value={value} index={2}>
-            <RequestsProductsTable type={'extrusion'} requestProducts={requestProducts}/>
-          </TabPanel>
-          <TabPanel value={value} index={3}>
-            <RequestsProductsTable type={'materials'} requestProducts={requestProducts}/>
-          </TabPanel>
-          <TabPanel value={value} index={4}>
-            <OrderRequestsDataTable />
-          </TabPanel>
-          <TabPanel value={value} index={5}>
-            <ProductionsByMatMacTable
-              machineProductions={machineProductions}
-              employeeProductions={employeeProductions}
+          <Switch>
+            <PrivateRoute
+              authed={props.isAdmin}
+              path={'/production'}
+              exact
+              component={() => {
+                return (
+                  <Grid
+                    container
+                    direction={'column'}
+                  >
+                    <Grid
+                      item
+                      style={{marginBottom: '3em'}}
+                    >
+
+                      <ProductionDataTable/>
+                    </Grid>
+                  </Grid>
+                )
+              }}
             />
-          </TabPanel>
-          <TabPanel value={value} index={6}>
-            <EmployeePerformanceTable employeePerformances={employeePerformances} />
-          </TabPanel>
-          <TabPanel value={value} index={7}>
-            <ProductionDataTable />
-          </TabPanel>
+            <PrivateRoute
+              authed={props.isAdmin}
+              path={'/production/inventory'}
+              exact
+              component={() => {
+                return (
+                  <Grid
+                    container
+                    direction={'column'}
+                  >
+                    <Grid
+                      item
+                      style={{marginBottom: '3em'}}
+                    >
+                      <InventoryTable type={'material'}/>
+                    </Grid>
+                    <Grid item>
+                      <InventoryTable type={'product'}/>
+                    </Grid>
+                  </Grid>
+                )
+              }}
+            />
+            <PrivateRoute
+              authed={props.isAdmin}
+              path={'/production/toProduce'}
+              exact
+              component={() => {
+                return (
+                  <Grid
+                    container
+                    direction={'column'}
+                  >
+                    <Grid
+                      item
+                      style={{marginBottom: '3em'}}
+                    >
+                      <RequestsProductsTable
+                        type={'materials'}
+                        requestProducts={requestProducts}
+                      />
+                    </Grid>
+                    <Grid
+                      item
+                      style={{marginBottom: '3em'}}
+                    >
+                      <RequestsProductsTable
+                        type={'extrusion'}
+                        requestProducts={requestProducts}
+                      />
+                    </Grid>
+                    <Grid
+                      item
+                      style={{marginBottom: '3em'}}
+                    >
+                      <OrderRequestsDataTable />
+                    </Grid>
+                    <Grid
+                      item
+                    >
+                      <RequestsProductsTable
+                        type={'products'}
+                        requestProducts={requestProducts}
+                      />
+                    </Grid>
+                  </Grid>
+                )
+              }}
+            />
+            <PrivateRoute
+              authed={props.isAdmin}
+              path={'/production/calculations'}
+              exact
+              component={() => {
+                return (
+                  <Grid
+                    container
+                    direction={'column'}
+                  >
+                    <Grid
+                      item
+                      style={{marginBottom: '3em'}}
+                    >
+                      <ProductionsByMatMacTable
+                        machineProductions={machineProductions}
+                        employeeProductions={employeeProductions}
+                      />
+                    </Grid>
+                    <Grid
+                      item
+                    >
+                      <EmployeePerformanceTable employeePerformances={employeePerformances}/>
+                    </Grid>
+                  </Grid>
+                )
+              }}
+            />
+          </Switch>
         </Grid>
       </Grid>
     </div>
   );
 }
+
+
+const mapStateToProps = (state, ownProps) => {
+  return {
+    areEntitiesLoading: state.general.areEntitiesLoading,
+    isAdmin: state.auth.isAdmin,
+    isSuperAdmin: state.auth.isSuperAdmin,
+    isProduction: state.auth.isProduction,
+    isExpenses: state.auth.isExpenses,
+    isSales: state.auth.isSales
+  }
+}
+
+export default connect(mapStateToProps, null)(Production)

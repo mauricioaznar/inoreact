@@ -156,6 +156,7 @@ function Navbar(props) {
           routes.map(route => {
             return (
               <Tab
+                key={route.name}
                 style={{display: route.authed ? 'inherit' : 'none'}}
                 label={route.name}
                 component={Link}

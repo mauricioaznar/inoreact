@@ -316,18 +316,23 @@ const ExpenseForm = (props) => {
     expenseCreditNotes.remove(index)
   }
 
-  const handleProductSelection = (e, index) => {
-    let productId = e.target.value
+  const handleProductSelection = (productId, index) => {
     let groupWeight = "0"
     let kiloPrice = "0"
     let kilos = "0"
     let groups = "0"
     let _total = "0"
     let _tax = "0"
+
     let initialExpenseProduct = defaultValues.expense_products.find(expenseProduct => {
-      return productId === String(expenseProduct.product_id)
+      return String(productId) === String(expenseProduct.product_id)
     })
-    if (!initialExpenseProduct) {
+
+    let isSameInitialProduct =
+      initialExpenseProduct
+      && String(initialExpenseProduct.product_id) === productId
+
+    if (!isSameInitialProduct) {
       let product = props.products.find(product => {
         return String(product.id) === productId
       })
@@ -1257,8 +1262,8 @@ const ExpenseForm = (props) => {
                             id={'productLabel'}
                             options={props.products}
                             displayName={'description'}
-                            onChange={(e) => {
-                              handleProductSelection(e, index)
+                            onChange={(e, productId) => {
+                              handleProductSelection(productId, index)
                             }}
                             name={`expense_products[${index}].product_id`}
                             rules={

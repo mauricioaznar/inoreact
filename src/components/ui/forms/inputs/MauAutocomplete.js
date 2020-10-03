@@ -29,8 +29,9 @@ export default function MauAutocomplete (props) {
               />
             )}
             onChange={(e, data) => {
-              if(props.onChange) props.onChange(e, data)
-              renderProps.onChange(data !== null ? String(data.id) : '')
+              let newData = data !== null ? String(data.id) : ''
+              if(props.onChange) props.onChange(e, newData)
+              renderProps.onChange(newData)
             }}
           />
         )}

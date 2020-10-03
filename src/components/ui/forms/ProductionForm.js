@@ -98,6 +98,21 @@ const ProductionForm = (props) => {
   const rollProducts = props.products.filter(product => product.product_type_id === 2)
   const pelletProducts = props.products.filter(product => product.product_type_id === 3)
 
+  const getProductionProductType = (productId) => {
+    let product = props.products.find(product => {
+      return String(product.id) === String(productId)
+    })
+    if (product) {
+      if (product.product_type_id === 1) {
+        return 'bolsa'
+      } else if (product.product_type_id === 2) {
+        return 'rollo'
+      } else {
+        return 'pellet'
+      }
+    }
+  }
+
   const defaultValues = {
     start_date_time: props.production ? props.production.start_date_time : '0000-00-00 00:00:00',
     end_date_time: props.production ? props.production.end_date_time : '0000-00-00 00:00:00',
@@ -118,7 +133,7 @@ const ProductionForm = (props) => {
             kilos: String(productionProduct.kilos),
             groups: String(productionProduct.groups),
             group_weight: String(productionProduct.group_weight),
-            type: 'Corte'
+            type: getProductionProductType(productionProduct.product_id)
           }
         })
       : [],
@@ -202,7 +217,7 @@ const ProductionForm = (props) => {
       kilos: "0",
       groups: "0",
       group_weight: "0",
-      type: 'corte'
+      type: ''
     })
   }
 
@@ -215,27 +230,39 @@ const ProductionForm = (props) => {
     let groupWeight = "0"
     let kilos = "0"
     let groups = "0"
-    let initialProductionProduct = defaultValues.order_production_products
-      .find(productionProduct => {
-        return productionProductId === String(productionProduct.id)
-      })
-    if (!initialProductionProduct) {
+    let ppType = ""
+    console.log(productId)
+    if (productId) {
+
+      let initialProductionProduct = defaultValues.order_production_products
+        .find(productionProduct => {
+          return String(productionProductId) === String(productionProduct.id)
+        })
+
+      let isSameInitialProduct =
+        initialProductionProduct
+        && String(initialProductionProduct.product_id) === productId
+
       let product = props.products.find(product => {
-        return String(product.id) === productId
+        return String(product.id) === String(productId)
       })
-      groupWeight = product.current_group_weight ? product.current_group_weight : "0"
-      kilos = "0"
-      groups = "0"
-    } else {
-      groupWeight = initialProductionProduct.group_weight
-      kilos = initialProductionProduct.kilos
-      groups = initialProductionProduct.groups
+
+      if (!isSameInitialProduct) {
+        groupWeight = product.current_group_weight ? product.current_group_weight : "0"
+        kilos = "0"
+        groups = "0"
+      } else {
+        groupWeight = initialProductionProduct.group_weight
+        kilos = initialProductionProduct.kilos
+        groups = initialProductionProduct.groups
+      }
+      ppType = getProductionProductType(product.id)
     }
     setValue(`order_production_products[${index}].group_weight`, String(groupWeight))
     setValue(`order_production_products[${index}].kilos`, String(kilos))
     setValue(`order_production_products[${index}].groups`, String(groups))
+    setValue(`order_production_products[${index}].type`, String(ppType))
   }
-  
 
   const calculateProductKilos = (e, index) => {
     let kilos = Number(watchProductionProducts[index].groups) * Number(watchProductionProducts[index].group_weight)
@@ -494,9 +521,10 @@ const ProductionForm = (props) => {
                   <TableHead>
                     <TableRow>
                       <TableCell style={{display: 'none'}}>Id</TableCell>
+                      <TableCell style={{display: 'none'}}>Tipo (input)</TableCell>
                       <TableCell>Tipo</TableCell>
-                      <TableCell style={{width: '20%'}}>Maquina</TableCell>
                       <TableCell style={{width: '30%'}}>Producto</TableCell>
+                      <TableCell style={{width: '20%'}}>Maquina</TableCell>
                       <TableCell>Bultos/rollos</TableCell>
                       <TableCell>Kilos</TableCell>
                       <TableCell>Peso</TableCell>
@@ -516,7 +544,7 @@ const ProductionForm = (props) => {
                             inputRef={register()}
                           />
                         </TableCell>
-                        <TableCell>
+                        <TableCell style={{display: 'none'}}>
                           <TextField
                             id="standard-number"
                             label="Tipo"
@@ -524,6 +552,33 @@ const ProductionForm = (props) => {
                             name={`order_production_products[${index}].type`}
                             defaultValue={`${productionProduct.type}`}
                             inputRef={register()}
+                          />
+                        </TableCell>
+                        <TableCell>
+                          {watchProductionProducts[index].type}
+                        </TableCell>
+                        <TableCell>
+                          <MauAutocomplete
+                            error={!!errors.order_production_products && !!errors.order_production_products[index].product_id}
+                            label={'Producto'}
+                            id={'productLabel'}
+                            options={props.products}
+                            displayName={'description'}
+                            onChange={(e, productId) => {
+                              let productionProductId = `${productionProduct.id}`
+                              handleProductSelection(productId, productionProductId, index)
+                            }}
+                            name={`order_production_products[${index}].product_id`}
+                            rules={
+                              {
+                                required: "this is required",
+                                validate: (value) => {
+                                  return value !== 'null'
+                                }
+                              }
+                            }
+                            control={control}
+                            defaultValue={`${productionProduct.product_id}`}
                           />
                         </TableCell>
                         <TableCell>
@@ -544,31 +599,6 @@ const ProductionForm = (props) => {
                             }
                             control={control}
                             defaultValue={`${productionProduct.machine_id}`}
-                          />
-                        </TableCell>
-                        <TableCell>
-                          <MauAutocomplete
-                            error={!!errors.order_production_products && !!errors.order_production_products[index].product_id}
-                            label={'Producto'}
-                            id={'productLabel'}
-                            options={props.products}
-                            displayName={'description'}
-                            onChange={(e) => {
-                              let productionProductId = `${productionProduct.id}`
-                              let productId = e.target.value
-                              handleProductSelection(productId, productionProductId, index)
-                            }}
-                            name={`order_production_products[${index}].product_id`}
-                            rules={
-                              {
-                                required: "this is required",
-                                validate: (value) => {
-                                  return value !== 'null'
-                                }
-                              }
-                            }
-                            control={control}
-                            defaultValue={`${productionProduct.product_id}`}
                           />
                         </TableCell>
                         <TableCell>
