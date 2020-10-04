@@ -22,6 +22,7 @@ import Select from '@material-ui/core/Select'
 import MenuItem from '@material-ui/core/MenuItem'
 import useMediaQuery from '@material-ui/core/useMediaQuery'
 import useFetch from '../../helpers/useFetch'
+import MauMonthYear from './inputs/MauMonthYear'
 
 
 const useStyles = makeStyles((theme) => {
@@ -35,8 +36,6 @@ const useStyles = makeStyles((theme) => {
     }
   }
 })
-
-
 
 
 export default function Equilibrium(props) {
@@ -57,15 +56,6 @@ export default function Equilibrium(props) {
   const invoicesBySup = useFetch(apiUrl + 'analytics/invoices?dateGroup=day&entityGroup=supplier')
   const otherIncomes = useFetch(apiUrl + 'analytics/otherIncomes')
 
-  const handleYearChange = (e) => {
-    console.log(e.target.value)
-    setYear(e.target.value)
-  }
-
-  const handleMonthChange = (e) => {
-    console.log(e.target.value)
-    setMonth(e.target.value)
-  }
 
   return (
     <Grid
@@ -88,70 +78,15 @@ export default function Equilibrium(props) {
       <Grid
         item
         container
-        direction={matchesXS ? 'column' : 'row'}
         className={classes.rowContainer}
         style={{marginTop: '4em', marginBottom: '2em'}}
       >
-        <Grid
-          item
-          xs={12}
-          sm={4}
-          md={2}
-        >
-          <FormControl
-            className={classes.formControl}
-            fullWidth
-          >
-            <InputLabel id="demo-simple-select-label">Mes</InputLabel>
-            <Select
-              labelId="demo-simple-select-label"
-              id="demo-simple-select"
-              value={month}
-              onChange={(e) => {
-                handleMonthChange(e)
-              }}
-            >
-              <MenuItem value={1}>{moment().month(0).format('MMMM')}</MenuItem>
-              <MenuItem value={2}>{moment().month(1).format('MMMM')}</MenuItem>
-              <MenuItem value={3}>{moment().month(2).format('MMMM')}</MenuItem>
-              <MenuItem value={4}>{moment().month(3).format('MMMM')}</MenuItem>
-              <MenuItem value={5}>{moment().month(4).format('MMMM')}</MenuItem>
-              <MenuItem value={6}>{moment().month(5).format('MMMM')}</MenuItem>
-              <MenuItem value={7}>{moment().month(6).format('MMMM')}</MenuItem>
-              <MenuItem value={8}>{moment().month(7).format('MMMM')}</MenuItem>
-              <MenuItem value={9}>{moment().month(8).format('MMMM')}</MenuItem>
-              <MenuItem value={10}>{moment().month(9).format('MMMM')}</MenuItem>
-              <MenuItem value={11}>{moment().month(10).format('MMMM')}</MenuItem>
-              <MenuItem value={12}>{moment().month(11).format('MMMM')}</MenuItem>
-
-            </Select>
-          </FormControl>
-        </Grid>
-        <Grid
-          item
-          xs={12}
-          sm={4}
-          md={2}
-          style={{marginLeft: matchesXS ? 0 : '4em'}}
-        >
-          <FormControl
-            className={classes.formControl}
-            fullWidth
-          >
-            <InputLabel id="demo-simple-select-label">Año</InputLabel>
-            <Select
-              labelId="demo-simple-select-label"
-              id="demo-simple-select"
-              value={year}
-              onChange={(e) => {
-                handleYearChange(e)
-              }}
-            >
-              <MenuItem value={2019}>2019</MenuItem>
-              <MenuItem value={2020}>2020</MenuItem>
-            </Select>
-          </FormControl>
-        </Grid>
+        <MauMonthYear
+          month={month}
+          setMonth={setMonth}
+          year={year}
+          setYear={setYear}
+        />
       </Grid>
 
       <Grid
@@ -173,7 +108,11 @@ export default function Equilibrium(props) {
             md={12}
             lg={4}
           >
-            <Grid item container direction={'column'}>
+            <Grid
+              item
+              container
+              direction={'column'}
+            >
               <Grid
                 item
                 xs={12}
@@ -208,7 +147,11 @@ export default function Equilibrium(props) {
             md={12}
             lg={8}
           >
-            <Grid item container direction={'column'}>
+            <Grid
+              item
+              container
+              direction={'column'}
+            >
               <Grid
                 item
                 xs={12}

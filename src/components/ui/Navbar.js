@@ -2,7 +2,7 @@ import React, {useState} from 'react'
 import {AppBar, Button, Grid, Toolbar, Tab, Tabs} from '@material-ui/core'
 import {Link, useLocation} from 'react-router-dom'
 import {connect} from 'react-redux'
-import {unsetRole, unsetToken} from '../../store/authActions'
+import {unsetRole, unsetToken, unsetUserBranch} from '../../store/authActions'
 import {setInventoryDrawerOpen} from '../../store/generalActions'
 import useMediaQuery from '@material-ui/core/useMediaQuery'
 import useTheme from '@material-ui/core/styles/useTheme'
@@ -272,6 +272,7 @@ const mapDispatchToProps = (dispatch, ownProps) => {
     signOutUser: () => {
       dispatch(unsetToken())
       dispatch(unsetRole())
+      dispatch(unsetUserBranch())
     },
     setOpenDrawer: () => {
       dispatch(setInventoryDrawerOpen(true))

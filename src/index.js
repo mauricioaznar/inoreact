@@ -15,7 +15,6 @@ import { ThemeProvider } from '@material-ui/styles';
 import DateFnsUtils from '@material-ui/pickers/adapter/moment';
 import LocalizationProvider from '@material-ui/pickers/LocalizationProvider'
 
-
 const store = createStore(combinedReducers, {}, composeWithDevTools(applyMiddleware(thunk)))
 
 const theme = createMuiTheme({

@@ -78,7 +78,8 @@ const UserForm = (props) => {
     email: props.user ? props.user.email : '',
     first_name: props.user ? props.user.first_name : '',
     last_name: props.user ? props.user.last_name : '',
-    role_id: props.user ? String(props.user.role_id) : 'null'
+    role_id: props.user ? String(props.user.role_id) : 'null',
+    branch_id: props.user ? String(props.user.branch_id) : 'null'
   }
 
   const {register, unregister, handleSubmit, reset, watch, control, setValue, getValues, errors} = useForm({
@@ -286,6 +287,31 @@ const UserForm = (props) => {
 
         <Grid
           item
+          xs={12}
+          className={classes.rowContainer}
+          style={{marginTop: '2em'}}
+        >
+          <MauAutocomplete
+            error={!!errors.branch_id}
+            label={'Sucursal'}
+            placeholder={'Sucursal x'}
+            id={'branchLabel'}
+            options={props.branches}
+            name={'branch_id'}
+            displayName={'name'}
+            rules={
+              {
+                required: true
+              }
+            }
+            control={control}
+            defaultValue={`${defaultValues.branch_id}`}
+          />
+        </Grid>
+
+
+        <Grid
+          item
           container
           xs={12}
           justify={'flex-end'}
@@ -316,7 +342,8 @@ const UserForm = (props) => {
 
 const mapStateToProps = (state) => {
   return {
-    roles: state.general.roles
+    roles: state.general.roles,
+    branches: state.general.branches
   }
 }
 

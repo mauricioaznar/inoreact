@@ -37,7 +37,13 @@ export default function MauAutocomplete (props) {
         )}
         name={props.name}
         control={props.control}
-        rules={props.rules}
+        rules={{
+          validate: (value) => {
+            return props.rules
+              && props.rules.required
+              && value !== 'null'
+          }
+        }}
       />
     </FormControl>
   )

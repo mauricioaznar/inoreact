@@ -39,6 +39,21 @@ export const unsetRole = () => {
     type: 'UNSET_ROLE'
   }
 }
+
+export const unsetUserBranch = () => {
+  return {
+    type: 'UNSET_USER_BRANCH'
+  }
+}
+
+export const setUserBranch = (user) => {
+  console.log(user)
+  return {
+    type: 'SET_USER_BRANCH',
+    userBranchId: user.branch_id
+  }
+}
+
 export const setToken = (token) => {
   window.localStorage.setItem('auth', JSON.stringify({token: token}))
   return {
