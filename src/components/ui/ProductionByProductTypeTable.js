@@ -38,13 +38,13 @@ function ProductionByProductTypeTable(props) {
 
   let productions = props.productions
 
-  let productTypeLookup = props.productTypes
+  let productTypeLookup = props.materials
     .reduce((acc, productType) => {
       return {
         ...acc,
         [productType.id]: 0
       }
-    }, {})
+    }, {total: 0})
 
   let productTypeWeekRange = getDayRange(props.daysBack, productTypeLookup)
     .reverse()
@@ -59,9 +59,10 @@ function ProductionByProductTypeTable(props) {
           .find(item => {
             return moment(item.date, dateFormat).isSame(moment(production.start_date, dateFormat))
           })
-        if (productTypeWRItem) {
-          console.log(production)
-          productTypeWRItem[production.product_type_id] += production.kilos
+        if (productTypeWRItem && production.product_type_id === 1) {
+          productTypeWRItem[production.material_id] += production.kilos
+          productTypeWRItem.total += production.kilos
+
         }
       })
   }
@@ -88,7 +89,7 @@ function ProductionByProductTypeTable(props) {
                 <TableRow>
                   <TableCell>Semana</TableCell>
                   {
-                    props.productTypes.map(productType => {
+                    props.materials.map(productType => {
                       return (
                         <TableCell key={productType.id}>
                           {productType.name}
@@ -96,6 +97,7 @@ function ProductionByProductTypeTable(props) {
                       )
                     })
                   }
+                  <TableCell>Total</TableCell>
                 </TableRow>
               </TableHead>
               <TableBody>
@@ -105,7 +107,7 @@ function ProductionByProductTypeTable(props) {
                       <TableRow key={item.date}>
                         <TableCell>{item.date}</TableCell>
                         {
-                          props.productTypes.map(productType => {
+                          props.materials.map(productType => {
                             return (
                               <TableCell
                                 align={'right'}
@@ -116,6 +118,7 @@ function ProductionByProductTypeTable(props) {
                             )
                           })
                         }
+                        <TableCell>{formatNumber(item.total)}</TableCell>
                       </TableRow>
                     )
                   })
@@ -143,7 +146,14 @@ function compare(a, b) {
 
 const mapStateToProps = (state, ownProps) => {
   return {
-    productTypes: state.production.productTypes
+    productTypes: state.production.productTypes,
+    materials: state.production.materials
+      .filter(material => material.product_type_id === 1)
+      .sort((a, b) => {
+        return a.product_type_id > b.product_type_id ? -1
+          : a.product_type_id < b.product_type_id ? 1
+            : 0
+      })
   }
 }
 

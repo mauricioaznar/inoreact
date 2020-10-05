@@ -55,7 +55,7 @@ function Production(props) {
   let initialDate = moment().subtract(daysBack + 1, 'days').format(dateFormat);
 
   const machineProductions = useFetch(apiUrl + 'analytics/production?dateGroup=none&entityGroup=material|product|machine&initialDate=2020-01-01')
-  const branchProductions = useFetch(apiUrl + 'analytics/production?dateGroup=day&entityGroup=productType|branch&initialDate=' + initialDate)
+  const materialProductions = useFetch(apiUrl + 'analytics/production?dateGroup=day&entityGroup=material|branch&initialDate=' + initialDate)
   const employeeProductions = useFetch(apiUrl + 'analytics/production?dateGroup=none&entityGroup=material|product|employee&initialDate=2020-01-01')
   const employeePerformances = useFetch(apiUrl + 'analytics/production?dateGroup=none&entityGroup=employee&initialDate=' + initialDate)
   const requestProducts = useFetch(apiUrl + 'stats/requestProducts')
@@ -191,14 +191,14 @@ function Production(props) {
                       style={{marginBottom: '3em'}}
                     >
                       <ProductionByProductTypeTable
-                        productions={branchProductions}
+                        productions={materialProductions}
                         branchId={1}
                         daysBack={daysBack}
                       />
                     </Grid>
                     <Grid item>
                       <ProductionByProductTypeTable
-                        productions={branchProductions}
+                        productions={materialProductions}
                         branchId={2}
                         daysBack={daysBack}
                       />
