@@ -17,6 +17,7 @@ import useMediaQuery from '@material-ui/core/useMediaQuery'
 import Slide from '@material-ui/core/Slide'
 import {localization, tableIcons, mainEntityPromise} from './common/common'
 import UserForm from '../forms/UserForm'
+import MauMaterialTable from './common/MauMaterialTable'
 
 const Transition = React.forwardRef(function Transition(props, ref) {
   return <Slide direction="up" ref={ref} {...props} />;
@@ -25,7 +26,7 @@ const Transition = React.forwardRef(function Transition(props, ref) {
 
 //Fix call in useEffect that is leaking memory (because is trying to set state in before component mounts?)
 
-function ExpenseDataTable(props) {
+function UserDataTable(props) {
 
   const tableRef = React.createRef();
 
@@ -36,9 +37,9 @@ function ExpenseDataTable(props) {
   const [open, setOpen] = React.useState(false);
   const [rowData, setRowData] = React.useState(null);
 
-  let rolesLookup = props.roles.reduce((prevObject, role) => {
-    return {...prevObject, [role.id]: role.name}
-  }, {})
+  const entityPath = 'user'
+
+  console.log(props.branches)
 
   const columns = [
     {
@@ -50,13 +51,18 @@ function ExpenseDataTable(props) {
       field: 'email'
     },
     {
-      title: 'Pass',
-      field: 'password'
-    },
-    {
       title: 'Rol',
       field: 'role_id',
-      lookup: rolesLookup,
+      type: 'options',
+      options: props.roles,
+      optionLabel: 'name'
+    },
+    {
+      title: 'Sucursal',
+      field: 'branch_id',
+      type: 'options',
+      options: props.branches,
+      optionLabel: 'name'
     }
   ]
 
@@ -106,65 +112,25 @@ function ExpenseDataTable(props) {
           xs={12}
           style={{marginTop: '2em'}}
         >
-          <MaterialTable
-            icons={tableIcons}
-            title="Usuarios"
+          <MauMaterialTable
             tableRef={tableRef}
-            localization={localization}
-            editable={{
-              onRowDelete: (oldData) => {
-                return handleRowDelete(oldData)
-              }
+            title="Usuarios"
+            entityPath={entityPath}
+            onRowDelete={(oldData) => {
+              return handleRowDelete(oldData)
             }}
-            options={{
-              pageSize: 10,
-              pageSizeOptions: [10, 20, 30],
-              selection: false,
-              search: false,
-              filtering: false
+            onRowAdd={(event, rowData) => {
+              setRowData(null)
+              setOpen(true)
             }}
-            actions={[
-              {
-                icon: (props) => <Edit {...props} color={'action'} fontSize={'small'} />,
-                position: 'row',
-                tooltip: 'Editar',
-                onClick: (event, rowData) => {
-                  setRowData(rowData)
-                  setOpen(true)
-                }
-              },
-              {
-                icon: (props) => <AddBox {...props} color={'action'} fontSize={'small'} />,
-                tooltip: 'Agregar',
-                isFreeAction: true,
-                onClick: (event) => {
-                  setRowData(null)
-                  setOpen(true)
-                }
-              }
-            ]}
+            onRowEdit={(event, rowData) => {
+              setRowData(rowData)
+              setOpen(true)
+            }}
             columns={columns}
-            data={query =>
-              new Promise((resolve, reject) => {
-                let url = apiUrl + 'user/list?'
-                url += 'per_page=' + query.pageSize
-                url += '&page=' + (query.page + 1)
-                if (query.orderBy) {
-                  url += '&sort=' + query.orderBy.field + '|' + query.orderDirection
-                }
-                axios.get(url, {headers: {...authHeader()}})
-                  .then(response => {
-                    return response.data
-                  })
-                  .then(result => {
-                    resolve({
-                      data: result.data,
-                      page: result.links.pagination.current_page - 1,
-                      totalCount: result.links.pagination.total,
-                    })
-                  })
-              })
-            }
+
+
+
           />
         </Grid>
       </Grid>
@@ -185,8 +151,9 @@ function ExpenseDataTable(props) {
 
 const mapStateToProps = (state, ownProps) => {
   return {
-    roles: state.general.roles
+    roles: state.general.roles,
+    branches: state.general.branches
   }
 }
 
-export default connect(mapStateToProps, null)(ExpenseDataTable)
+export default connect(mapStateToProps, null)(UserDataTable)

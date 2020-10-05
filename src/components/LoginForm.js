@@ -51,7 +51,6 @@ const LoginForm = (props) => {
     const checked = e.target.checked
     const name = e.target.name
     const type = e.target.type
-    console.log(type)
 
     const updatedFormControl = {...formControl}
     const updatedFormControlElement = {...updatedFormControl[name]}
@@ -66,7 +65,6 @@ const LoginForm = (props) => {
     updatedFormControlElement.errors = updatedFormControlElementErrors
 
     if (type === 'checkbox') {
-      console.log('Checkbox!')
       updatedFormControlElement.checked = !!checked
     } else {
       updatedFormControlElement.value = value

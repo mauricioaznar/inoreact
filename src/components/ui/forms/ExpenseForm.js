@@ -1273,9 +1273,6 @@ const ExpenseForm = (props) => {
                             rules={
                               {
                                 required: "this is required",
-                                validate: (value) => {
-                                  return value !== 'null'
-                                }
                               }
                             }
                             control={control}

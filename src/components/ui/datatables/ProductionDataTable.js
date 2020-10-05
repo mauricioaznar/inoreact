@@ -65,6 +65,13 @@ function ProductionDataTable(props) {
       type: 'options',
       options: props.orderProductionTypes,
       optionLabel: 'name'
+    },
+    {
+      title: 'Sucursal',
+      field: 'branch_id',
+      type: 'options',
+      options: props.branches,
+      optionLabel: 'name'
     }
   ]
 
@@ -172,6 +179,7 @@ const mapStateToProps = (state, ownProps) => {
   return {
     machines: state.production.machines,
     productTypes: state.production.productTypes,
+    branches: state.general.branches,
     orderProductionTypes: state.production.orderProductionTypes
   }
 }

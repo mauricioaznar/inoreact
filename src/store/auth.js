@@ -13,6 +13,10 @@ const auth = (state = {
   isExpenses: false,
   isMaintenance: false,
   isRoleSet: false,
+  isUserBranchCaucel: false,
+  isUserBranchBaca: false,
+  isUserBranchBoth: false,
+  isUserBranchSet: false
 }, action) => {
   switch (action.type) {
     case 'SET_TOKEN':
@@ -48,6 +52,25 @@ const auth = (state = {
         isSales: false,
         isExpenses: false,
         isMaintenance: false
+      }
+    case 'SET_USER_BRANCH':
+      switch (action.userBranchId) {
+        case 1:
+          return {...state, isUserBranchSet: true, isUserBranchCaucel: true}
+        case 2:
+          return {...state, isUserBranchSet: true, isUserBranchBaca: true}
+        case 3:
+          return {...state, isUserBranchSet: true, isUserBranchBoth: true}
+        default:
+          return state
+      }
+    case 'UNSET_USER_BRANCH':
+      return {
+        ...state,
+        isUserBranchSet: false,
+        isUserBranchCaucel: false,
+        isUserBranchBaca: false,
+        isUserBranchBoth: false
       }
     default:
       return state

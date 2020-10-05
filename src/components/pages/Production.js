@@ -17,6 +17,10 @@ import ProductionDataTable from '../ui/datatables/ProductionDataTable'
 import {connect} from 'react-redux'
 import {Route, Switch, Link, useLocation} from 'react-router-dom'
 import PrivateRoute from '../ui/PrivateRoute'
+import MauMonthYear from './inputs/MauMonthYear'
+import moment from 'moment'
+import ProductionByProductTypeTable from '../ui/ProductionByProductTypeTable'
+import dateFormat from '../../helpers/dateFormat'
 
 function a11yProps(index) {
   return {
@@ -39,7 +43,6 @@ const useStyles = makeStyles((theme) => ({
 
 function Production(props) {
   const classes = useStyles();
-  const [value, setValue] = React.useState(0);
 
   const theme = useTheme()
 
@@ -47,9 +50,14 @@ function Production(props) {
 
   const matchesXS = useMediaQuery(theme.breakpoints.down('md'))
 
-  const machineProductions = useFetch(apiUrl + 'analytics/production?dateGroup=none&entityGroup=material|product|machine')
-  const employeeProductions = useFetch(apiUrl + 'analytics/production?dateGroup=none&entityGroup=material|product|employee')
-  const employeePerformances = useFetch(apiUrl + 'analytics/production?dateGroup=none&entityGroup=employee')
+
+  const daysBack = 250
+  let initialDate = moment().subtract(daysBack + 1, 'days').format(dateFormat);
+
+  const machineProductions = useFetch(apiUrl + 'analytics/production?dateGroup=none&entityGroup=material|product|machine&initialDate=2020-01-01')
+  const materialProductions = useFetch(apiUrl + 'analytics/production?dateGroup=day&entityGroup=material|branch&initialDate=' + initialDate)
+  const employeeProductions = useFetch(apiUrl + 'analytics/production?dateGroup=none&entityGroup=material|product|employee&initialDate=2020-01-01')
+  const employeePerformances = useFetch(apiUrl + 'analytics/production?dateGroup=none&entityGroup=employee&initialDate=' + initialDate)
   const requestProducts = useFetch(apiUrl + 'stats/requestProducts')
 
   const routes = [
@@ -62,6 +70,11 @@ function Production(props) {
       name: 'Inventario',
       link: '/production/inventory',
       authed: props.isAdmin
+    },
+    {
+      name: 'Resumen',
+      link: '/production/summary',
+      authed: props.isAdmin || props.isProduction
     },
     {
       name: 'Por producir',
@@ -164,6 +177,37 @@ function Production(props) {
               }}
             />
             <PrivateRoute
+              authed={props.isAdmin || props.isProduction}
+              path={'/production/summary'}
+              exact
+              component={() => {
+                return (
+                  <Grid
+                    container
+                    direction={'column'}
+                  >
+                    <Grid
+                      item
+                      style={{marginBottom: '3em'}}
+                    >
+                      <ProductionByProductTypeTable
+                        productions={materialProductions}
+                        branchId={1}
+                        daysBack={daysBack}
+                      />
+                    </Grid>
+                    <Grid item>
+                      <ProductionByProductTypeTable
+                        productions={materialProductions}
+                        branchId={2}
+                        daysBack={daysBack}
+                      />
+                    </Grid>
+                  </Grid>
+                )
+              }}
+            />
+            <PrivateRoute
               authed={props.isAdmin}
               path={'/production/toProduce'}
               exact
@@ -195,7 +239,7 @@ function Production(props) {
                       item
                       style={{marginBottom: '3em'}}
                     >
-                      <OrderRequestsDataTable />
+                      <OrderRequestsDataTable/>
                     </Grid>
                     <Grid
                       item

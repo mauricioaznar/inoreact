@@ -124,6 +124,7 @@ const ProductionForm = (props) => {
     leader_employee_id: props.production ? String(props.production.order_production_employees
       .filter(productionEmployees => productionEmployees.is_leader === 1)[0].employee_id) : '',
     waste: props.production ? String(props.production.waste) : '',
+    branch_id: props.production ? String(props.production.branch_id) : '',
     order_production_type_id: props.production ? String(props.production.order_production_type_id) : '',
     order_production_products: props.production ?
       props.production.order_production_products
@@ -404,6 +405,31 @@ const ProductionForm = (props) => {
           item
           xs={12}
           className={classes.rowContainer}
+          style={{marginTop: '1em'}}
+        >
+          <MauAutocomplete
+            error={!!errors.branch_id}
+            label={'Sucursal'}
+            placeholder={'Sucursal x'}
+            id={'branchLabel'}
+            options={props.branches}
+            name={'branch_id'}
+            displayName={'name'}
+            rules={
+              {
+                required: true
+              }
+            }
+            control={control}
+            defaultValue={`${defaultValues.branch_id}`}
+          />
+        </Grid>
+
+
+        <Grid
+          item
+          xs={12}
+          className={classes.rowContainer}
           style={{marginTop: '2em'}}
         >
           <FormControl
@@ -555,7 +581,11 @@ const ProductionForm = (props) => {
                           />
                         </TableCell>
                         <TableCell>
-                          {watchProductionProducts[index].type}
+                          {
+                            watchProductionProducts.length > 0
+                              ? watchProductionProducts[index].type
+                              : ''
+                          }
                         </TableCell>
                         <TableCell>
                           <MauAutocomplete
@@ -701,7 +731,8 @@ const mapStateToProps = (state) => {
     products: state.production.products,
     machines: state.production.machines,
     productTypes: state.production.productTypes,
-    employees: state.general.employees
+    employees: state.general.employees,
+    branches: state.general.branches
   }
 }
 
