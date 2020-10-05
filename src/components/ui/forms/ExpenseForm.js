@@ -358,16 +358,20 @@ const ExpenseForm = (props) => {
     setValue(`expense_products[${index}]._tax`, String(_tax))
   }
 
-  const calculateExpenseProductKilos = (e, index) => {
-    let kilos = Number(watchExpenseProducts[index].groups) * Number(watchExpenseProducts[index].group_weight)
-    setValue(`expense_products[${index}].kilos`, String(kilos))
-  }
-
-  const calculateExpenseProductTotal = (e, index) => {
-    let _total = Number(watchExpenseProducts[index].kilos) * Number(watchExpenseProducts[index].kilo_price) * 1.16
-    let _tax = Number(watchExpenseProducts[index].kilos) * Number(watchExpenseProducts[index].kilo_price) * 0.16
-    setValue(`expense_products[${index}]._total`, String(_total))
-    setValue(`expense_products[${index}]._tax`, String(_tax))
+  const calculateExpenseProduct = (e, index) => {
+    if (hasGroupWeight(index)) {
+      let kilos = Number(watchExpenseProducts[index].groups) * Number(watchExpenseProducts[index].group_weight)
+      setValue(`expense_products[${index}].kilos`, String(kilos))
+      let _total = Number(kilos) * Number(watchExpenseProducts[index].kilo_price) * 1.16
+      let _tax = Number(kilos) * Number(watchExpenseProducts[index].kilo_price) * 0.16
+      setValue(`expense_products[${index}]._total`, String(Math.trunc(_total)))
+      setValue(`expense_products[${index}]._tax`, String(Math.trunc(_tax)))
+    } else {
+      let _total = Number(watchExpenseProducts[index].kilos) * Number(watchExpenseProducts[index].kilo_price) * 1.16
+      let _tax = Number(watchExpenseProducts[index].kilos) * Number(watchExpenseProducts[index].kilo_price) * 0.16
+      setValue(`expense_products[${index}]._total`, String(Math.trunc(_total)))
+      setValue(`expense_products[${index}]._tax`, String(Math.trunc(_tax)))
+    }
   }
 
   const hasGroupWeight = (index) => {
@@ -1286,10 +1290,7 @@ const ExpenseForm = (props) => {
                             type="number"
                             name={`expense_products[${index}].groups`}
                             onChange={(e) => {
-                              if (hasGroupWeight(index)) {
-                                calculateExpenseProductKilos(e, index)
-                              }
-                              calculateExpenseProductTotal(e, index)
+                              calculateExpenseProduct(e, index)
                             }}
                             defaultValue={`${expenseProduct.groups}`}
                             inputRef={register({required: true, max: 10000000})}
@@ -1301,7 +1302,7 @@ const ExpenseForm = (props) => {
                             label="Kilos"
                             type="number"
                             onChange={(e) => {
-                              calculateExpenseProductTotal(e, index)
+                              calculateExpenseProduct(e, index)
                             }}
                             disabled={hasGroupWeight(index)}
                             name={`expense_products[${index}].kilos`}
