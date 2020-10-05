@@ -11,7 +11,7 @@ import TableHead from '@material-ui/core/TableHead';
 import TableRow from '@material-ui/core/TableRow';
 import Paper from '@material-ui/core/Paper';
 import Grid from '@material-ui/core/Grid'
-import {getWeekRange} from '../../helpers/dateObjects'
+import {getDayRange, getWeekRange} from '../../helpers/dateObjects'
 import dateFormat from '../../helpers/dateFormat'
 
 
@@ -19,7 +19,7 @@ const useStyles = makeStyles({
   table: {
     minWidth: 400,
     overflow: 'auto'
-  },
+  }
 });
 
 
@@ -33,11 +33,10 @@ const formatNumber = (x, digits = 2) => {
 // const dateFormat = 'YYYY-MM-DD'
 
 
-
-function ProductionByWeekSummaryTable(props) {
+function ProductionByProductTypeTable(props) {
   const classes = useStyles();
 
-  let productions =  props.productions
+  let productions = props.productions
 
   let productTypeLookup = props.productTypes
     .reduce((acc, productType) => {
@@ -47,11 +46,10 @@ function ProductionByWeekSummaryTable(props) {
       }
     }, {})
 
-  let productTypeWeekRange = getWeekRange(-5, productTypeLookup)
+  let productTypeWeekRange = getDayRange(props.daysBack, productTypeLookup)
+    .reverse()
 
   if (productions) {
-
-
     productions
       .filter(production => {
         return props.branchId ? props.branchId === production.branch_id : true
@@ -65,14 +63,19 @@ function ProductionByWeekSummaryTable(props) {
           console.log(production)
           productTypeWRItem[production.product_type_id] += production.kilos
         }
-    })
-
+      })
   }
 
   return (
     <>
-      <Grid container direction={'column'}>
-        <Grid item xs={12}>
+      <Grid
+        container
+        direction={'column'}
+      >
+        <Grid
+          item
+          xs={12}
+        >
           <TableContainer
             component={Paper}
           >
@@ -104,8 +107,11 @@ function ProductionByWeekSummaryTable(props) {
                         {
                           props.productTypes.map(productType => {
                             return (
-                              <TableCell key={productType.id}>
-                                {[item[productType.id]]}
+                              <TableCell
+                                align={'right'}
+                                key={productType.id}
+                              >
+                                {formatNumber(item[productType.id])}
                               </TableCell>
                             )
                           })
@@ -124,13 +130,11 @@ function ProductionByWeekSummaryTable(props) {
 }
 
 
-
-
-function compare( a, b ) {
-  if ( a.total < b.total ){
+function compare(a, b) {
+  if (a.total < b.total) {
     return 1;
   }
-  if ( a.total > b.total ){
+  if (a.total > b.total) {
     return -1;
   }
   return 0;
@@ -143,4 +147,4 @@ const mapStateToProps = (state, ownProps) => {
   }
 }
 
-export default connect(mapStateToProps, null)(ProductionByWeekSummaryTable)
+export default connect(mapStateToProps, null)(ProductionByProductTypeTable)

@@ -19,7 +19,8 @@ import {Route, Switch, Link, useLocation} from 'react-router-dom'
 import PrivateRoute from '../ui/PrivateRoute'
 import MauMonthYear from './inputs/MauMonthYear'
 import moment from 'moment'
-import ProductionByWeekSummary from '../ui/ProductionByWeekSummary'
+import ProductionByProductTypeTable from '../ui/ProductionByProductTypeTable'
+import dateFormat from '../../helpers/dateFormat'
 
 function a11yProps(index) {
   return {
@@ -42,7 +43,6 @@ const useStyles = makeStyles((theme) => ({
 
 function Production(props) {
   const classes = useStyles();
-  const [value, setValue] = React.useState(0);
 
   const theme = useTheme()
 
@@ -50,13 +50,14 @@ function Production(props) {
 
   const matchesXS = useMediaQuery(theme.breakpoints.down('md'))
 
-  const [year, setYear] = React.useState(moment().year())
-  const [month, setMonth] = React.useState(moment().month())
+
+  const daysBack = 250
+  let initialDate = moment().subtract(daysBack + 1, 'days').format(dateFormat);
 
   const machineProductions = useFetch(apiUrl + 'analytics/production?dateGroup=none&entityGroup=material|product|machine&initialDate=2020-01-01')
-  const branchProductions = useFetch(apiUrl + 'analytics/production?dateGroup=week&entityGroup=productType|branch&initialDate=2020-01-01')
+  const branchProductions = useFetch(apiUrl + 'analytics/production?dateGroup=day&entityGroup=productType|branch&initialDate=' + initialDate)
   const employeeProductions = useFetch(apiUrl + 'analytics/production?dateGroup=none&entityGroup=material|product|employee&initialDate=2020-01-01')
-  const employeePerformances = useFetch(apiUrl + 'analytics/production?dateGroup=none&entityGroup=employee&initialDate=2020-01-01')
+  const employeePerformances = useFetch(apiUrl + 'analytics/production?dateGroup=none&entityGroup=employee&initialDate=' + initialDate)
   const requestProducts = useFetch(apiUrl + 'stats/requestProducts')
 
   const routes = [
@@ -187,32 +188,19 @@ function Production(props) {
                   >
                     <Grid
                       item
-                      style={{marginBottom: '2em'}}
-                    >
-                      <MauMonthYear
-                        month={month}
-                        setMonth={setMonth}
-                        year={year}
-                        setYear={setYear}
-                      />
-                    </Grid>
-                    <Grid
-                      item
                       style={{marginBottom: '3em'}}
                     >
-                      <ProductionByWeekSummary
+                      <ProductionByProductTypeTable
                         productions={branchProductions}
                         branchId={1}
-                        month={month}
-                        year={year}
+                        daysBack={daysBack}
                       />
                     </Grid>
                     <Grid item>
-                      <ProductionByWeekSummary
+                      <ProductionByProductTypeTable
                         productions={branchProductions}
                         branchId={2}
-                        month={month}
-                        year={year}
+                        daysBack={daysBack}
                       />
                     </Grid>
                   </Grid>

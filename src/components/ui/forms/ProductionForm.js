@@ -581,7 +581,11 @@ const ProductionForm = (props) => {
                           />
                         </TableCell>
                         <TableCell>
-                          {watchProductionProducts[index].type}
+                          {
+                            watchProductionProducts.length > 0
+                              ? watchProductionProducts[index].type
+                              : ''
+                          }
                         </TableCell>
                         <TableCell>
                           <MauAutocomplete
