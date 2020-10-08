@@ -5,6 +5,8 @@ import {
 import FormControl from '@material-ui/core/FormControl'
 import {Controller} from 'react-hook-form'
 import TextField from '@material-ui/core/TextField'
+import moment from 'moment'
+import {dateTimeFormat} from '../../../../helpers/dateFormat'
 
 function MauDateTimePicker (props) {
 
@@ -22,11 +24,10 @@ function MauDateTimePicker (props) {
               label={props.label}
               value={renderProps.value}
               renderInput={(props) => {
-                return (<TextField {...props} helperText={null}/>)
+                return (<TextField {...props} helperText={null} error={props.error}/>)
               }}
-              error={props.error}
               onChange={(date) => {
-                renderProps.onChange(date.set({second: 0}).format('YYYY-MM-DD HH:mm:ss'))
+                renderProps.onChange(date.set({second: 0}).format(dateTimeFormat))
               }}
               inputFormat={'YYYY-MM-DD HH:mm:ss'}
               animateYearScrolling
@@ -39,11 +40,11 @@ function MauDateTimePicker (props) {
         }}
         name={props.name}
         control={props.control}
-        defaultValue={props.defaultValue && props.defaultValue !== '0000-00-00 00:00:00' ? props.defaultValue : null}
+        defaultValue={props.defaultValue ? props.defaultValue : null}
         rules={{
           ...props.rules,
           validate: (value) => {
-            let isValid = props.rules && props.rules.required ? value !== '0000-00-00 00:00:00' : true
+            let isValid = props.rules && props.rules.required ? moment(value, dateTimeFormat) : true
             return  isValid || `La ${props.label.toLowerCase()} es requerida`
           }
         }}

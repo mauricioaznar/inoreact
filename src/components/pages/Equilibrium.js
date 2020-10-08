@@ -22,7 +22,7 @@ import Select from '@material-ui/core/Select'
 import MenuItem from '@material-ui/core/MenuItem'
 import useMediaQuery from '@material-ui/core/useMediaQuery'
 import useFetch from '../../helpers/useFetch'
-import MauMonthYear from './inputs/MauMonthYear'
+import MauMonthYear from '../ui/inputs/MauMonthYear'
 
 
 const useStyles = makeStyles((theme) => {

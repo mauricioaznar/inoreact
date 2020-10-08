@@ -1,4 +1,4 @@
-import dateFormat from './dateFormat'
+import {dateFormat} from './dateFormat'
 import moment from 'moment'
 
 export const getWeekRange= (week = 0, content) => {

@@ -33,8 +33,6 @@ function ProductionDataTable(props) {
 
   const entityPath = 'orderProduction'
 
-  const matchesXS = useMediaQuery(theme.breakpoints.down('md'))
-
   const [open, setOpen] = React.useState(false);
   const [rowData, setRowData] = React.useState(null);
 

@@ -114,8 +114,8 @@ const ProductionForm = (props) => {
   }
 
   const defaultValues = {
-    start_date_time: props.production ? props.production.start_date_time : '0000-00-00 00:00:00',
-    end_date_time: props.production ? props.production.end_date_time : '0000-00-00 00:00:00',
+    start_date_time: props.production ? props.production.start_date_time : '',
+    end_date_time: props.production ? props.production.end_date_time : '',
     id: props.production ? props.production.id : '',
     order_production_employees: props.production ? props.production.order_production_employees : [],
     helper_employees: props.production ? props.production.order_production_employees
@@ -442,7 +442,8 @@ const ProductionForm = (props) => {
               name="waste"
               label="Desperdicio"
               type="number"
-              placeholder="'0'"
+              error={!!errors.waste}
+              placeholder="0"
               InputLabelProps={{
                 shrink: true
               }}
@@ -582,8 +583,8 @@ const ProductionForm = (props) => {
                         </TableCell>
                         <TableCell>
                           {
-                            watchProductionProducts.length > 0
-                              ? watchProductionProducts[index].type
+                            watchProductionProducts.length > 0 && watchProductionProducts[index] ?
+                              watchProductionProducts[index].type
                               : ''
                           }
                         </TableCell>

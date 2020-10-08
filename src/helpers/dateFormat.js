@@ -1,3 +1,3 @@
-const dateFormat = 'YYYY-MM-DD'
+export const dateFormat = 'YYYY-MM-DD'
 
-export default dateFormat
+export const dateTimeFormat = 'YYYY-MM-DD HH:mm:ss'

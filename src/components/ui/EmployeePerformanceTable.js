@@ -6,7 +6,7 @@ import {
 } from "@material-ui/pickers";
 import Grid from '@material-ui/core/Grid'
 import {connect} from 'react-redux'
-import dateFormat from '../../helpers/dateFormat'
+import {dateFormat} from '../../helpers/dateFormat'
 import moment from 'moment'
 import TableContainer from '@material-ui/core/TableContainer'
 import Table from '@material-ui/core/Table'

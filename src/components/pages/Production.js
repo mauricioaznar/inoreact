@@ -15,12 +15,12 @@ import InventoryTable from '../ui/InventoryTable'
 import EmployeePerformanceTable from '../ui/EmployeePerformanceTable'
 import ProductionDataTable from '../ui/datatables/ProductionDataTable'
 import {connect} from 'react-redux'
-import {Route, Switch, Link, useLocation} from 'react-router-dom'
+import {Switch, Link, useLocation} from 'react-router-dom'
 import PrivateRoute from '../ui/PrivateRoute'
-import MauMonthYear from './inputs/MauMonthYear'
+
 import moment from 'moment'
 import ProductionByProductTypeTable from '../ui/ProductionByProductTypeTable'
-import dateFormat from '../../helpers/dateFormat'
+import {dateFormat} from '../../helpers/dateFormat'
 
 function a11yProps(index) {
   return {
@@ -52,7 +52,7 @@ function Production(props) {
 
 
   const daysBack = 250
-  let initialDate = moment().subtract(daysBack + 1, 'days').format(dateFormat);
+  let initialDate = moment('2019-01-01', dateFormat).format(dateFormat);
 
   const machineProductions = useFetch(apiUrl + 'analytics/production?dateGroup=none&entityGroup=material|product|machine&initialDate=2020-01-01')
   const materialProductions = useFetch(apiUrl + 'analytics/production?dateGroup=day&entityGroup=material|branch&initialDate=' + initialDate)

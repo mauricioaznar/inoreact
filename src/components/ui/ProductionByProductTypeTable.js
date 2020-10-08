@@ -11,8 +11,9 @@ import TableHead from '@material-ui/core/TableHead';
 import TableRow from '@material-ui/core/TableRow';
 import Paper from '@material-ui/core/Paper';
 import Grid from '@material-ui/core/Grid'
-import {getDayRange, getWeekRange} from '../../helpers/dateObjects'
-import dateFormat from '../../helpers/dateFormat'
+import {getDayRange} from '../../helpers/dateObjects'
+import {dateFormat} from '../../helpers/dateFormat'
+import MauMonthYear from './inputs/MauMonthYear'
 
 
 const useStyles = makeStyles({
@@ -34,6 +35,9 @@ const formatNumber = (x, digits = 2) => {
 
 
 function ProductionByProductTypeTable(props) {
+  const [year, setYear] = React.useState(moment().year())
+  const [month, setMonth] = React.useState(moment().month() + 1)
+
   const classes = useStyles();
 
   let productions = props.productions
@@ -73,6 +77,14 @@ function ProductionByProductTypeTable(props) {
         container
         direction={'column'}
       >
+        <Grid item xs={12}>
+          <MauMonthYear
+            year={year}
+            setYear={setYear}
+            month={month}
+            setMonth={setMonth}
+          />
+        </Grid>
         <Grid
           item
           xs={12}
@@ -87,7 +99,7 @@ function ProductionByProductTypeTable(props) {
             >
               <TableHead>
                 <TableRow>
-                  <TableCell>Semana</TableCell>
+                  <TableCell>Dia</TableCell>
                   {
                     props.materials.map(productType => {
                       return (
