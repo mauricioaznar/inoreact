@@ -54,11 +54,19 @@ function Production(props) {
   const daysBack = 250
   let initialDate = moment('2019-01-01', dateFormat).format(dateFormat);
 
-  const machineProductions = useFetch(apiUrl + 'analytics/production?dateGroup=none&entityGroup=material|product|machine&initialDate=2020-01-01')
-  const materialProductions = useFetch(apiUrl + 'analytics/production?dateGroup=day&entityGroup=material|branch&initialDate=' + initialDate)
-  const employeeProductions = useFetch(apiUrl + 'analytics/production?dateGroup=none&entityGroup=material|product|employee&initialDate=2020-01-01')
-  const employeePerformances = useFetch(apiUrl + 'analytics/production?dateGroup=none&entityGroup=employee&initialDate=' + initialDate)
+
+  //TODO async results causing rerendering. Create a child components with each async request to avoid rerendering
+  // const machineProductions = useFetch(apiUrl + 'analytics/production?dateGroup=none&entityGroup=material|product|machine&initialDate=2020-01-01')
+  // const materialProductions = useFetch(apiUrl + 'analytics/production?dateGroup=day&entityGroup=material|branch&initialDate=' + initialDate)
+  // const employeeProductions = useFetch(apiUrl + 'analytics/production?dateGroup=none&entityGroup=material|product|employee&initialDate=2020-01-01')
+  // const employeePerformances = useFetch(apiUrl + 'analytics/production?dateGroup=none&entityGroup=employee&initialDate=' + initialDate)
   const requestProducts = useFetch(apiUrl + 'stats/requestProducts')
+
+  const machineProductions = []
+  const materialProductions = []
+  const employeeProductions = []
+  const employeePerformances = []
+
 
   const routes = [
     {
