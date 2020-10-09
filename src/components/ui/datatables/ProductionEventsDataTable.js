@@ -25,7 +25,7 @@ const Transition = React.forwardRef(function Transition(props, ref) {
 
 //Fix call in useEffect that is leaking memory (because is trying to set state in before component mounts?)
 
-function ProductionDataTable(props) {
+function ProductionEventDataTable(props) {
 
   const tableRef = React.createRef();
 
@@ -190,4 +190,4 @@ const mapStateToProps = (state, ownProps) => {
   }
 }
 
-export default connect(mapStateToProps, null)(ProductionDataTable)
+export default connect(mapStateToProps, null)(ProductionEventDataTable)

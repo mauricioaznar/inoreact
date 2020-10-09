@@ -113,6 +113,16 @@ const ProductionForm = (props) => {
     }
   }
 
+  let defaultProductionProduct = {
+    id: '',
+    product_id: '',
+    machine_id: '',
+    kilos: '0',
+    groups: '0',
+    group_weight: '0',
+    type: ''
+  }
+
   const defaultValues = {
     start_date_time: props.production ? props.production.start_date_time : '',
     end_date_time: props.production ? props.production.end_date_time : '',
@@ -137,7 +147,7 @@ const ProductionForm = (props) => {
             type: getProductionProductType(productionProduct.product_id)
           }
         })
-      : [],
+      : [defaultProductionProduct],
     
   }
   
@@ -168,6 +178,8 @@ const ProductionForm = (props) => {
     setSuccess(false);
     setLoading(true);
 
+    console.log(data)
+
     let order_production_employees = data.helper_employees
       .map(helperEmployee => {
         return {
@@ -196,7 +208,6 @@ const ProductionForm = (props) => {
       defaultValues
     }
 
-    console.log(finalSubmitted)
     props.onSubmit(finalSubmitted, onSubmitCallback)
   };
 
@@ -211,15 +222,7 @@ const ProductionForm = (props) => {
 
 
   const handleAddProductionProduct = () => {
-    productionProducts.append({
-      id: '',
-      product_id: "null",
-      machine_id: "null",
-      kilos: "0",
-      groups: "0",
-      group_weight: "0",
-      type: ''
-    })
+    productionProducts.append(defaultProductionProduct)
   }
 
   const handleRemoveProductionProducts = (index) => {
@@ -228,7 +231,7 @@ const ProductionForm = (props) => {
 
 
   const handleProductSelection = (productId, productionProductId, index) => {
-    let groupWeight = "0"
+    let groupWeight = '0'
     let kilos = "0"
     let groups = "0"
     let ppType = ""
@@ -249,8 +252,6 @@ const ProductionForm = (props) => {
 
       if (!isSameInitialProduct) {
         groupWeight = product.current_group_weight ? product.current_group_weight : "0"
-        kilos = "0"
-        groups = "0"
       } else {
         groupWeight = initialProductionProduct.group_weight
         kilos = initialProductionProduct.kilos
@@ -591,7 +592,6 @@ const ProductionForm = (props) => {
                           <MauAutocomplete
                             error={!!errors.order_production_products && !!errors.order_production_products[index].product_id}
                             label={'Producto'}
-                            id={'productLabel'}
                             options={props.products}
                             displayName={'description'}
                             onChange={(e, productId) => {
@@ -653,7 +653,7 @@ const ProductionForm = (props) => {
                             disabled={hasGroupWeight(index)}
                             name={`order_production_products[${index}].kilos`}
                             defaultValue={`${productionProduct.kilos}`}
-                            inputRef={register({required: true, max: 10000000})}
+                            inputRef={register({required: true, max: 10000000, min: 1})}
                           />
                         </TableCell>
                         <TableCell>

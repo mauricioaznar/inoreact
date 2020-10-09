@@ -10,8 +10,6 @@ import {dateTimeFormat} from '../../../../helpers/dateFormat'
 
 function MauDateTimePicker(props) {
 
-  console.log(props.error)
-
   return (
     <FormControl
       fullWidth

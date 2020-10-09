@@ -113,6 +113,8 @@ function Navbar(props) {
 
   const location = useLocation()
 
+  const firstPath = '/' + location.pathname.split('/')[1]
+
   const routes = [
     {
       name: 'Punto de equilibrio',
@@ -150,7 +152,7 @@ function Navbar(props) {
     <>
       <Tabs
         indicatorColor="primary"
-        value={location.pathname}
+        value={firstPath}
       >
         {
           routes.map(route => {
@@ -199,7 +201,7 @@ function Navbar(props) {
                   button
                   component={Link}
                   to={route.link}
-                  selected={location.pathname === route.link}
+                  selected={firstPath === route.link}
                   classes={{selected: classes.drawerItemSelected}}
                 >
                   <ListItemText
