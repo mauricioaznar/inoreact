@@ -232,7 +232,6 @@ const ProductionForm = (props) => {
     let kilos = "0"
     let groups = "0"
     let ppType = ""
-    console.log(productId)
     if (productId) {
 
       let initialProductionProduct = defaultValues.order_production_products
@@ -602,10 +601,7 @@ const ProductionForm = (props) => {
                             name={`order_production_products[${index}].product_id`}
                             rules={
                               {
-                                required: "this is required",
-                                validate: (value) => {
-                                  return value !== 'null'
-                                }
+                                required: true
                               }
                             }
                             control={control}

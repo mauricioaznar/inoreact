@@ -8,10 +8,9 @@ import TextField from '@material-ui/core/TextField'
 import moment from 'moment'
 import {dateTimeFormat} from '../../../../helpers/dateFormat'
 
-function MauDateTimePicker (props) {
+function MauDateTimePicker(props) {
 
-
-
+  console.log(props.error)
 
   return (
     <FormControl
@@ -23,8 +22,12 @@ function MauDateTimePicker (props) {
             <MobileDateTimePicker
               label={props.label}
               value={renderProps.value}
-              renderInput={(props) => {
-                return (<TextField {...props} helperText={null} error={props.error}/>)
+              renderInput={(params) => {
+                return (<TextField
+                  {...params}
+                  helperText={null}
+                  error={!!props.error}
+                />)
               }}
               onChange={(date) => {
                 renderProps.onChange(date.set({second: 0}).format(dateTimeFormat))
@@ -32,8 +35,8 @@ function MauDateTimePicker (props) {
               inputFormat={'YYYY-MM-DD HH:mm:ss'}
               animateYearScrolling
               PopoverProps={{
-                anchorOrigin: { horizontal: "left", vertical: "bottom" },
-                transformOrigin: { horizontal: "left", vertical: "top"}
+                anchorOrigin: {horizontal: "left", vertical: "bottom"},
+                transformOrigin: {horizontal: "left", vertical: "top"}
               }}
             />
           )
@@ -45,7 +48,7 @@ function MauDateTimePicker (props) {
           ...props.rules,
           validate: (value) => {
             let isValid = props.rules && props.rules.required ? moment(value, dateTimeFormat) : true
-            return  isValid || `La ${props.label.toLowerCase()} es requerida`
+            return isValid || `La ${props.label.toLowerCase()} es requerida`
           }
         }}
       />

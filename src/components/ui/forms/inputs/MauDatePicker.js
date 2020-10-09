@@ -6,9 +6,7 @@ import FormControl from '@material-ui/core/FormControl'
 import {Controller} from 'react-hook-form'
 import TextField from '@material-ui/core/TextField'
 
-function MauDatePicker (props) {
-
-
+function MauDatePicker(props) {
 
 
   return (
@@ -21,7 +19,13 @@ function MauDatePicker (props) {
             <DatePicker
               label={props.label}
               value={renderProps.value}
-              renderInput={(props) => <TextField {...props} helperText={null}/>}
+              renderInput={(params) =>
+                <TextField
+                  {...params}
+                  helperText={null}
+                  error={props.error}
+                />
+              }
               error={props.error}
               onChange={(date) => {
                 renderProps.onChange(date.format('YYYY-MM-DD'))
@@ -29,8 +33,8 @@ function MauDatePicker (props) {
               inputFormat={'YYYY-MM-DD'}
               animateYearScrolling
               PopoverProps={{
-                anchorOrigin: { horizontal: "left", vertical: "bottom" },
-                transformOrigin: { horizontal: "left", vertical: "top"}
+                anchorOrigin: {horizontal: "left", vertical: "bottom"},
+                transformOrigin: {horizontal: "left", vertical: "top"}
               }}
             />
           )
@@ -42,7 +46,7 @@ function MauDatePicker (props) {
           ...props.rules,
           validate: (value) => {
             let isValid = props.rules && props.rules.required ? value !== '0000-00-00' : true
-            return  isValid || `La ${props.label.toLowerCase()} es requerida`
+            return isValid || `La ${props.label.toLowerCase()} es requerida`
           }
         }}
       />

@@ -207,8 +207,6 @@ const ExpenseForm = (props) => {
     'expense/list?paginate=false&filter_exact_1=supplier_id&filter_exact_value_1=' +
     supplierId) || []
 
-  console.log(supplierExpenses)
-
 
   let isDifferedPaymentMethod = false
 
@@ -239,6 +237,8 @@ const ExpenseForm = (props) => {
       .map(complement => {
         return {...complement, delivered: (complement.delivered ? '1' : '-1')}
       }) : []
+
+    console.log(errors)
 
     let finalSubmitted = {
       ...data,
@@ -523,7 +523,7 @@ const ExpenseForm = (props) => {
               name="date_paid"
               control={control}
               rules={{required: isDatePaidRequired}}
-              error={!!errors.date_paid}
+              error={errors.date_paid}
               helperText={errors.date_paid && errors.date_paid.message}
               defaultValue={defaultValues.date_paid}
               label="Fecha de pago"
@@ -1000,7 +1000,11 @@ const ExpenseForm = (props) => {
 
                         <TableCell>
                           <MauAutocomplete
-                            error={!!errors.branch_id}
+                            error={
+                              errors.expense_items
+                              && errors.expense_items[index]
+                              && errors.expense_items[index].branch_id
+                              ? errors.expense_items[index].branch_id : false}
                             label={'Sucursal'}
                             id={'branchLabel'}
                             options={props.branches}
