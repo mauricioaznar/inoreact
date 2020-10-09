@@ -30,14 +30,38 @@ const Home = (props) => {
   } else {
     return (
       <div>
-        <Navbar />
+        <Navbar/>
         <Switch>
-          <PrivateRoute authed={props.isAdmin} path={'/'} exact component={() => <Equilibrium />}/>
-          <Route path={'/production'} component={() => <Production />}/>
-          <PrivateRoute authed={props.isExpenses || props.isAdmin} path={'/expenses'} component={() => <Expenses />}/>
-          <PrivateRoute authed={props.isSales || props.isAdmin} path={'/sales'} component={() => <Sales />}/>
-          <PrivateRoute authed={props.isAdmin || props.isProduction} path={'/maintenance'} component={() => <Maintenance />}/>
-          <PrivateRoute authed={props.isSuperAdmin} path={'/admin'} component={() => <Admin />}/>
+          <PrivateRoute
+            authed={props.isAdmin}
+            path={'/'}
+            exact
+            component={() => <Equilibrium/>}
+          />
+          <Route
+            path={'/production'}
+            component={() => <Production/>}
+          />
+          <PrivateRoute
+            authed={props.isExpenses || props.isAdmin}
+            path={'/expenses'}
+            component={() => <Expenses/>}
+          />
+          <PrivateRoute
+            authed={props.isSales || props.isAdmin}
+            path={'/sales'}
+            component={() => <Sales/>}
+          />
+          <PrivateRoute
+            authed={props.isAdmin || props.isProduction}
+            path={'/maintenance'}
+            component={() => <Maintenance/>}
+          />
+          <PrivateRoute
+            authed={props.isSuperAdmin}
+            path={'/admin'}
+            component={() => <Admin/>}
+          />
         </Switch>
       </div>
     )
@@ -46,7 +70,9 @@ const Home = (props) => {
 
 const mapDispatchToProps = (dispatch, ownProps) => {
   return {
-    getApiEntities: () => {dispatch(getApiEntities())}
+    getApiEntities: () => {
+      dispatch(getApiEntities())
+    }
   }
 }
 

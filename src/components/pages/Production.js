@@ -15,7 +15,7 @@ import InventoryTable from '../ui/InventoryTable'
 import EmployeePerformanceTable from '../ui/EmployeePerformanceTable'
 import ProductionDataTable from '../ui/datatables/ProductionDataTable'
 import {connect} from 'react-redux'
-import {Switch, Link, useLocation} from 'react-router-dom'
+import {Switch, Link, useLocation, Route} from 'react-router-dom'
 import PrivateRoute from '../ui/PrivateRoute'
 
 import moment from 'moment'
@@ -43,6 +43,9 @@ const useStyles = makeStyles((theme) => ({
 
 function Production(props) {
   const classes = useStyles();
+
+  console.log('Production')
+
 
   const theme = useTheme()
 
@@ -140,8 +143,7 @@ function Production(props) {
           xs={12}
         >
           <Switch>
-            <PrivateRoute
-              authed={props.isAdmin}
+            <Route
               path={'/production'}
               exact
               component={() => {
