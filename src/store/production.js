@@ -1,6 +1,7 @@
 const production = (state = {
   orderProductions: [],
   materials: [],
+  packings: [],
   productTypes: [],
   machines: [],
   products: [],
@@ -11,6 +12,8 @@ const production = (state = {
       return {...state, orderProductions: action.orderProductions}
     case 'SET_MATERIALS':
       return {...state, materials: action.materials}
+    case 'SET_PACKINGS':
+      return {...state, packings: action.packings}
     case 'SET_PRODUCT_TYPES':
       return {...state, productTypes: action.productTypes}
     case 'SET_MACHINES':

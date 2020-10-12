@@ -16,6 +16,7 @@ export default function ProductionSummary(props) {
 
   const materialProductions = useFetch(apiUrl + 'analytics/production?dateGroup=day&entityGroup=material|branch&initialDate=' + initialDate)
 
+
   let loading = !materialProductions
 
   return (

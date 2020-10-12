@@ -12,6 +12,13 @@ export const setMaterials = (materials) => {
   }
 }
 
+export const setPackings = (packings) => {
+  return {
+    type: 'SET_PACKINGS',
+    packings: packings
+  }
+}
+
 export const setMachines = (machines) => {
   return {
     type: 'SET_MACHINES',

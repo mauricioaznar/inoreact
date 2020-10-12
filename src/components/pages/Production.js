@@ -8,7 +8,7 @@ import {connect} from 'react-redux'
 import {Switch, Link, useLocation, Route} from 'react-router-dom'
 import PrivateRoute from '../ui/PrivateRoute'
 
-import ProductionHome from './production/ProductionHome'
+import ProductionDataCapture from './production/ProductionDataCapture'
 import ProductionInventory from './production/ProductionInventory'
 import ProductionSummary from './production/ProductionSummary'
 import ProductionCalculations from './production/ProductionCalculations'
@@ -33,13 +33,13 @@ function Production(props) {
 
   const routes = [
     {
-      name: 'Inicio',
+      name: 'Inventario',
       link: '/production',
       authed: true
     },
     {
-      name: 'Inventario',
-      link: '/production/inventory',
+      name: 'Captura de datos',
+      link: '/production/dataCapture',
       authed: true
     },
     {
@@ -108,16 +108,16 @@ function Production(props) {
               exact
               component={() => {
                 return (
-                  <ProductionHome />
+                  <ProductionInventory />
                 )
               }}
             />
             <Route
-              path={'/production/inventory'}
+              path={'/production/dataCapture'}
               exact
               component={() => {
                 return (
-                  <ProductionInventory />
+                  <ProductionDataCapture />
                 )
               }}
             />
@@ -161,7 +161,6 @@ function Production(props) {
 
 const mapStateToProps = (state, ownProps) => {
   return {
-    areEntitiesLoading: state.general.areEntitiesLoading,
     isAdmin: state.auth.isAdmin,
     isSuperAdmin: state.auth.isSuperAdmin,
     isProduction: state.auth.isProduction,
