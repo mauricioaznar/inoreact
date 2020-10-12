@@ -1,7 +1,5 @@
 import React from 'react'
 import apiUrl from '../../helpers/apiUrl'
-import authHeader from '../../helpers/authHeader'
-import axios from 'axios'
 
 import moment from 'moment';
 import 'moment/locale/es';
@@ -16,10 +14,6 @@ import ExpensesBySupSubTable from '../ui/ExpensesBySubSupTable'
 import InvoicesBySupTable from '../ui/InvoicesBySupTable'
 import ExpensesVsSalesChart from '../ui/ExpensesVsSalesChart'
 import EquilibriumSummary from '../ui/EquilibriumSummary'
-import FormControl from '@material-ui/core/FormControl'
-import InputLabel from '@material-ui/core/InputLabel'
-import Select from '@material-ui/core/Select'
-import MenuItem from '@material-ui/core/MenuItem'
 import useMediaQuery from '@material-ui/core/useMediaQuery'
 import useFetch from '../../helpers/useFetch'
 import MauMonthYear from '../ui/inputs/MauMonthYear'
@@ -48,7 +42,6 @@ export default function Equilibrium(props) {
 
   const matchesXS = useMediaQuery(theme.breakpoints.down('xs'))
 
-  //check usages with ctl + v
   const expensesEstimation = useFetch(apiUrl + 'analytics/expensesEstimation?dateGroup=month')
   const sales = useFetch(apiUrl + 'analytics/sales?dateGroup=month&entityGroup=material')
   const expensesNoEstimatesByCatSubBra = useFetch(apiUrl + 'analytics/expenses?dateGroup=month&entityGroup=branch|expenseCategory|expenseSubcategory&noEstimates')

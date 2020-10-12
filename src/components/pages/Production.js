@@ -8,11 +8,11 @@ import {connect} from 'react-redux'
 import {Switch, Link, useLocation, Route} from 'react-router-dom'
 import PrivateRoute from '../ui/PrivateRoute'
 
-import ProductionHome from './subpages/ProductionHome'
-import ProductionInventory from './subpages/ProductionInventory'
-import ProductionSummary from './subpages/ProductionSummary'
-import ProductionCalculations from './subpages/ProductionCalculations'
-import ProductionToProduce from './subpages/ProductionToProduce'
+import ProductionHome from './production/ProductionHome'
+import ProductionInventory from './production/ProductionInventory'
+import ProductionSummary from './production/ProductionSummary'
+import ProductionCalculations from './production/ProductionCalculations'
+import ProductionToProduce from './production/ProductionToProduce'
 
 const useStyles = makeStyles((theme) => ({
   root: {

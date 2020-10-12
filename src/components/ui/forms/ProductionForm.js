@@ -94,10 +94,6 @@ const ProductionForm = (props) => {
     [classes.buttonSuccess]: success
   });
 
-  const bagProducts = props.products.filter(product => product.product_type_id === 1)
-  const rollProducts = props.products.filter(product => product.product_type_id === 2)
-  const pelletProducts = props.products.filter(product => product.product_type_id === 3)
-
   const getProductionProductType = (productId) => {
     let product = props.products.find(product => {
       return String(product.id) === String(productId)
@@ -157,6 +153,33 @@ const ProductionForm = (props) => {
   });
 
   const watchProductionProducts = watch('order_production_products')
+
+  const watchOrderProductionTypeId = watch('order_production_type_id')
+
+  let typeProducts = []
+
+  const bagProducts = props.products.filter(product => product.product_type_id === 1)
+  const rollProducts = props.products.filter(product => product.product_type_id === 2)
+  const pelletProducts = props.products.filter(product => product.product_type_id === 3)
+
+  let typeMachines = []
+
+  const bagMachines = props.machines.filter(machine => machine.machine_type_id === 1)
+  const rollMachines = props.machines.filter(machine => machine.machine_type_id === 2)
+
+  if (String(watchOrderProductionTypeId) === '1') {
+    typeProducts = bagProducts.concat(rollProducts)
+    typeMachines = bagMachines
+  } else if (String(watchOrderProductionTypeId) === '2') {
+    typeProducts = rollProducts
+    typeMachines = rollMachines
+  } else if (String(watchOrderProductionTypeId) === '3') {
+    typeProducts = pelletProducts
+    typeMachines = []
+  } else {
+    typeProducts = []
+    typeMachines = []
+  }
 
 
   const productionProducts = useFieldArray(
@@ -592,7 +615,7 @@ const ProductionForm = (props) => {
                           <MauAutocomplete
                             error={!!errors.order_production_products && !!errors.order_production_products[index].product_id}
                             label={'Producto'}
-                            options={props.products}
+                            options={typeProducts}
                             displayName={'description'}
                             onChange={(e, productId) => {
                               let productionProductId = `${productionProduct.id}`
@@ -613,7 +636,7 @@ const ProductionForm = (props) => {
                             error={!!errors.order_production_products && !!errors.order_production_products[index].machine_id}
                             label={'Maquina'}
                             id={'machineLabel'}
-                            options={props.machines}
+                            options={typeMachines}
                             displayName={'name'}
                             name={`order_production_products[${index}].machine_id`}
                             rules={

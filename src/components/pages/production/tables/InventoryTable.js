@@ -1,6 +1,6 @@
 import React from 'react'
 import {connect} from 'react-redux'
-import formatNumber from '../../helpers/formatNumber'
+import formatNumber from '../../../../helpers/formatNumber'
 import {makeStyles} from '@material-ui/core/styles'
 import TableContainer from '@material-ui/core/TableContainer'
 import Table from '@material-ui/core/Table'
@@ -29,36 +29,44 @@ const InventoryTable = (props) => {
   let type = props.type === 'material' ? 'material' : 'product'
 
 
-  let materials = props.bagsMaterials
-    .map(material => {
+  let materials = []
 
-      const {kilosBalance, groupsBalance} = props.inventory.reduce((acc, product) => {
+  let products = []
 
-        return product.material_id === material.id ?
-          {
-            kilosBalance: acc.kilosBalance + product.kilos_balance,
-            groupsBalance: acc.groupsBalance + product.groups_balance
-          } :
-          acc
-      }, {kilosBalance: 0, groupsBalance: 0})
+  console.log(props.inventory)
 
-      return {
-        ...material,
-        kilos_balance: kilosBalance,
-        groups_balance: groupsBalance
-      }
-    })
-    .filter(material => {
-      return material.kilos_balance > 1 || material.kilos_balance < -1
-    })
+  if (props.inventory && props.inventory.length > 0) {
+    materials = props.bagsMaterials
+      .map(material => {
 
-  let products = props.inventory
-    .filter(product => {
-      return product.kilos_balance > 1 || product.kilos_balance < -1
-    })
-    .sort((a, b) => {
-      return a.material_id > b.material_id ? 1 : a.material_id < b.material_id ? -1 : 0
-    })
+        const {kilosBalance, groupsBalance} = props.inventory.reduce((acc, product) => {
+
+          return product.material_id === material.id ?
+            {
+              kilosBalance: acc.kilosBalance + product.kilos_balance,
+              groupsBalance: acc.groupsBalance + product.groups_balance
+            } :
+            acc
+        }, {kilosBalance: 0, groupsBalance: 0})
+
+        return {
+          ...material,
+          kilos_balance: kilosBalance,
+          groups_balance: groupsBalance
+        }
+      })
+      .filter(material => {
+        return material.kilos_balance > 1 || material.kilos_balance < -1
+      })
+
+    products = props.inventory
+      .filter(product => {
+        return product.kilos_balance > 1 || product.kilos_balance < -1
+      })
+      .sort((a, b) => {
+        return a.material_id > b.material_id ? 1 : a.material_id < b.material_id ? -1 : 0
+      })
+  }
 
   const MaterialsTable = (
     <Grid container direction={'column'}>
@@ -67,8 +75,8 @@ const InventoryTable = (props) => {
           Inventario por subtipos
         </Typography>
       </Grid>
-      <Grid item xs>
-        <TableContainer style={{maxWidth: 1000}}>
+      <Grid item>
+        <TableContainer>
           <Table aria-label="simple table">
             <TableHead>
               <TableRow>
@@ -99,8 +107,8 @@ const InventoryTable = (props) => {
           Inventario por productos
         </Typography>
       </Grid>
-      <Grid item xs>
-        <TableContainer style={{maxWidth: 1000}}>
+      <Grid item>
+        <TableContainer>
           <Table aria-label="simple table">
             <TableHead>
               <TableRow>
@@ -129,7 +137,6 @@ const InventoryTable = (props) => {
 
 const mapStateToProps = (state, ownProps) => {
   return {
-    inventory: state.general.inventory,
     bagsMaterials: state.production.materials
       .filter(material => {
         return material.product_type_id === 1 || material.product_type_id === 4

@@ -9,11 +9,9 @@ import TableCell from '@material-ui/core/TableCell';
 import TableContainer from '@material-ui/core/TableContainer';
 import TableHead from '@material-ui/core/TableHead';
 import TableRow from '@material-ui/core/TableRow';
-import Paper from '@material-ui/core/Paper';
 import Grid from '@material-ui/core/Grid'
-import {getDayRange} from '../../helpers/dateObjects'
-import {dateFormat} from '../../helpers/dateFormat'
-import MauMonthYear from './inputs/MauMonthYear'
+import {getDayRange} from '../../../../helpers/dateObjects'
+import {dateFormat} from '../../../../helpers/dateFormat'
 
 
 const useStyles = makeStyles({
@@ -35,9 +33,6 @@ const formatNumber = (x, digits = 2) => {
 
 
 function ProductionByProductTypeTable(props) {
-  const [year, setYear] = React.useState(moment().year())
-  const [month, setMonth] = React.useState(moment().month() + 1)
-
   const classes = useStyles();
 
   let productions = props.productions
@@ -63,7 +58,7 @@ function ProductionByProductTypeTable(props) {
           .find(item => {
             return moment(item.date, dateFormat).isSame(moment(production.start_date, dateFormat))
           })
-        if (productTypeWRItem && production.product_type_id === 1) {
+        if (productTypeWRItem && production.product_type_id === props.productTypeId) {
           productTypeWRItem[production.material_id] += production.kilos
           productTypeWRItem.total += production.kilos
 
@@ -77,29 +72,21 @@ function ProductionByProductTypeTable(props) {
         container
         direction={'column'}
       >
-        <Grid item xs={12}>
-          <MauMonthYear
-            year={year}
-            setYear={setYear}
-            month={month}
-            setMonth={setMonth}
-          />
-        </Grid>
         <Grid
           item
           xs={12}
         >
-          <TableContainer
-            component={Paper}
-          >
+          <TableContainer>
             <Table
               className={classes.table}
               size="small"
               stickyHeader
+
             >
               <TableHead>
                 <TableRow>
                   <TableCell>Dia</TableCell>
+                  <TableCell>Total</TableCell>
                   {
                     props.materials.map(productType => {
                       return (
@@ -109,15 +96,15 @@ function ProductionByProductTypeTable(props) {
                       )
                     })
                   }
-                  <TableCell>Total</TableCell>
                 </TableRow>
               </TableHead>
-              <TableBody>
+              <TableBody stripedRows>
                 {
                   productTypeWeekRange.map(item => {
                     return (
                       <TableRow key={item.date}>
                         <TableCell>{item.date}</TableCell>
+                        <TableCell>{formatNumber(item.total)}</TableCell>
                         {
                           props.materials.map(productType => {
                             return (
@@ -130,7 +117,6 @@ function ProductionByProductTypeTable(props) {
                             )
                           })
                         }
-                        <TableCell>{formatNumber(item.total)}</TableCell>
                       </TableRow>
                     )
                   })
@@ -160,7 +146,7 @@ const mapStateToProps = (state, ownProps) => {
   return {
     productTypes: state.production.productTypes,
     materials: state.production.materials
-      .filter(material => material.product_type_id === 1)
+      .filter(material => material.product_type_id === ownProps.productTypeId)
       .sort((a, b) => {
         return a.product_type_id > b.product_type_id ? -1
           : a.product_type_id < b.product_type_id ? 1

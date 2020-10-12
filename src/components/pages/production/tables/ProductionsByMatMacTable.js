@@ -12,7 +12,7 @@ import TableHead from '@material-ui/core/TableHead';
 import TableRow from '@material-ui/core/TableRow';
 import Paper from '@material-ui/core/Paper';
 import Grid from '@material-ui/core/Grid'
-import Autocomplete from '../ui/inputs/Autocomplete'
+import Autocomplete from '../../../ui/inputs/Autocomplete'
 import moment from 'moment'
 import * as ss from 'simple-statistics'
 import Box from '@material-ui/core/Box'
@@ -139,9 +139,7 @@ function ProductionsByMatMacTable(props) {
   }, [product, props.employeeProductions, props.machineProductions])
 
   return (
-    loading
-      ? <CircularProgress size={40} style={{marginLeft: '.5em'}}/>
-      : <>
+      <>
         <Grid
           container
           direction={'column'}

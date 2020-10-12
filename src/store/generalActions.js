@@ -60,11 +60,9 @@ export const getApiEntities = () => {
   return (dispatch, getState) => {
     dispatch(setAreEntitiesLoading())
     return axios.all([
-      axios.get(apiUrl + 'stats/inventory', {headers: {...authHeader()}}),
-      axios.get(apiUrl + 'stats/dependentEntities', {headers: {...authHeader()}}),
+      axios.get(apiUrl + 'stats/dependentEntities', {headers: {...authHeader()}})
     ]).then(result => {
       // const orderProductions = result[0].data.data[0]
-      const inventory = result[0].data.data
       const {
         expense_subcategories: expenseSubcategories,
         machines,
@@ -86,9 +84,8 @@ export const getApiEntities = () => {
         roles,
         order_production_type: orderProductionTypes,
         production_event_type: productionEventTypes
-      } = result[1].data.data
+      } = result[0].data.data
       // dispatch(setOrderProductions(orderProductions))
-      dispatch(setInventory(inventory))
       dispatch(setBranches(branches))
       dispatch(setExpenseCategories(expenseCategories))
       dispatch(setExpenseInvoicePaymentMethods(expense_invoice_payment_methods))
