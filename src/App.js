@@ -26,6 +26,8 @@ function App(props) {
     const initialPassword = password || ''
     if (initialEmail !== '' && initialPassword !== '') {
       props.loginUser(initialEmail, initialPassword)
+    } else {
+      props.unsetToken()
     }
   }
 
@@ -43,7 +45,7 @@ function App(props) {
   return (
     <div className="Auth">
       {
-        !props.authenticated ? <LoginForm />
+        !props.authenticated  ? <LoginForm />
         : !userValid ? <div>Validating token...</div>
         : !props.isRoleSet ? <div>Validating role...</div>
         : !props.isUserBranchSet ? <div>Validating user branch...</div>
@@ -66,6 +68,7 @@ const mapStateToProps = (state, ownProps) => {
 const mapDispatchToProps = (dispatch, getState) => {
   return {
     loginUser: (email, password) => {dispatch(loginUser(email, password))},
+    unsetToken: () => {dispatch(unsetToken())},
     setRole: (user) => {dispatch(setRole(user))},
     setUserBranch: (user) => {dispatch(setUserBranch(user))}
   }
