@@ -1,21 +1,15 @@
 import React from 'react'
 import {connect} from 'react-redux'
 
-
-import AddBox from '@material-ui/icons/AddBox';
-import Edit from '@material-ui/icons/Edit';
-
 import Grid from '@material-ui/core/Grid'
 import {useTheme} from '@material-ui/core/styles'
 import axios from 'axios'
 import apiUrl from '../../../helpers/apiUrl'
 import authHeader from '../../../helpers/authHeader'
-import MaterialTable from 'material-table'
 import Dialog from '@material-ui/core/Dialog'
-import ExpenseForm from '../forms/ExpenseForm'
 import useMediaQuery from '@material-ui/core/useMediaQuery'
 import Slide from '@material-ui/core/Slide'
-import {localization, tableIcons, mainEntityPromise} from './common/common'
+import {mainEntityPromise} from './common/common'
 import UserForm from '../forms/UserForm'
 import MauMaterialTable from './common/MauMaterialTable'
 
@@ -81,7 +75,7 @@ function UserDataTable(props) {
         if (user.password === '') {
           return true
         }
-        return axios.put(apiUrl + 'user/password/' + userId , {password: user.password}, {headers: {...authHeader()}})
+        return axios.put(apiUrl + entityPath + '/password/' + userId , {password: user.password}, {headers: {...authHeader()}})
       })
       .then(result => {
         callback(true)
@@ -92,7 +86,7 @@ function UserDataTable(props) {
 
   const handleRowDelete = (oldData) => {
     let promises = []
-    promises.push(axios.put(apiUrl + 'user/' + oldData.id, {active: -1}, {headers: {...authHeader()}}))
+    promises.push(axios.put(apiUrl + entityPath + '/' + oldData.id, {active: -1}, {headers: {...authHeader()}}))
     return Promise.all(promises).then(results => {
       return new Promise((resolve, reject) => {
         resolve()
@@ -103,37 +97,23 @@ function UserDataTable(props) {
 
   return (
     <>
-      <Grid
-        container
-        direction={'column'}
-      >
-        <Grid
-          item
-          xs={12}
-          style={{marginTop: '2em'}}
-        >
-          <MauMaterialTable
-            tableRef={tableRef}
-            title="Usuarios"
-            entityPath={entityPath}
-            onRowDelete={(oldData) => {
-              return handleRowDelete(oldData)
-            }}
-            onRowAdd={(event, rowData) => {
-              setRowData(null)
-              setOpen(true)
-            }}
-            onRowEdit={(event, rowData) => {
-              setRowData(rowData)
-              setOpen(true)
-            }}
-            columns={columns}
-
-
-
-          />
-        </Grid>
-      </Grid>
+      <MauMaterialTable
+        tableRef={tableRef}
+        title="Usuarios"
+        entityPath={entityPath}
+        onRowDelete={(oldData) => {
+          return handleRowDelete(oldData)
+        }}
+        onRowAdd={(event, rowData) => {
+          setRowData(null)
+          setOpen(true)
+        }}
+        onRowEdit={(event, rowData) => {
+          setRowData(rowData)
+          setOpen(true)
+        }}
+        columns={columns}
+      />
       <Dialog
         maxWidth={!matchesXS ? 'lg' : null}
         fullWidth={!matchesXS || null}
