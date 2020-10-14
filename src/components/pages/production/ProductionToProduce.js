@@ -8,8 +8,9 @@ import CircularProgress from '@material-ui/core/CircularProgress'
 export default function ProductionToProduce (props) {
 
   const requestProducts = useFetch(apiUrl + 'stats/requestProducts')
+  const inventory = useFetch(apiUrl + 'stats/inventory')
 
-  let loading = !requestProducts
+  let loading = !requestProducts || !inventory
 
   return (
     loading
@@ -22,35 +23,38 @@ export default function ProductionToProduce (props) {
             item
             style={{marginBottom: '3em'}}
             xs
-            sm={8}
+            sm={12}
             md={6}
           >
             <RequestsProductsTable
               type={'materials'}
               requestProducts={requestProducts}
+              inventory={inventory}
             />
           </Grid>
           <Grid
             item
             style={{marginBottom: '3em'}}
             xs
-            sm={8}
+            sm={12}
             md={6}
           >
             <RequestsProductsTable
               type={'extrusion'}
               requestProducts={requestProducts}
+              inventory={inventory}
             />
           </Grid>
           <Grid
             item
             style={{marginBottom: '3em'}}
             xs
-            sm={8}
+            sm={12}
             md={12}
           >
             <RequestsProductsTable
               requestProducts={requestProducts}
+              inventory={inventory}
             />
           </Grid>
         </Grid>

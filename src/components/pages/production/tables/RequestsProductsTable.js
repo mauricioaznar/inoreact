@@ -46,6 +46,8 @@ function RequestsProductsTable(props) {
 
     let inventoryForCalcs = JSON.parse(JSON.stringify(inventory))
 
+    console.log(inventoryForCalcs)
+
     productsByPriority = requestProducts
       .sort((a, b) => {
         let aRequestDate = moment(a.order_request_date, dateFormat)
@@ -82,7 +84,6 @@ function RequestsProductsTable(props) {
         let pendingToProduceKilos = requestNetKilos - givenInventoryKilos
         return {
           ...requestProduct,
-
           pending_to_produce: pendingToProduceKilos,
           given_inventory_kilos: givenInventoryKilos
         }
@@ -125,6 +126,10 @@ function RequestsProductsTable(props) {
       })
 
     productsByPriority.forEach(product => {
+      if (product.product_id === 17) {
+        console.log(product)
+      }
+
       if (product.product_type_id === 1 || product.product_type_id === 2) {
         let wcGroup =  widthAndCaliberGroups.find(item => {
           return item.width === product.product_width
@@ -300,8 +305,6 @@ RequestsProductsTable.propTypes = {
 
 const mapStateToProps = (state, ownProps) => {
   return {
-    requestsProducts: state.sales.requestsProducts,
-    inventory: state.general.inventory,
     materials: state.production.materials,
     products: state.production.products
   }
