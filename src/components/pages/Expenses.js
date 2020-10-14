@@ -16,6 +16,7 @@ import IconButton from '@material-ui/core/IconButton'
 import FormControl from '@material-ui/core/FormControl'
 import useMediaQuery from '@material-ui/core/useMediaQuery'
 import TextField from '@material-ui/core/TextField'
+import SupplierDataTable from '../ui/datatables/SupplierDataTable'
 
 const useStyles = makeStyles((theme) => {
   return {
@@ -274,6 +275,14 @@ export default function Expenses(props) {
           updates={updates}
           setUpdates={setUpdates}
         />
+      </Grid>
+      <Grid
+        item
+        xs
+        className={classes.rowContainer}
+        style={{marginBottom: '2em'}}
+      >
+        <SupplierDataTable />
       </Grid>
     </Grid>
   )
