@@ -38,7 +38,9 @@ function RequestsProductsTable(props) {
 
   let materials = []
 
-  let type = props.type || 'products'
+  let products = []
+
+  let type = props.type || 'all'
 
   if (props.requestProducts) {
 
@@ -125,34 +127,55 @@ function RequestsProductsTable(props) {
         }
       })
 
-    productsByPriority.forEach(product => {
-      if (product.product_id === 17) {
-        console.log(product)
-      }
+    products = props.products
+      .filter(product => {
+        return product.product_type_id === 1 || product.product_type_id === 2
+      })
+      .map(product => {
+        return {
+          ...product,
+          kilos: 0,
+          kilos_in_prod: 0,
+          kilos_pending: 0
+        }
+      })
 
-      if (product.product_type_id === 1 || product.product_type_id === 2) {
+
+    productsByPriority.forEach(productByPriority => {
+      if (productByPriority.product_type_id === 1 || productByPriority.product_type_id === 2) {
         let wcGroup =  widthAndCaliberGroups.find(item => {
-          return item.width === product.product_width
-            && item.calibre === product.product_calibre
-            && item.material_name === product.material_name
+          return item.width === productByPriority.product_width
+            && item.calibre === productByPriority.product_calibre
+            && item.material_name === productByPriority.material_name
         })
         let material = materials.find(mat => {
-          return mat.id === product.material_id
+          return mat.id === productByPriority.material_id
+        })
+        let product = products.find(product => {
+          return product.id === productByPriority.product_id
         })
         if (wcGroup) {
-          wcGroup.kilos += product.pending_to_produce
-          if (product.order_request_status_id === 1) {
-            wcGroup.kilos_pending += product.pending_to_produce
-          } else if (product.order_request_status_id === 2) {
-            wcGroup.kilos_in_prod += product.pending_to_produce
+          wcGroup.kilos += productByPriority.pending_to_produce
+          if (productByPriority.order_request_status_id === 1) {
+            wcGroup.kilos_pending += productByPriority.pending_to_produce
+          } else if (productByPriority.order_request_status_id === 2) {
+            wcGroup.kilos_in_prod += productByPriority.pending_to_produce
           }
         }
         if (material) {
-          material.kilos += product.pending_to_produce
-          if (product.order_request_status_id === 1) {
-            material.kilos_pending += product.pending_to_produce
-          } else if (product.order_request_status_id === 2) {
-            material.kilos_in_prod += product.pending_to_produce
+          material.kilos += productByPriority.pending_to_produce
+          if (productByPriority.order_request_status_id === 1) {
+            material.kilos_pending += productByPriority.pending_to_produce
+          } else if (productByPriority.order_request_status_id === 2) {
+            material.kilos_in_prod += productByPriority.pending_to_produce
+          }
+        }
+        if (product) {
+          product.kilos += productByPriority.pending_to_produce
+          if (productByPriority.order_request_status_id === 1) {
+            product.kilos_pending += productByPriority.pending_to_produce
+          } else if (productByPriority.order_request_status_id === 2) {
+            product.kilos_in_prod += productByPriority.pending_to_produce
           }
         }
       }
@@ -172,6 +195,13 @@ function RequestsProductsTable(props) {
         return a.kilos > b.kilos ? -1 : a.kilos < b.kilos ? 1 : 0
       })
       .filter(material => material.kilos !== 0)
+
+    products = products
+      .sort((a, b) => {
+         return a.material_id > b.material_id ? -1 : a.material_id < b.material_id ? 1
+          : a.kilos > b.kilos ? -1 : a.kilos < b.kilos ? 1 : 0
+      })
+      .filter(product => product.kilos !== 0)
 
     productsByPriority = productsByPriority
       .filter(product => product.pending_to_produce !== 0)
@@ -210,6 +240,36 @@ function RequestsProductsTable(props) {
     </TableContainer>
   )
 
+  const ProductsTable = (
+    <TableContainer className={classes.table}>
+      <Table aria-label="simple table" stickyHeader>
+        <TableHead>
+          <TableRow>
+            <TableCell style={{width: '5%'}}>&nbsp;</TableCell>
+            <TableCell>Producto</TableCell>
+            <TableCell>Kilos en prod</TableCell>
+            <TableCell>Kilos pendientes</TableCell>
+            <TableCell>Kilos por producir</TableCell>
+          </TableRow>
+        </TableHead>
+        <TableBody>
+          {
+            products.map(product => {
+              return (
+                <TableRow key={product.id}>
+                  <TableCell>&nbsp;</TableCell>
+                  <TableCell>{product.description}</TableCell>
+                  <TableCell align={'right'}>{formatNumber(product.kilos_in_prod)}</TableCell>
+                  <TableCell align={'right'}>{formatNumber(product.kilos_pending)}</TableCell>
+                  <TableCell align={'right'}>{formatNumber(product.kilos)}</TableCell>
+                </TableRow>
+              )
+            })
+          }
+        </TableBody>
+      </Table>
+    </TableContainer>
+  )
 
   const WidthAndCaliberTable = (
     <TableContainer className={classes.table}>
@@ -292,9 +352,10 @@ function RequestsProductsTable(props) {
     </TableContainer>
   )
 
-  return type === 'products' ? ProductsOrderByPriorityTable
+  return type === 'all' ? ProductsOrderByPriorityTable
     : type === 'extrusion' ? WidthAndCaliberTable
     : type === 'materials' ? MaterialTable
+    : type === 'products' ? ProductsTable
     : null;
 }
 

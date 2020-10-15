@@ -50,6 +50,19 @@ export default function ProductionToProduce (props) {
             style={{marginBottom: '3em'}}
             xs
             sm={12}
+            md={6}
+          >
+            <RequestsProductsTable
+              type={'products'}
+              requestProducts={requestProducts}
+              inventory={inventory}
+            />
+          </Grid>
+          <Grid
+            item
+            style={{marginBottom: '3em'}}
+            xs
+            sm={12}
             md={12}
           >
             <RequestsProductsTable
