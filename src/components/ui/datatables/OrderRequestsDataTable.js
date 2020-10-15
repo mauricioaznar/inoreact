@@ -1,7 +1,5 @@
 import React from 'react'
 import {connect} from 'react-redux'
-
-import Grid from '@material-ui/core/Grid'
 import {useTheme} from '@material-ui/core/styles'
 import axios from 'axios'
 import apiUrl from '../../../helpers/apiUrl'
@@ -11,6 +9,7 @@ import useMediaQuery from '@material-ui/core/useMediaQuery'
 import Slide from '@material-ui/core/Slide'
 import {mainEntityPromise} from './common/common'
 import MauMaterialTable from './common/MauMaterialTable'
+import OrderRequestForm from '../forms/OrderRequestForm'
 
 const Transition = React.forwardRef(function Transition(props, ref) {
   return <Slide direction="up" ref={ref} {...props} />;
@@ -19,7 +18,7 @@ const Transition = React.forwardRef(function Transition(props, ref) {
 
 //Fix call in useEffect that is leaking memory (because is trying to set state in before component mounts?)
 
-function UserDataTable(props) {
+function OrderRequestDataTable(props) {
 
   const tableRef = React.createRef();
 
@@ -32,12 +31,10 @@ function UserDataTable(props) {
 
   const entityPath = 'orderRequest'
 
-  console.log(props.branches)
-
   const columns = [
     {
-      title: 'ID',
-      field: 'id'
+      title: 'Codigo',
+      field: 'order_code'
     }
   ]
 
@@ -100,7 +97,7 @@ function UserDataTable(props) {
         onClose={handleClose}
         aria-labelledby="form-dialog-title"
       >
-         {/*<UserForm user={rowData} onSubmit={handleOnSubmit} />*/}
+         <OrderRequestForm orderRequest={rowData} onSubmit={handleOnSubmit} />
       </Dialog>
     </>
   )
@@ -111,4 +108,4 @@ const mapStateToProps = (state, ownProps) => {
   }
 }
 
-export default connect(mapStateToProps, null)(UserDataTable)
+export default connect(mapStateToProps, null)(OrderRequestDataTable)

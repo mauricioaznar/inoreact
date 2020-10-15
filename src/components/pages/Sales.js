@@ -24,13 +24,16 @@ const Sales = (props) => {
     >
       <Grid
         item
+        className={classes.rowContainer}
+        style={{marginBottom: '2em', marginTop: '2em'}}
       >
-        <SalesCollectionDataTable />
+        <OrderRequestsDataTable />
       </Grid>
       <Grid
         item
+        className={classes.rowContainer}
       >
-        <OrderRequestsDataTable />
+        <SalesCollectionDataTable />
       </Grid>
     </Grid>
   )
