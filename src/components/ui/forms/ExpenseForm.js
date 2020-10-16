@@ -135,6 +135,7 @@ const ExpenseForm = (props) => {
     expense_invoice_complements: props.expense ? props.expense.expense_invoice_complements.map(complement => {
       return {...complement, delivered: complement.delivered === 1}
     }) : [],
+    comments: props.expense ? props.expense.comments : '',
     tax: props.expense ? props.expense.tax : '0',
     invoice_isr_retained: props.expense ? props.expense.invoice_isr_retained : '0',
     invoice_tax_retained: props.expense ? props.expense.invoice_tax_retained : '0',
@@ -1539,6 +1540,26 @@ const ExpenseForm = (props) => {
           </FormControl>
         </Grid>
 
+        <Grid
+          item
+          xs={12}
+          className={classes.rowContainer}
+          style={{marginTop: '2em'}}
+        >
+          <FormControl
+            fullWidth
+          >
+            <TextField
+              inputRef={register()}
+              name="comments"
+              label="Comentarios"
+              placeholder=""
+              InputLabelProps={{
+                shrink: true
+              }}
+            />
+          </FormControl>
+        </Grid>
 
         <Grid
           item

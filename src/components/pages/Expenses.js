@@ -36,25 +36,24 @@ const mapExpenseToInvoice = expense => {
   let expenseMoneySource = expense.expense_money_source ? expense.expense_money_source.name : ''
   let expenseInternalCode = expense.internal_code
   let expenseInvoicePaymentForm = expense.expense_invoice_payment_form ? expense.expense_invoice_payment_form.name : ''
-  let expenseInvoicePaymentFormAbb = expense.expense_invoice_payment_form ? expense.expense_invoice_payment_form.name.substring(0, 6) : ''
-  let abbreviation = expenseMoneySource + ' ' + expenseInvoicePaymentFormAbb + ' ' + expenseInternalCode
+  let abbreviation = + expenseInternalCode + ' ' + expenseMoneySource
   return {
     '#': abbreviation,
     'Proveedor': expense.supplier.name,
     'Fecha de pago': expense.date_paid,
     'Fecha de emision': expense.date_emitted,
-    'Banco': expenseMoneySource,
     'Forma de pago': expenseInvoicePaymentForm,
     'Total': total,
-    'Iva': expense.tax,
     'Isr': +(total - expense.tax).toFixed(2),
+    'Iva': expense.tax,
     'Codigo interno': expenseInternalCode,
     'Codigo de la factura': expense.invoice_code,
     'ISR retenido': expense.invoice_isr_retained,
     'IVA retenido': expense.invoice_tax_retained,
     'Complementos': expense.expense_invoice_complements.map(complement => {
       return (complement.delivered === 1 ? 'E' : 'P') + ' ' + complement.name
-    }).join(', ')
+    }).join(', '),
+    'Comentarios': expense.comments
   }
 }
 
@@ -65,8 +64,6 @@ const sortInvoices = (a, b) => {
   let bMomentDate = moment(b.date_paid, 'YYYY-MM-DD')
   let aExpenseMoneySourceId = a.expense_money_source_id
   let bExpenseMoneySourceId = b.expense_money_source_id
-  let aExpensePaymentFormId = a.expense_invoice_payment_form_id
-  let bExpensePaymentFormId = b.expense_invoice_payment_form_id
   let aInternalCode = ''
   let bInternalCode = ''
   const isCharNumber = (c) => {
@@ -88,15 +85,13 @@ const sortInvoices = (a, b) => {
   }
   return aExpenseMoneySourceId > bExpenseMoneySourceId ? 1
     : aExpenseMoneySourceId < bExpenseMoneySourceId ? -1
-      : aExpensePaymentFormId > bExpensePaymentFormId ? 1
-        : aExpensePaymentFormId < bExpensePaymentFormId ? -1
-          : aMomentDate.isAfter(bMomentDate) ? 1
-            : aMomentDate.isBefore(bMomentDate) ? -1
-              : aInternalCode === '' && Number(bInternalCode) > 0 ? -1
-                : Number(aInternalCode) > 0 && bInternalCode === '' ? 1
-                  : Number(aInternalCode) > Number(bInternalCode) ? 1
-                    : Number(aInternalCode) < Number(bInternalCode) ? -1
-                      : 0
+      : aMomentDate.isAfter(bMomentDate) ? 1
+        : aMomentDate.isBefore(bMomentDate) ? -1
+          : aInternalCode === '' && Number(bInternalCode) > 0 ? -1
+            : Number(aInternalCode) > 0 && bInternalCode === '' ? 1
+              : Number(aInternalCode) > Number(bInternalCode) ? 1
+                : Number(aInternalCode) < Number(bInternalCode) ? -1
+                  : 0
 }
 
 export default function Expenses(props) {
