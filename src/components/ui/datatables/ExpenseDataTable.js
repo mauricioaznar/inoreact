@@ -195,6 +195,10 @@ function ExpenseDataTable(props) {
       field: 'tax',
       filtering: false,
       type: 'currency'
+    },
+    {
+      title: 'Comentarios',
+      field: 'comments'
     }
   ]
 
