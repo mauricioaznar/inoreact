@@ -74,43 +74,21 @@ function ProductionDataTable(props) {
     },
     {
       title: 'Maquinas',
-      sorting: false,
-      render: (rowData) => {
-        return (
-          <ul>
-            {
-              rowData.order_production_products.map(productionProduct => {
-                let machine = props.machines.find(machine => machine.id === productionProduct.machine_id)
-                return (
-                  <li>
-                    {machine.name}
-                  </li>
-                )
-              })
-            }
-          </ul>
-        )
-      }
+      type: 'entity',
+      field: 'machine_id',
+      entity: 'orderProductionProducts',
+      table: 'order_production_products',
+      options: props.machines,
+      optionLabel: 'name'
     },
     {
       title: 'Productos',
-      sorting: false,
-      render: (rowData) => {
-        return (
-          <ul>
-            {
-              rowData.order_production_products.map(productionProduct => {
-                let product = props.products.find(product => product.id === productionProduct.product_id)
-                return (
-                  <li style={{whiteSpace: 'nowrap'}}>
-                    {product.description}
-                  </li>
-                )
-              })
-            }
-          </ul>
-        )
-      }
+      type: 'entity',
+      field: 'product_id',
+      entity: 'orderProductionProducts',
+      table: 'order_production_products',
+      options: props.products,
+      optionLabel: 'description'
     },
     {
       title: 'Kilos',

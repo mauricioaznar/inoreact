@@ -15,6 +15,10 @@ import TextField from '@material-ui/core/TextField'
 import axios from 'axios'
 import authHeader from '../../../helpers/authHeader'
 import apiUrl from '../../../helpers/apiUrl'
+import FormLabel from '@material-ui/core/FormLabel'
+import FormControlLabel from '@material-ui/core/FormControlLabel'
+import Switch from '@material-ui/core/Switch'
+import MauDatePicker from './inputs/MauDatePicker'
 
 
 const useStyles = makeStyles((theme) => {
@@ -75,12 +79,10 @@ const OrderRequestForm = (props) => {
   });
 
   const defaultValues = {
-    id: props.user ? props.user.id : '',
-    email: props.user ? props.user.email : '',
-    first_name: props.user ? props.user.first_name : '',
-    last_name: props.user ? props.user.last_name : '',
-    role_id: props.user ? String(props.user.role_id) : 'null',
-    branch_id: props.user ? String(props.user.branch_id) : 'null'
+    id: props.orderRequest ? props.orderRequest.id : '',
+    order_code: props.orderRequest ? props.orderRequest.order_code : '',
+    estimated_delivery_date: props.orderRequest ? props.orderRequest.estimated_delivery_date : '',
+    date: props.orderRequest ? props.orderRequest.date : ''
   }
 
   const {register, unregister, handleSubmit, reset, watch, control, setValue, getValues, errors} = useForm({
@@ -149,6 +151,53 @@ const OrderRequestForm = (props) => {
           </FormControl>
         </Grid>
 
+        <Grid
+          item
+          container
+          xs={12}
+          className={classes.rowContainer}
+          direction={'column'}
+          style={{marginTop: '2em'}}
+        >
+          <Grid
+            item
+            xs
+          >
+            <MauDatePicker
+              name="date"
+              control={control}
+              rules={{required: true}}
+              error={!!errors.date}
+              helperText={errors.date && errors.date.message}
+              defaultValue={defaultValues.date}
+              label="Fecha de solicitud"
+            />
+          </Grid>
+        </Grid>
+
+        <Grid
+          item
+          container
+          xs={12}
+          className={classes.rowContainer}
+          direction={'column'}
+          style={{marginTop: '2em'}}
+        >
+          <Grid
+            item
+            xs
+          >
+            <MauDatePicker
+              name="estimated_delivery_date"
+              control={control}
+              rules={{required: true}}
+              error={!!errors.estimated_delivery_date}
+              helperText={errors.estimated_delivery_date && errors.estimated_delivery_date.message}
+              defaultValue={defaultValues.estimated_delivery_date}
+              label="Fecha de entrega estimada"
+            />
+          </Grid>
+        </Grid>
 
         <Grid
           item
@@ -173,11 +222,15 @@ const OrderRequestForm = (props) => {
                       apiUrl + 'orderRequest/list?' + params,
                       {headers: {...authHeader()}}
                     )
-                  return result && result.data && result.data.data.length === 0
+                  let isSameAsInitial = false
+                  if (props.orderRequest && props.orderRequest.order_code) {
+                    isSameAsInitial = String(value) === String(props.orderRequest.order_code)
+                  }
+                  return isSameAsInitial || (result && result.data && result.data.data.length === 0)
                 }
               })}
               name="order_code"
-              label="Codigo"
+              label="Folio"
               InputLabelProps={{
                 shrink: true
               }}
@@ -217,8 +270,7 @@ const OrderRequestForm = (props) => {
 
 const mapStateToProps = (state) => {
   return {
-    roles: state.general.roles,
-    branches: state.general.branches
+
   }
 }
 

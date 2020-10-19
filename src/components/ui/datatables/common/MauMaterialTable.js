@@ -75,7 +75,49 @@ export default function MauMaterialTable (props) {
         }
       }
 
-    } else if (newColumn.type === 'text') {
+    } else if (newColumn.type === 'entity') {
+
+    return {
+      ...newColumn,
+      customFilterAndSearch: () => { return true },
+      filterComponent: (filterProps) => {
+        return (
+          <Autocomplete
+            options={newColumn.options}
+            value={filters[newColumn.field].value}
+            getOptionLabel={option => {
+              return option[newColumn.optionLabel]
+            }}
+            renderInput={params => (
+              <TextField
+                {...params}
+              />
+            )}
+            onChange={(e, data) => {
+              handleFilters( newColumn.field, data)
+            }}
+          />
+        )
+      },
+      render: (rowData) => {
+        return (
+          <ul>
+            {
+              rowData[newColumn.table].map(entity => {
+                let option = newColumn.options.find(option => option.id === entity[newColumn.field])
+                return (
+                  <li style={{whiteSpace: 'nowrap'}}>
+                    {option[newColumn.optionLabel]}
+                  </li>
+                )
+              })
+            }
+          </ul>
+        )
+      }
+    }
+
+  } else if (newColumn.type === 'text') {
 
       return {
         ...newColumn,
@@ -109,8 +151,14 @@ export default function MauMaterialTable (props) {
   const [filters, setFilters] = React.useState(columns.reduce((acc, column) => {
     return {...acc, [column.field]: {
         value: storageFilters[column.field] ? storageFilters[column.field].value
-          : (column.type === 'date' || column.type === 'date_time' || column.lookup) ? null : '',
-        type: column.type ? column.type : column.lookup ? 'options' : 'text',
+          : (
+              column.type === 'date'
+              || column.type === 'date_time'
+              || column.type === 'options'
+              || column.type === 'entity'
+            ) ? null : '',
+        type: column.type ? column.type : 'text',
+        entity: column.type === 'entity' ? column.entity : '',
         focus: false
       }}
   }, {}));
@@ -177,6 +225,7 @@ export default function MauMaterialTable (props) {
           }
           let likes = 1
           let exacts = 1
+          let entities = 1
           let index = 1
           for (let field in filters) {
             if (filters.hasOwnProperty(field)) {
@@ -192,6 +241,11 @@ export default function MauMaterialTable (props) {
               } else if (filter.type === 'options' && filter.value !== null) {
                 url += `&filter_exact_${exacts}=${field}`
                 url += `&filter_exact_value_${exacts}=${filter.value.id}`
+                exacts++
+              } else if (filter.type === 'entity' && filter.value !== null) {
+                url += `&filter_entity_property_${entities}=${field}`
+                url += `&filter_entity_value_${entities}=${filter.value.id}`
+                url += `&filter_entity_${entities}=${filter.entity}`
                 exacts++
               } else if (filter.type === 'text' && filter.value !== '') {
                 url += `&filter_like_${likes}=${field}`
