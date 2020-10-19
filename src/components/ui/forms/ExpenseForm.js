@@ -99,9 +99,9 @@ const ExpenseForm = (props) => {
   const [isDateEmittedRequired, setIsDateEmittedRequired] = React.useState(
     props.expense ? moment(props.expense.date_emitted).isValid() : true
   );
-  const [isProvisionDateRequired, setIsProvisionDateRequired] = React.useState(
-    props.expense ? moment(props.expense.invoice_provision_date).isValid() : false
-  );
+  // const [isProvisionDateRequired, setIsProvisionDateRequired] = React.useState(
+  //   props.expense ? moment(props.expense.invoice_provision_date).isValid() : false
+  // );
 
   const [isSupplierTableVisible, setIsSupplierTableVisible] = React.useState(false)
 
@@ -140,7 +140,7 @@ const ExpenseForm = (props) => {
     invoice_isr_retained: props.expense ? props.expense.invoice_isr_retained : '0',
     invoice_tax_retained: props.expense ? props.expense.invoice_tax_retained : '0',
     supplier_id: props.expense ? String(props.expense.supplier_id) : 'null',
-    invoice_provision_date: props.expense ? props.expense.invoice_provision_date : '',
+    // invoice_provision_date: props.expense ? props.expense.invoice_provision_date : '',
     date_emitted: props.expense ? props.expense.date_emitted : '',
     date_paid: props.expense ? props.expense.date_paid : '',
     invoice_code: props.expense ? props.expense.invoice_code : '',
@@ -148,7 +148,7 @@ const ExpenseForm = (props) => {
     expense_type_id: props.expense ? String(props.expense.expense_type_id) : '',
     expense_invoice_payment_method_id: props.expense ? String(props.expense.expense_invoice_payment_method_id) : '',
     expense_invoice_payment_form_id: props.expense ? String(props.expense.expense_invoice_payment_form_id) : '',
-    expense_invoice_cdfi_use_id: props.expense ? String(props.expense.expense_invoice_cdfi_use_id) : '',
+    // expense_invoice_cdfi_use_id: props.expense ? String(props.expense.expense_invoice_cdfi_use_id) : '',
     expense_money_source_id: props.expense ? String(props.expense.expense_money_source_id) : '',
     expense_products: props.expense ? props.expense.expense_products.map(expenseProduct => {
       return {
@@ -249,14 +249,14 @@ const ExpenseForm = (props) => {
       invoice_code: isInvoice ? data.invoice_code : '',
       internal_code: isInvoice ? data.internal_code : '',
       date_paid: isDatePaidRequired ? data.date_paid : '0000-00-00',
-      invoice_provision_date: isProvisionDateRequired && isInvoice ? data.invoice_provision_date : '0000-00-00',
+      // invoice_provision_date: isProvisionDateRequired && isInvoice ? data.invoice_provision_date : '0000-00-00',
       date_emitted: isDateEmittedRequired && isInvoice ? data.date_emitted : '0000-00-00',
       expense_invoice_complements: complements,
       expense_products: isExpenseProductsRequired() ? data.expense_products : [],
       expense_credit_notes: isInvoice && data.expense_credit_notes ? data.expense_credit_notes : [],
       expense_invoice_payment_method_id: isInvoice ? String(data.expense_invoice_payment_method_id) : 'null',
       expense_invoice_payment_form_id: isInvoice ? String(data.expense_invoice_payment_form_id) : 'null',
-      expense_invoice_cdfi_use_id: isInvoice ? String(data.expense_invoice_cdfi_use_id) : 'null',
+      // expense_invoice_cdfi_use_id: isInvoice ? String(data.expense_invoice_cdfi_use_id) : 'null',
       expense_money_source_id: isInvoice ? String(data.expense_money_source_id) : 'null',
       defaultValues
     }
@@ -583,56 +583,56 @@ const ExpenseForm = (props) => {
           </Grid>
         </Grid>
 
-        <Grid
-          item
-          container
-          xs={12}
-          className={classes.rowContainer}
-          direction={'column'}
-          style={{marginTop: '2em', display: isInvoice ? 'inherit' : 'none'}}
-        >
-          <Grid
-            item
-            xs
-          >
-            <FormControl>
-              <FormLabel component="legend">
-                ¿Fue provisionada?
-              </FormLabel>
-              <FormControlLabel
-                control={
-                  <Switch
-                    checked={isProvisionDateRequired}
-                    onChange={() => {
-                      setIsProvisionDateRequired(!isProvisionDateRequired)
-                    }}
-                    name="provisionDateRequired"
-                    color="primary"
-                  />
-                }
-                label={isProvisionDateRequired ? 'Provisionada' : 'No fue provisionada'}
-              />
-            </FormControl>
-          </Grid>
-          <Grid
-            item
-            xs
-            style={{
-              marginTop: '0.5em',
-              display: !isProvisionDateRequired ? 'none' : 'inherit'
-            }}
-          >
-            <MauDatePicker
-              name="invoice_provision_date"
-              control={control}
-              rules={{required: isProvisionDateRequired && isInvoice}}
-              error={!!errors.invoice_provision_date}
-              helperText={errors.invoice_provision_date && errors.invoice_provision_date.message}
-              defaultValue={defaultValues.invoice_provision_date}
-              label="Fecha de provisión"
-            />
-          </Grid>
-        </Grid>
+        {/*<Grid*/}
+        {/*  item*/}
+        {/*  container*/}
+        {/*  xs={12}*/}
+        {/*  className={classes.rowContainer}*/}
+        {/*  direction={'column'}*/}
+        {/*  style={{marginTop: '2em', display: isInvoice ? 'inherit' : 'none'}}*/}
+        {/*>*/}
+        {/*  <Grid*/}
+        {/*    item*/}
+        {/*    xs*/}
+        {/*  >*/}
+        {/*    <FormControl>*/}
+        {/*      <FormLabel component="legend">*/}
+        {/*        ¿Fue provisionada?*/}
+        {/*      </FormLabel>*/}
+        {/*      <FormControlLabel*/}
+        {/*        control={*/}
+        {/*          <Switch*/}
+        {/*            checked={isProvisionDateRequired}*/}
+        {/*            onChange={() => {*/}
+        {/*              setIsProvisionDateRequired(!isProvisionDateRequired)*/}
+        {/*            }}*/}
+        {/*            name="provisionDateRequired"*/}
+        {/*            color="primary"*/}
+        {/*          />*/}
+        {/*        }*/}
+        {/*        label={isProvisionDateRequired ? 'Provisionada' : 'No fue provisionada'}*/}
+        {/*      />*/}
+        {/*    </FormControl>*/}
+        {/*  </Grid>*/}
+        {/*  <Grid*/}
+        {/*    item*/}
+        {/*    xs*/}
+        {/*    style={{*/}
+        {/*      marginTop: '0.5em',*/}
+        {/*      display: !isProvisionDateRequired ? 'none' : 'inherit'*/}
+        {/*    }}*/}
+        {/*  >*/}
+        {/*    <MauDatePicker*/}
+        {/*      name="invoice_provision_date"*/}
+        {/*      control={control}*/}
+        {/*      rules={{required: isProvisionDateRequired && isInvoice}}*/}
+        {/*      error={!!errors.invoice_provision_date}*/}
+        {/*      helperText={errors.invoice_provision_date && errors.invoice_provision_date.message}*/}
+        {/*      defaultValue={defaultValues.invoice_provision_date}*/}
+        {/*      label="Fecha de provisión"*/}
+        {/*    />*/}
+        {/*  </Grid>*/}
+        {/*</Grid>*/}
 
         <Grid
           item
@@ -883,28 +883,28 @@ const ExpenseForm = (props) => {
           />
         </Grid>
 
-        <Grid
-          item
-          xs={12}
-          className={classes.rowContainer}
-          style={{marginTop: '2em', display: isInvoice ? 'inherit' : 'none'}}
-        >
-          <MauAutocomplete
-            error={!!errors.expense_invoice_cdfi_use_id}
-            label={'Usos del cdfi'}
-            id={'cdfiUses'}
-            options={props.cdfiUses}
-            name={'expense_invoice_cdfi_use_id'}
-            displayName={'name'}
-            rules={
-              {
-                required: isInvoice
-              }
-            }
-            control={control}
-            defaultValue={`${defaultValues.expense_invoice_cdfi_use_id}`}
-          />
-        </Grid>
+        {/*<Grid*/}
+        {/*  item*/}
+        {/*  xs={12}*/}
+        {/*  className={classes.rowContainer}*/}
+        {/*  style={{marginTop: '2em', display: isInvoice ? 'inherit' : 'none'}}*/}
+        {/*>*/}
+        {/*  <MauAutocomplete*/}
+        {/*    error={!!errors.expense_invoice_cdfi_use_id}*/}
+        {/*    label={'Usos del cdfi'}*/}
+        {/*    id={'cdfiUses'}*/}
+        {/*    options={props.cdfiUses}*/}
+        {/*    name={'expense_invoice_cdfi_use_id'}*/}
+        {/*    displayName={'name'}*/}
+        {/*    rules={*/}
+        {/*      {*/}
+        {/*        required: isInvoice*/}
+        {/*      }*/}
+        {/*    }*/}
+        {/*    control={control}*/}
+        {/*    defaultValue={`${defaultValues.expense_invoice_cdfi_use_id}`}*/}
+        {/*  />*/}
+        {/*</Grid>*/}
 
 
         <Grid

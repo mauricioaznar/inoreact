@@ -13,6 +13,7 @@ import Slide from '@material-ui/core/Slide'
 import {tableIcons, mainEntityPromise, subEntitiesPromises} from './common/common'
 import ProductionForm from '../forms/ProductionForm'
 import MauMaterialTable from './common/MauMaterialTable'
+import formatNumber from '../../../helpers/formatNumber'
 
 const Transition = React.forwardRef(function Transition(props, ref) {
   return <Slide direction="up" ref={ref} {...props} />;
@@ -70,6 +71,66 @@ function ProductionDataTable(props) {
       type: 'options',
       options: props.branches,
       optionLabel: 'name'
+    },
+    {
+      title: 'Maquinas',
+      sorting: false,
+      render: (rowData) => {
+        return (
+          <ul>
+            {
+              rowData.order_production_products.map(productionProduct => {
+                let machine = props.machines.find(machine => machine.id === productionProduct.machine_id)
+                return (
+                  <li>
+                    {machine.name}
+                  </li>
+                )
+              })
+            }
+          </ul>
+        )
+      }
+    },
+    {
+      title: 'Productos',
+      sorting: false,
+      render: (rowData) => {
+        return (
+          <ul>
+            {
+              rowData.order_production_products.map(productionProduct => {
+                let product = props.products.find(product => product.id === productionProduct.product_id)
+                return (
+                  <li style={{whiteSpace: 'nowrap'}}>
+                    {product.description}
+                  </li>
+                )
+              })
+            }
+          </ul>
+        )
+      }
+    },
+    {
+      title: 'Kilos',
+      sorting: false,
+      render: (rowData) => {
+        return (
+          <ul>
+            {
+              rowData.order_production_products.map(productionProduct => {
+                return (
+                  <li style={{whiteSpace: 'nowrap', textAlign: 'right'}}>
+                    {formatNumber(productionProduct.kilos)}
+                  </li>
+                )
+              })
+            }
+          </ul>
+        )
+      },
+
     }
   ]
 
@@ -176,6 +237,7 @@ function ProductionDataTable(props) {
 const mapStateToProps = (state, ownProps) => {
   return {
     machines: state.production.machines,
+    products: state.production.products,
     productTypes: state.production.productTypes,
     branches: state.general.branches,
     orderProductionTypes: state.production.orderProductionTypes

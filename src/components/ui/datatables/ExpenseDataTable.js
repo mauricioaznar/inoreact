@@ -397,7 +397,7 @@ function ExpenseDataTable(props) {
         maxWidth={!matchesXS ? 'lg' : null}
         fullWidth={!matchesXS || null}
         open={open}
-        fullScreen={matchesXS}
+        fullScreen={true}
         TransitionComponent={Transition}
         onClose={handleClose}
         aria-labelledby="form-dialog-title"
