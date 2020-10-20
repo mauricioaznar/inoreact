@@ -10,6 +10,7 @@ import Slide from '@material-ui/core/Slide'
 import {mainEntityPromise} from './common/common'
 import MauMaterialTable from './common/MauMaterialTable'
 import OrderRequestForm from '../forms/OrderRequestForm'
+import formatNumber from '../../../helpers/formatNumber'
 
 const Transition = React.forwardRef(function Transition(props, ref) {
   return <Slide direction="up" ref={ref} {...props} />;
@@ -33,8 +34,80 @@ function OrderRequestDataTable(props) {
 
   const columns = [
     {
-      title: 'Codigo',
+      title: 'Folio',
       field: 'order_code'
+    },
+    {
+      title: 'Fecha de solicitud',
+      field: 'date',
+      type: 'date'
+    },
+    {
+      title: 'Fecha de entrega estimada',
+      field: 'estimated_delivery_date',
+      type: 'date'
+    },
+    {
+      title: 'Cliente',
+      field: 'client_id',
+      type: 'options',
+      options: props.clients,
+      optionLabel: 'name'
+    },
+    {
+      title: 'Productos',
+      type: 'entity',
+      field: 'product_id',
+      entity: 'orderRequestProducts',
+      table: 'order_request_products',
+      options: props.products,
+      optionLabel: 'description'
+    },
+    {
+      title: 'Kilos',
+      render: (rowData) => {
+        return (
+          <ul>
+            {
+              rowData.order_request_products.map(requestProduct => {
+                return (
+                  <li style={{whiteSpace: 'nowrap', textAlign: 'right'}}>
+                    {formatNumber(requestProduct.kilos)} kg
+                  </li>
+                )
+              })
+            }
+          </ul>
+        )
+      },
+    },
+    {
+      title: 'Total por producto',
+      render: (rowData) => {
+        return (
+          <ul>
+            {
+              rowData.order_request_products.map(requestProduct => {
+                return (
+                  <li style={{whiteSpace: 'nowrap', textAlign: 'right'}}>
+                   ${formatNumber(requestProduct.kilos * requestProduct.kilo_price)}
+                  </li>
+                )
+              })
+            }
+          </ul>
+        )
+      },
+    },
+    {
+      title: 'total',
+      render: (rowData) => {
+        let total = rowData.order_request_products
+          .reduce((acc, ele) => {
+            return acc + (ele.kilos * ele.kilo_price)
+          }, 0)
+        return '$' + formatNumber(total)
+      }
     }
   ]
 
@@ -92,7 +165,7 @@ function OrderRequestDataTable(props) {
         maxWidth={!matchesXS ? 'lg' : null}
         fullWidth={!matchesXS || null}
         open={open}
-        fullScreen={matchesXS}
+        fullScreen
         TransitionComponent={Transition}
         onClose={handleClose}
         aria-labelledby="form-dialog-title"
@@ -105,6 +178,8 @@ function OrderRequestDataTable(props) {
 
 const mapStateToProps = (state, ownProps) => {
   return {
+    products: state.production.products,
+    clients: state.sales.clients
   }
 }
 

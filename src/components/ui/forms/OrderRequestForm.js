@@ -3,7 +3,7 @@ import React from "react";
 import {connect} from 'react-redux'
 
 import clsx from 'clsx';
-import {useForm} from "react-hook-form";
+import {useFieldArray, useForm} from "react-hook-form";
 import {green} from '@material-ui/core/colors';
 import {makeStyles} from '@material-ui/core/styles'
 import FormControl from '@material-ui/core/FormControl'
@@ -15,10 +15,21 @@ import TextField from '@material-ui/core/TextField'
 import axios from 'axios'
 import authHeader from '../../../helpers/authHeader'
 import apiUrl from '../../../helpers/apiUrl'
-import FormLabel from '@material-ui/core/FormLabel'
-import FormControlLabel from '@material-ui/core/FormControlLabel'
-import Switch from '@material-ui/core/Switch'
 import MauDatePicker from './inputs/MauDatePicker'
+import MauAutocomplete from './inputs/MauAutocomplete'
+import Toolbar from '@material-ui/core/Toolbar'
+import Typography from '@material-ui/core/Typography'
+import Tooltip from '@material-ui/core/Tooltip'
+import IconButton from '@material-ui/core/IconButton'
+import AddIcon from '@material-ui/icons/Add'
+import TableContainer from '@material-ui/core/TableContainer'
+import Paper from '@material-ui/core/Paper'
+import Table from '@material-ui/core/Table'
+import TableHead from '@material-ui/core/TableHead'
+import TableRow from '@material-ui/core/TableRow'
+import TableCell from '@material-ui/core/TableCell'
+import TableBody from '@material-ui/core/TableBody'
+import DeleteIcon from '@material-ui/icons/Delete'
 
 
 const useStyles = makeStyles((theme) => {
@@ -78,16 +89,48 @@ const OrderRequestForm = (props) => {
     [classes.buttonSuccess]: success
   });
 
+  let defaultRequestProduct = {
+    id: '',
+    product_id: '',
+    kilos: '0',
+    groups: '0',
+    total: '0',
+    kilo_price: '0',
+    group_weight: '0',
+    type: ''
+  }
+
+
   const defaultValues = {
     id: props.orderRequest ? props.orderRequest.id : '',
     order_code: props.orderRequest ? props.orderRequest.order_code : '',
     estimated_delivery_date: props.orderRequest ? props.orderRequest.estimated_delivery_date : '',
-    date: props.orderRequest ? props.orderRequest.date : ''
+    date: props.orderRequest ? props.orderRequest.date : '',
+    priority: props.orderRequest ? props.orderRequest.priority : '',
+    client_id: props.orderRequest ? props.orderRequest.client_id : '',
+    order_request_products: props.orderRequest ? props.orderRequest.order_request_products
+      .map(requestProduct => {
+        return {
+          ...requestProduct,
+          kilos: String(requestProduct.kilos),
+          groups: String(requestProduct.groups),
+          group_weight: String(requestProduct.group_weight),
+          kilo_price: String(requestProduct.kilo_price),
+          total: String(requestProduct.kilos * requestProduct.kilo_price)
+        }
+      }) : []
   }
 
   const {register, unregister, handleSubmit, reset, watch, control, setValue, getValues, errors} = useForm({
     defaultValues
   });
+
+  const requestProducts = useFieldArray(
+    {
+      control,
+      name: "order_request_products"
+    }
+  );
 
   React.useEffect(() => {
     if (!props.orderRequest) {
@@ -123,6 +166,74 @@ const OrderRequestForm = (props) => {
   const onSubmitCallback = (isValid) => {
     setSuccess(true);
     setLoading(false);
+  }
+
+  const handleAddRequestProduct = () => {
+    requestProducts.append(defaultRequestProduct)
+  }
+
+  const handleRemoveRequestProducts = (index) => {
+    requestProducts.remove(index)
+  }
+
+  const watchRequestProducts = watch('order_request_products')
+
+  const handleProductSelection = (productId, productionProductId, index) => {
+    let groupWeight = '0'
+    let kilos = "0"
+    let groups = "0"
+    if (productId) {
+
+      let initialProductionProduct = defaultValues.order_request_products
+        .find(requestProduct => {
+          return String(productionProductId) === String(requestProduct.id)
+        })
+
+      let isSameInitialProduct =
+        initialProductionProduct
+        && String(initialProductionProduct.product_id) === productId
+
+      console.log('is same initial product')
+      console.log(isSameInitialProduct)
+
+      let product = props.products.find(product => {
+        return String(product.id) === String(productId)
+      })
+
+      if (!isSameInitialProduct) {
+        groupWeight = product.current_group_weight ? product.current_group_weight : "0"
+      } else {
+        groupWeight = initialProductionProduct.group_weight
+        kilos = initialProductionProduct.kilos
+        groups = initialProductionProduct.groups
+      }
+
+    }
+    setValue(`order_request_products[${index}].group_weight`, String(groupWeight))
+    setValue(`order_request_products[${index}].kilos`, String(kilos))
+    setValue(`order_request_products[${index}].groups`, String(groups))
+  }
+
+  const calculateProductKilos = (e, index) => {
+    let kilos = Number(watchRequestProducts[index].groups) * Number(watchRequestProducts[index].group_weight)
+    setValue(`order_request_products[${index}].kilos`, String(kilos))
+    let _total = Number(kilos) * Number(watchRequestProducts[index].kilo_price)
+    setValue(`order_request_products[${index}].total`, String(Math.trunc(_total)))
+  }
+
+  const hasGroupWeight = (index) => {
+    let requestProduct = watchRequestProducts[index]
+    let isValid = requestProduct.group_weight !== "0" &&
+      requestProduct.group_weight !== "null" &&
+      requestProduct.group_weight !== "" &&
+      !isNaN(requestProduct.group_weight) &&
+      Number(requestProduct.group_weight) > 0
+    return requestProduct && isValid
+  }
+
+  const calculateRequestProduct = (e, index) => {
+    let _total = Number(watchRequestProducts[index].kilos) * Number(watchRequestProducts[index].kilo_price)
+    setValue(`order_request_products[${index}].total`, String(Math.trunc(_total)))
   }
 
 
@@ -205,6 +316,28 @@ const OrderRequestForm = (props) => {
           className={classes.rowContainer}
           style={{marginTop: '2em'}}
         >
+          <MauAutocomplete
+            error={!!errors.client_id}
+            label={'Cliente'}
+            options={props.clients}
+            name={'client_id'}
+            displayName={'name'}
+            rules={
+              {
+                required: true
+              }
+            }
+            control={control}
+            defaultValue={`${defaultValues.client_id}`}
+          />
+        </Grid>
+
+        <Grid
+          item
+          xs={12}
+          className={classes.rowContainer}
+          style={{marginTop: '2em'}}
+        >
           <FormControl
             fullWidth
           >
@@ -240,6 +373,200 @@ const OrderRequestForm = (props) => {
 
         <Grid
           item
+          xs={12}
+          className={classes.rowContainer}
+          style={{marginTop: '2em'}}
+        >
+          <FormControl
+            fullWidth
+          >
+            <TextField
+              inputRef={register({
+                required: true
+              })}
+              name="priority"
+              label="Prioridad"
+              type="number"
+              InputLabelProps={{
+                shrink: true
+              }}
+            />
+          </FormControl>
+        </Grid>
+
+        <Grid
+          item
+          xs={12}
+          className={classes.rowContainer}
+          style={{
+            marginTop: '2em',
+            display: 'inherit'
+          }}
+        >
+          <Grid
+            container
+            direction={'column'}
+          >
+            <Grid
+              item
+              xs={12}
+            >
+              <Toolbar>
+                <Typography
+                  className={classes.tableTitle}
+                  variant="h6"
+                  id="tableTitle"
+                  component="div"
+                >
+                  Productos
+                </Typography>
+                <Tooltip title="Agregar">
+                  <IconButton
+                    aria-label="filter list"
+                    onClick={() => {
+                      handleAddRequestProduct()
+                    }}
+                  >
+                    <AddIcon/>
+                  </IconButton>
+                </Tooltip>
+              </Toolbar>
+              <TableContainer component={Paper}>
+                <Table
+                  aria-label="complements table"
+                  className={classes.table}
+                >
+                  <TableHead>
+                    <TableRow>
+                      <TableCell style={{display: 'none'}}>Id</TableCell>
+                      <TableCell style={{width: '30%'}}>Producto</TableCell>
+                      <TableCell>Bultos/rollos</TableCell>
+                      <TableCell>Kilos</TableCell>
+                      <TableCell>Peso</TableCell>
+                      <TableCell>Precio</TableCell>
+                      <TableCell>&nbsp;</TableCell>
+                    </TableRow>
+                  </TableHead>
+                  <TableBody>
+                    {requestProducts.fields.map((requestProduct, index) => (
+                      <TableRow key={index}>
+                        <TableCell style={{display: 'none'}}>
+                          <TextField
+                            id="standard-number"
+                            label="Number"
+                            type="number"
+                            name={`order_request_products[${index}].id`}
+                            defaultValue={`${requestProduct.id}`}
+                            inputRef={register()}
+                          />
+                        </TableCell>
+                        <TableCell>
+                          <MauAutocomplete
+                            error={!!errors.order_request_products && !!errors.order_request_products[index].product_id}
+                            label={'Producto'}
+                            options={props.products}
+                            displayName={'description'}
+                            onChange={(e, productId) => {
+                              let requestProductId = `${requestProduct.id}`
+                              handleProductSelection(productId, requestProductId, index)
+                            }}
+                            name={`order_request_products[${index}].product_id`}
+                            rules={
+                              {
+                                required: true
+                              }
+                            }
+                            control={control}
+                            defaultValue={`${requestProduct.product_id}`}
+                          />
+                        </TableCell>
+                        <TableCell>
+                          <TextField
+                            error={!!errors.order_request_products && !!errors.order_request_products[index].groups}
+                            label="Bultos"
+                            type="number"
+                            name={`order_request_products[${index}].groups`}
+                            onChange={(e) => {
+                              if (hasGroupWeight(index)) {
+                                calculateProductKilos(e, index)
+                              }
+                            }}
+                            defaultValue={`${requestProduct.groups}`}
+                            inputRef={register({required: true, max: 10000000})}
+                          />
+                        </TableCell>
+                        <TableCell>
+                          <TextField
+                            error={!!errors.order_request_products && !!errors.order_request_products[index].kilos}
+                            label="Kilos"
+                            type="number"
+                            onChange={(e, value) => {
+                              calculateRequestProduct(e, index)
+                            }}
+                            disabled={hasGroupWeight(index)}
+                            name={`order_request_products[${index}].kilos`}
+                            defaultValue={`${requestProduct.kilos}`}
+                            inputRef={register({required: true, max: 10000000, min: 1})}
+                          />
+                        </TableCell>
+                        <TableCell>
+                          <TextField
+                            error={!!errors.order_request_products && !!errors.order_request_products[index].group_weight}
+                            label="Peso por kilo"
+                            disabled
+                            type="number"
+                            name={`order_request_products[${index}].group_weight`}
+                            defaultValue={`${requestProduct.group_weight}`}
+                            inputRef={register({max: 10000000})}
+                          />
+                        </TableCell>
+                        <TableCell>
+                          <TextField
+                            error={!!errors.order_request_products && !!errors.order_request_products[index].kilo_price}
+                            label="Precio"
+                            type="number"
+                            onChange={(e, value) => {
+                              calculateRequestProduct(e, index)
+                            }}
+                            name={`order_request_products[${index}].kilo_price`}
+                            defaultValue={`${requestProduct.kilo_price}`}
+                            inputRef={register({required: true, maxValue: 1000000})}
+                          />
+                        </TableCell>
+                        <TableCell>
+                          <TextField
+                            error={!!errors.order_request_products && !!errors.order_request_products[index].total}
+                            label="Total"
+                            disabled
+                            type="number"
+                            name={`order_request_products[${index}].total`}
+                            defaultValue={`${requestProduct.total}`}
+                            inputRef={register({})}
+                          />
+                        </TableCell>
+                        <TableCell align={'right'}>
+                          {
+                            index !== 0 ?
+                              <IconButton
+                                onClick={() => {
+                                  handleRemoveRequestProducts(index)
+                                }}
+                              >
+                                <DeleteIcon/>
+                              </IconButton> : ' '
+                          }
+                        </TableCell>
+                      </TableRow>
+                    ))}
+                  </TableBody>
+                </Table>
+              </TableContainer>
+            </Grid>
+          </Grid>
+        </Grid>
+        
+        <Grid
+          item
           container
           xs={12}
           justify={'flex-end'}
@@ -270,7 +597,8 @@ const OrderRequestForm = (props) => {
 
 const mapStateToProps = (state) => {
   return {
-
+    clients: state.sales.clients,
+    products: state.production.products
   }
 }
 
