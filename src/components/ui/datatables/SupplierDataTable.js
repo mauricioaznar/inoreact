@@ -59,7 +59,7 @@ function UserDataTable(props) {
 
   const handleRowDelete = (oldData) => {
     let promises = []
-    promises.push(axios.put(apiUrl + 'user/' + oldData.id, {active: -1}, {headers: {...authHeader()}}))
+    promises.push(axios.put(apiUrl + 'supplier/' + oldData.id, {active: -1}, {headers: {...authHeader()}}))
     return Promise.all(promises).then(results => {
       return new Promise((resolve, reject) => {
         resolve()
@@ -83,9 +83,6 @@ function UserDataTable(props) {
             tableRef={tableRef}
             title="Proveedores"
             entityPath={entityPath}
-            onRowDelete={(oldData) => {
-              return handleRowDelete(oldData)
-            }}
             onRowAdd={(event, rowData) => {
               setRowData(null)
               setOpen(true)
