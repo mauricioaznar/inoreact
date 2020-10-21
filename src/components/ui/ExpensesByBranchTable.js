@@ -26,13 +26,15 @@ function ExpensesByBranchTable (props) {
 
   if (props.expenses && props.sales) {
 
+    console.log(props.expenseSubcategories)
+
     let sales = props.sales.sales
 
-    let defaultRowObject = props.expenseCategories
-      .reduce((acc, expenseCategory) => {
+    let defaultRowObject = props.expenseSubcategories
+      .reduce((acc, expenseSubcategory) => {
         return {
           ...acc,
-          [expenseCategory.id]: 0
+          [expenseSubcategory.id]: 0
         }
       }, {sales_total: 0, year: 2020 })
 
@@ -57,16 +59,16 @@ function ExpensesByBranchTable (props) {
           && expense.month === row.month
           && expense.year === row.year
       })
-      if (rowFoundBranch) {
-        rowFoundBranch[expense.expense_category_id] += expense.total
+      if (rowFoundBranch && rowFoundBranch[expense.expense_subcategory_id] !== undefined) {
+        rowFoundBranch[expense.expense_subcategory_id] += expense.total
       }
       let rowFoundTotal = rows.find(row => {
         return row.branch_id === 4
           && expense.month === row.month
           && expense.year === row.year
       })
-      if (rowFoundTotal) {
-        rowFoundTotal[expense.expense_category_id] += expense.total
+      if (rowFoundTotal && rowFoundTotal[expense.expense_subcategory_id] !== undefined) {
+        rowFoundTotal[expense.expense_subcategory_id] += expense.total
       }
     })
 
@@ -83,9 +85,9 @@ function ExpensesByBranchTable (props) {
       })
 
     rows.forEach(row => {
-      props.expenseCategories.forEach(expenseCategory => {
-        row[expenseCategory.id] = row.sales_total !== 0 ?
-          (row[expenseCategory.id] / row.sales_total) : 0
+      props.expenseSubcategories.forEach(expenseSubcategory => {
+        row[expenseSubcategory.id] = row.sales_total !== 0 ?
+          (row[expenseSubcategory.id] / row.sales_total) : 0
       })
     })
 
@@ -116,11 +118,11 @@ function ExpensesByBranchTable (props) {
                 <TableCell>Mes</TableCell>
                 <TableCell>Sucursal</TableCell>
                 {
-                  props.expenseCategories.map(expenseCategory => {
+                  props.expenseSubcategories.map(expenseSubcategory => {
                     return (
-                      <TableCell key={expenseCategory.id}>
+                      <TableCell key={expenseSubcategory.id}>
                         {
-                          expenseCategory.name
+                          expenseSubcategory.name
                         }
                       </TableCell>
                     )
@@ -147,11 +149,11 @@ function ExpensesByBranchTable (props) {
                         <TableCell>{row.month}</TableCell>
                         <TableCell>{row.branch_name}</TableCell>
                         {
-                          props.expenseCategories.map(expenseCategory => {
+                          props.expenseSubcategories.map(expenseSubcategory => {
                             return (
-                              <TableCell key={expenseCategory.id}>
+                              <TableCell key={expenseSubcategory.id}>
                                 {
-                                  formatNumber(row[expenseCategory.id])
+                                  formatNumber(row[expenseSubcategory.id])
                                 }
                               </TableCell>
                             )
@@ -176,7 +178,10 @@ function ExpensesByBranchTable (props) {
 
 const mapStateToProps = (state, ownProps) => {
   return {
-    expenseCategories: state.expenses.expenseCategories,
+    expenseSubcategories: state.expenses.expenseSubcategories
+      .filter(expenseSubcategory => {
+        return expenseSubcategory.expense_subcategory_frequency_id === 1
+      }),
     branches: state.general.branches
   }
 }
