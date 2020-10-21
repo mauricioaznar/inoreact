@@ -110,7 +110,7 @@ function UserDataTable(props) {
         onClose={handleClose}
         aria-labelledby="form-dialog-title"
       >
-         <SupplierForm user={rowData} onSubmit={handleOnSubmit} />
+         <SupplierForm supplier={rowData} onSubmit={handleOnSubmit} />
       </Dialog>
     </>
   )
