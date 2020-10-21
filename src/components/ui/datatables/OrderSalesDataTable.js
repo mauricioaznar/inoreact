@@ -19,7 +19,7 @@ const Transition = React.forwardRef(function Transition(props, ref) {
 
 //Fix call in useEffect that is leaking memory (because is trying to set state in before component mounts?)
 
-function OrderRequestsDataTable(props) {
+function OrderSalesDataTable(props) {
 
   const tableRef = React.createRef();
 
@@ -30,7 +30,7 @@ function OrderRequestsDataTable(props) {
   const [open, setOpen] = React.useState(false);
   const [rowData, setRowData] = React.useState(null);
 
-  const entityPath = 'orderRequest'
+  const entityPath = 'orderSale'
 
   const columns = [
     {
@@ -38,28 +38,16 @@ function OrderRequestsDataTable(props) {
       field: 'order_code'
     },
     {
-      title: 'Fecha de solicitud',
+      title: 'Fecha de la venta',
       field: 'date',
       type: 'date'
-    },
-    {
-      title: 'Fecha de entrega estimada',
-      field: 'estimated_delivery_date',
-      type: 'date'
-    },
-    {
-      title: 'Cliente',
-      field: 'client_id',
-      type: 'options',
-      options: props.clients,
-      optionLabel: 'name'
     },
     {
       title: 'Productos',
       type: 'entity',
       field: 'product_id',
-      entity: 'orderRequestProducts',
-      table: 'order_request_products',
+      entity: 'orderSaleProducts',
+      table: 'order_sale_products',
       options: props.products,
       optionLabel: 'description'
     },
@@ -69,10 +57,10 @@ function OrderRequestsDataTable(props) {
         return (
           <ul>
             {
-              rowData.order_request_products.map(requestProduct => {
+              rowData.order_sale_products.map(saleProduct => {
                 return (
                   <li style={{whiteSpace: 'nowrap', textAlign: 'right'}}>
-                    {formatNumber(requestProduct.kilos)} kg
+                    {formatNumber(saleProduct.kilos)} kg
                   </li>
                 )
               })
@@ -87,10 +75,10 @@ function OrderRequestsDataTable(props) {
         return (
           <ul>
             {
-              rowData.order_request_products.map(requestProduct => {
+              rowData.order_sale_products.map(saleProduct => {
                 return (
                   <li style={{whiteSpace: 'nowrap', textAlign: 'right'}}>
-                   ${formatNumber(requestProduct.kilos * requestProduct.kilo_price)}
+                   ${formatNumber(saleProduct.kilos * saleProduct.kilo_price)}
                   </li>
                 )
               })
@@ -102,7 +90,7 @@ function OrderRequestsDataTable(props) {
     {
       title: 'total',
       render: (rowData) => {
-        let total = rowData.order_request_products
+        let total = rowData.order_sale_products
           .reduce((acc, ele) => {
             return acc + (ele.kilos * ele.kilo_price)
           }, 0)
@@ -143,7 +131,7 @@ function OrderRequestsDataTable(props) {
     <>
       <MauMaterialTable
         tableRef={tableRef}
-        title="Pedidos"
+        title="Ventas"
         entityPath={entityPath}
         onRowDelete={(oldData) => {
           return handleRowDelete(oldData)
@@ -157,21 +145,18 @@ function OrderRequestsDataTable(props) {
           setOpen(true)
         }}
         columns={columns}
-
-
-
       />
-      <Dialog
-        maxWidth={!matchesXS ? 'lg' : null}
-        fullWidth={!matchesXS || null}
-        open={open}
-        fullScreen
-        TransitionComponent={Transition}
-        onClose={handleClose}
-        aria-labelledby="form-dialog-title"
-      >
-         <OrderRequestForm orderRequest={rowData} onSubmit={handleOnSubmit} />
-      </Dialog>
+        <Dialog
+          maxWidth={!matchesXS ? 'lg' : null}
+          fullWidth={!matchesXS || null}
+          open={open}
+          fullScreen
+          TransitionComponent={Transition}
+          onClose={handleClose}
+          aria-labelledby="form-dialog-title"
+        >
+           {/*<OrderRequestForm orderRequest={rowData} onSubmit={handleOnSubmit} />*/}
+        </Dialog>
     </>
   )
 }
@@ -183,4 +168,4 @@ const mapStateToProps = (state, ownProps) => {
   }
 }
 
-export default connect(mapStateToProps, null)(OrderRequestsDataTable)
+export default connect(mapStateToProps, null)(OrderSalesDataTable)

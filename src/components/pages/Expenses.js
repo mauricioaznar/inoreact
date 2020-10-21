@@ -17,6 +17,8 @@ import FormControl from '@material-ui/core/FormControl'
 import useMediaQuery from '@material-ui/core/useMediaQuery'
 import TextField from '@material-ui/core/TextField'
 import SupplierDataTable from '../ui/datatables/SupplierDataTable'
+import useFetch from '../../helpers/useFetch'
+import ExpensesByBranchTable from '../ui/ExpensesByBranchTable'
 
 const useStyles = makeStyles((theme) => {
   return {
@@ -106,6 +108,9 @@ export default function Expenses(props) {
 
   const classes = useStyles()
 
+
+  const expensesNoEstimatesByCatSubBra = useFetch(apiUrl + 'analytics/expenses?dateGroup=month&entityGroup=branch|expenseCategory|expenseSubcategory&noEstimates')
+  const sales = useFetch(apiUrl + 'analytics/sales?dateGroup=month')
 
   const exportExcel = () => {
     if (!loading) {
@@ -259,6 +264,17 @@ export default function Expenses(props) {
               </IconButton>
           }
         </Grid>
+      </Grid>
+      <Grid
+        item
+        xs
+        className={classes.rowContainer}
+        style={{marginBottom: '2em'}}
+      >
+        <ExpensesByBranchTable
+          expenses={expensesNoEstimatesByCatSubBra}
+          sales={sales}
+        />
       </Grid>
       <Grid
         item

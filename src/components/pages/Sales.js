@@ -3,6 +3,7 @@ import {connect} from 'react-redux'
 import Grid from '@material-ui/core/Grid'
 import OrderRequestsDataTable from '../ui/datatables/OrderRequestsDataTable'
 import {makeStyles} from '@material-ui/core/styles'
+import OrderSaleDataTable from '../ui/datatables/OrderSalesDataTable'
 
 
 const useStyles = makeStyles((theme) => ({
@@ -27,6 +28,13 @@ const Sales = (props) => {
         style={{marginBottom: '2em', marginTop: '2em'}}
       >
         <OrderRequestsDataTable />
+      </Grid>
+      <Grid
+        item
+        className={classes.rowContainer}
+        style={{marginBottom: '2em', marginTop: '2em'}}
+      >
+        <OrderSaleDataTable />
       </Grid>
     </Grid>
   )
