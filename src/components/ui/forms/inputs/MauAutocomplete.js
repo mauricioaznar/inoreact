@@ -20,6 +20,7 @@ export default function MauAutocomplete (props) {
             getOptionLabel={option => {
               return option[displayName]
             }}
+            disabled={props.disabled || undefined}
             renderInput={params => (
               <TextField
                 {...params}

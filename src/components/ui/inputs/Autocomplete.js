@@ -10,10 +10,12 @@ export default function MauAutocomplete (props) {
     <Autocomplete
       options={props.options}
       getOptionLabel={option => {
-        return option[displayName]
+        return String(option[displayName])
       }}
+      value={props.value ? props.value : undefined}
       renderInput={params => (
         <TextField
+          label={props.label ? props.label : undefined}
           {...params}
         />
       )}
