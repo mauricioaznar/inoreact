@@ -7,7 +7,7 @@ import authHeader from '../../../helpers/authHeader'
 import Dialog from '@material-ui/core/Dialog'
 import useMediaQuery from '@material-ui/core/useMediaQuery'
 import Slide from '@material-ui/core/Slide'
-import {mainEntityPromise} from './common/common'
+import {mainEntityPromise, subEntitiesPromises} from './common/common'
 import MauMaterialTable from './common/MauMaterialTable'
 import OrderRequestForm from '../forms/OrderRequestForm'
 import formatNumber from '../../../helpers/formatNumber'
@@ -119,9 +119,23 @@ function OrderRequestsDataTable(props) {
     setOpen(false);
   };
 
-  const handleOnSubmit = (user, callback) => {
-    mainEntityPromise(user, entityPath)
+  const handleOnSubmit = (orderRequest, callback) => {
+    mainEntityPromise(orderRequest, entityPath)
       .then(result => {
+        let orderRequestId = result.data.data.id
+        const subEntitiesConfs = [
+          {
+            initialSubEntities: orderRequest.defaultValues.order_request_products,
+            subEntities: orderRequest.order_request_products,
+            path: 'orderRequestProduct'
+          }
+        ]
+        const mainEntityConf = {
+          'order_request_id': orderRequestId
+        }
+        return Promise.all(subEntitiesPromises(subEntitiesConfs, mainEntityConf))
+      })
+      .then(results => {
         callback(true)
         tableRef.current && tableRef.current.onQueryChange()
         setOpen(false)

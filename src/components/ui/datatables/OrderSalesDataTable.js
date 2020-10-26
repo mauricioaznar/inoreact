@@ -16,13 +16,13 @@ import Grid from '@material-ui/core/Grid'
 import FormControl from '@material-ui/core/FormControl'
 import Autocomplete from '../inputs/Autocomplete'
 import {green} from '@material-ui/core/colors'
+import CircularProgress from '@material-ui/core/CircularProgress'
 
 const Transition = React.forwardRef(function Transition(props, ref) {
   return <Slide
     direction="up"
     ref={ref} {...props} />;
 });
-
 
 
 const useStyles = makeStyles((theme) => {
@@ -83,12 +83,13 @@ function OrderSalesDataTable(props) {
   const [open, setOpen] = React.useState(false);
   const [rowData, setRowData] = React.useState(null);
   const [orderRequests, setOrderRequests] = React.useState(null);
-
+  const [loading, setLoading] = React.useState(false);
+  const [updates, setUpdates] = React.useState(0)
 
   const entityPath = 'orderSale'
 
   const orderRequestsInProductions = useFetch(apiUrl +
-    'orderRequest/list?filter_exact_1=order_request_status_id&filter_exact_value_1=2')
+    'orderRequest/list?filter_exact_1=order_request_status_id&filter_exact_value_1=2', [updates])
 
   React.useEffect(() => {
     if (orderRequestsInProductions && !rowData) {
@@ -175,7 +176,6 @@ function OrderSalesDataTable(props) {
   };
 
   const handleOnSubmit = (orderSale, callback) => {
-    console.log(orderSale)
     mainEntityPromise({...orderSale, order_request_id: orderRequest.id}, entityPath)
       .then(result => {
         let orderSaleId = result.data.data.id
@@ -195,6 +195,7 @@ function OrderSalesDataTable(props) {
         callback(true)
         tableRef.current && tableRef.current.onQueryChange()
         setOpen(false)
+        setUpdates(updates + 1)
       })
   }
 
@@ -206,6 +207,20 @@ function OrderSalesDataTable(props) {
         resolve()
       })
     })
+  }
+
+  const handleRowEdit = (rowData) => {
+    setLoading(true)
+    setOpen(true)
+    axios.get(apiUrl + 'orderRequest/' + rowData.order_request.id, {headers: {...authHeader()}})
+      .then(result => {
+        setRowData(rowData)
+        setOrderRequest(result.data.data)
+        setLoading(false)
+      })
+      .catch(error => {
+        console.log(error)
+      })
   }
 
 
@@ -224,9 +239,7 @@ function OrderSalesDataTable(props) {
           setOpen(true)
         }}
         onRowEdit={(event, rowData) => {
-          setRowData(rowData)
-          setOrderRequest(rowData.order_request)
-          setOpen(true)
+          handleRowEdit(rowData)
         }}
         columns={columns}
       />
@@ -242,37 +255,49 @@ function OrderSalesDataTable(props) {
             onClose={handleClose}
             aria-labelledby="form-dialog-title"
           >
-            <Grid container direction={'column'}>
-              <Grid
-                item
-                xs={12}
-                className={classes.rowContainer}
-                style={{
-                  marginTop: '2em'
-                }}
-              >
-                <FormControl fullWidth>
-                  <Autocomplete
-                    label={'Folio del pedido'}
-                    key={orderRequest}
-                    options={orderRequests}
-                    disabled={!props.orderSale}
-                    displayName={'order_code'}
-                    value={orderRequest}
-                    onChange={(e, data) => {setOrderRequest(data)}}
-                  />
-                </FormControl>
-              </Grid>
+            {
+              loading ? <CircularProgress
+                  size={40}
+                  style={{marginLeft: '2em', marginTop: '2em'}}
+                />
+                : <div>
+                    <Grid
+                      container
+                      direction={'column'}
+                    >
+                    <Grid
+                      item
+                      xs={12}
+                      className={classes.rowContainer}
+                      style={{
+                        marginTop: '2em'
+                      }}
+                    >
+                      <FormControl fullWidth>
+                        <Autocomplete
+                          label={'Folio del pedido'}
+                          key={orderRequest}
+                          options={orderRequests}
+                          disabled={!props.orderSale}
+                          displayName={'order_code'}
+                          value={orderRequest}
+                          onChange={(e, data) => {
+                            setOrderRequest(data)
+                          }}
+                        />
+                      </FormControl>
+                    </Grid>
 
-            </Grid>
-
-             <OrderSaleForm
-               key={orderRequest ? orderRequest.id : 0}
-               orderRequestsInProduction={orderRequestsInProductions ? orderRequestsInProductions : []}
-               orderRequest={orderRequest}
-               orderSale={rowData}
-               onSubmit={handleOnSubmit}
-             />
+                  </Grid>
+                   <OrderSaleForm
+                     key={orderRequest ? orderRequest.id : 0}
+                     orderRequestsInProduction={orderRequestsInProductions ? orderRequestsInProductions : []}
+                     orderRequest={orderRequest}
+                     orderSale={rowData}
+                     onSubmit={handleOnSubmit}
+                   />
+                  </div>
+            }
           </Dialog>
           : undefined
       }

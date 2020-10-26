@@ -101,6 +101,38 @@ const OrderSaleForm = (props) => {
     type: ''
   }
 
+  let soldSaleProducts = []
+
+  if (props.orderRequest) {
+
+    soldSaleProducts = props.orderRequest.order_request_products
+      .map(requestProduct => {
+        return {
+          ...requestProduct,
+          kilos_sold: 0,
+          kilos_remaining: requestProduct.kilos,
+          groups_sold: 0,
+          groups_remaining: requestProduct.groups
+        }
+      })
+
+    props.orderRequest.order_sales.forEach(orderSale => {
+      if (!(props.orderSale && props.orderSale.id && props.orderSale.id === orderSale.id)) {
+        orderSale.order_sale_products.forEach(saleProduct => {
+          let soldSaleProduct = soldSaleProducts.find(soldSaleProduct => {
+            return String(soldSaleProduct.product_id) === String(saleProduct.product_id)
+          })
+          if (soldSaleProduct) {
+            soldSaleProduct.kilos_remaining = soldSaleProduct.kilos_remaining - saleProduct.kilos
+            soldSaleProduct.groups_remaining = soldSaleProduct.groups_remaining - saleProduct.groups
+          }
+        })
+      }
+    })
+
+    console.log(soldSaleProducts)
+  }
+
   const defaultValues = {
     id: props.orderSale ? props.orderSale.id : '',
     order_code: props.orderSale ? props.orderSale.order_code : '',
@@ -119,14 +151,20 @@ const OrderSaleForm = (props) => {
         })
       : props.orderRequest ? props.orderRequest.order_request_products
         .map(requestProduct => {
+          let soldSaleProduct = soldSaleProducts.find(soldSaleProduct => {
+            return String(requestProduct.product_id) === String(soldSaleProduct.product_id)
+          })
           return {
             product_id: String(requestProduct.product_id),
-            kilos: String(requestProduct.kilos),
-            groups: String(requestProduct.groups),
+            kilos: soldSaleProduct ? soldSaleProduct.kilos_remaining : String(requestProduct.kilos),
+            groups:soldSaleProduct ? soldSaleProduct.groups_remaining : String(requestProduct.groups),
             group_weight: String(requestProduct.group_weight),
             kilo_price: String(requestProduct.kilo_price),
             total: String(requestProduct.kilos * requestProduct.kilo_price)
           }
+        })
+        .filter(requestProduct => {
+          return Number(requestProduct.kilos) > 0 && Number(requestProduct.groups) > 0
         }) : []
   }
 
@@ -164,10 +202,6 @@ const OrderSaleForm = (props) => {
     }
   }, [])
 
-  React.useEffect(() => {
-    console.log(errors)
-  }, [errors])
-
   const onSubmit = data => {
     setSuccess(false);
     setLoading(true);
@@ -189,14 +223,6 @@ const OrderSaleForm = (props) => {
   const onSubmitCallback = (isValid) => {
     setSuccess(true);
     setLoading(false);
-  }
-
-  const handleAddSaleProduct = () => {
-    saleProducts.append(defaultSaleProduct)
-  }
-
-  const handleRemoveSaleProducts = (index) => {
-    saleProducts.remove(index)
   }
 
   const watchSaleProducts = watch('order_sale_products')
@@ -243,12 +269,16 @@ const OrderSaleForm = (props) => {
 
   const hasGroupWeight = (index) => {
     let saleProduct = watchSaleProducts[index]
-    let isValid = saleProduct.group_weight !== "0" &&
-      saleProduct.group_weight !== "null" &&
-      saleProduct.group_weight !== "" &&
-      !isNaN(saleProduct.group_weight) &&
-      Number(saleProduct.group_weight) > 0
-    return saleProduct && isValid
+    if (saleProduct) {
+      let isValid = saleProduct.group_weight !== "0" &&
+        saleProduct.group_weight !== "null" &&
+        saleProduct.group_weight !== "" &&
+        !isNaN(saleProduct.group_weight) &&
+        Number(saleProduct.group_weight) > 0
+      return saleProduct && isValid
+    } else {
+      return true
+    }
   }
 
   const calculateSaleProduct = (e, index) => {
@@ -392,16 +422,6 @@ const OrderSaleForm = (props) => {
                 >
                   Productos
                 </Typography>
-                <Tooltip title="Agregar">
-                  <IconButton
-                    aria-label="filter list"
-                    onClick={() => {
-                      handleAddSaleProduct()
-                    }}
-                  >
-                    <AddIcon />
-                  </IconButton>
-                </Tooltip>
               </Toolbar>
               <TableContainer component={Paper}>
                 <Table
@@ -416,7 +436,6 @@ const OrderSaleForm = (props) => {
                       <TableCell>Kilos</TableCell>
                       <TableCell>Peso</TableCell>
                       <TableCell>Precio</TableCell>
-                      <TableCell>&nbsp;</TableCell>
                     </TableRow>
                   </TableHead>
                   <TableBody>
@@ -434,7 +453,7 @@ const OrderSaleForm = (props) => {
                         </TableCell>
                         <TableCell>
                           <MauAutocomplete
-                            error={!!errors[`order_sale_products[${index}].product_id`]}
+                            error={errors[`order_sale_products`] && errors[`order_sale_products`][index] && errors[`order_sale_products`][index].product_id}
                             label={'Producto'}
                             options={requestedProducts}
                             displayName={'description'}
@@ -445,7 +464,16 @@ const OrderSaleForm = (props) => {
                             name={`order_sale_products[${index}].product_id`}
                             rules={
                               {
-                                required: true
+                                required: true,
+                                validate: (value) => {
+                                  let count = 0
+                                  watchSaleProducts.forEach(saleProduct => {
+                                    if (String(value) === String(saleProduct.product_id)) {
+                                     count = count + 1
+                                    }
+                                  })
+                                  return count === 1
+                                }
                               }
                             }
                             control={control}
@@ -469,7 +497,19 @@ const OrderSaleForm = (props) => {
                                 required: true,
                                 max: 10000000,
                                 validate: (value) => {
-                                  return false
+                                  let productId = watchSaleProducts[index].product_id
+                                  if (productId) {
+                                    let soldSaleProduct = soldSaleProducts.find(soldSaleProduct => {
+                                      return String(soldSaleProduct.product_id) === String(productId)
+                                    })
+                                    if (soldSaleProduct && Number(value) >= 0) {
+                                      return Number(value) <= Number(soldSaleProduct.groups_remaining)
+                                    } else {
+                                      return false
+                                    }
+                                  } else {
+                                    return false
+                                  }
                                 }
                               }
                             )}
@@ -486,7 +526,28 @@ const OrderSaleForm = (props) => {
                             disabled={hasGroupWeight(index)}
                             name={`order_sale_products[${index}].kilos`}
                             defaultValue={`${saleProduct.kilos}`}
-                            inputRef={register({required: true, max: 10000000, min: 1})}
+                            inputRef={register(
+                              {
+                                required: true,
+                                max: 10000000,
+                                min: 1,
+                                validate: (value) => {
+                                  let productId = watchSaleProducts[index].product_id
+                                  if (productId) {
+                                    let soldSaleProduct = soldSaleProducts.find(soldSaleProduct => {
+                                      return String(soldSaleProduct.product_id) === String(productId)
+                                    })
+                                    if (soldSaleProduct && Number(value) >= 0) {
+                                      return Number(value) <= Number(soldSaleProduct.kilos_remaining)
+                                    } else {
+                                      return false
+                                    }
+                                  } else {
+                                    return false
+                                  }
+                                }
+                              })
+                            }
                           />
                         </TableCell>
                         <TableCell>
@@ -510,7 +571,12 @@ const OrderSaleForm = (props) => {
                             }}
                             name={`order_sale_products[${index}].kilo_price`}
                             defaultValue={`${saleProduct.kilo_price}`}
-                            inputRef={register({required: true, maxValue: 1000000})}
+                            inputRef={register(
+                              {
+                                required: true,
+                                maxValue: 1000000
+                              })
+                            }
                           />
                         </TableCell>
                         <TableCell>
@@ -523,18 +589,6 @@ const OrderSaleForm = (props) => {
                             defaultValue={`${saleProduct.total}`}
                             inputRef={register({})}
                           />
-                        </TableCell>
-                        <TableCell align={'right'}>
-                          {
-                            index !== 0 ?
-                              <IconButton
-                                onClick={() => {
-                                  handleRemoveSaleProducts(index)
-                                }}
-                              >
-                                <DeleteIcon />
-                              </IconButton> : ' '
-                          }
                         </TableCell>
                       </TableRow>
                     ))}
@@ -558,6 +612,7 @@ const OrderSaleForm = (props) => {
               aria-label="save"
               color="primary"
               className={buttonClassname}
+              disabled={watchSaleProducts.length === 0}
               onClick={handleSubmit(onSubmit, onError)}
             >
               {success ? <CheckIcon /> : <SaveIcon />}
