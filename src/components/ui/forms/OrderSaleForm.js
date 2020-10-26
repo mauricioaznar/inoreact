@@ -101,6 +101,13 @@ const OrderSaleForm = (props) => {
     type: ''
   }
 
+  let defaultOrderSalePayment = {
+    id: '',
+    date_paid: '',
+    order_sale_collection_status_id: '',
+    amount: ''
+  }
+
   let soldSaleProducts = []
 
   if (props.orderRequest) {
@@ -137,8 +144,10 @@ const OrderSaleForm = (props) => {
     id: props.orderSale ? props.orderSale.id : '',
     order_code: props.orderSale ? props.orderSale.order_code : '',
     date: props.orderSale ? props.orderSale.date : '',
+    order_sale_receipt_type_id: props.orderSale ? props.orderSale.order_sale_receipt_type_id : '',
     client_id: props.orderSale ? props.orderSale.order_request.client_id : props.orderRequest ? props.orderRequest.client_id : '',
     order_sale_status_id: props.orderSale ? props.orderSale.order_sale_status_id : '',
+    order_sale_payments: props.orderSale ? props.orderSale.order_sale_payments : [],
     order_sale_products: props.orderSale ? props.orderSale.order_sale_products
         .map(saleProduct => {
           return {
@@ -174,7 +183,7 @@ const OrderSaleForm = (props) => {
       props.orderRequest.order_request_products
         .map(requestProduct => {
           return requestProduct.product_id
-        }) : []
+        }) : [{...defaultOrderSalePayment}]
     return orderRequestProductsIds.includes(product.id)
   })
 
@@ -189,6 +198,22 @@ const OrderSaleForm = (props) => {
       name: "order_sale_products"
     }
   );
+
+  const salePayments = useFieldArray(
+    {
+      control,
+      name: "order_sale_payments"
+    }
+  );
+
+  const handleAddOrderSalePayment = () => {
+    salePayments.append(defaultOrderSalePayment)
+  }
+
+  const handleRemoveOrderSalePayment = (index) => {
+    salePayments.remove(index)
+  }
+
 
   React.useEffect(() => {
     if (!props.orderSale) {
@@ -355,6 +380,28 @@ const OrderSaleForm = (props) => {
             }
             control={control}
             defaultValue={`${defaultValues.client_id}`}
+          />
+        </Grid>
+
+        <Grid
+          item
+          xs={12}
+          className={classes.rowContainer}
+          style={{marginTop: '2em'}}
+        >
+          <MauAutocomplete
+            error={!!errors.order_sale_receipt_type_id}
+            label={'Tipo'}
+            options={props.saleReceiptTypes}
+            name={'order_sale_receipt_type_id'}
+            displayName={'name'}
+            rules={
+              {
+                required: true
+              }
+            }
+            control={control}
+            defaultValue={`${defaultValues.order_sale_receipt_type_id}`}
           />
         </Grid>
 
@@ -621,7 +668,127 @@ const OrderSaleForm = (props) => {
             </Grid>
           </Grid>
         </Grid>
-        
+
+
+        <Grid
+          item
+          xs={12}
+          className={classes.rowContainer}
+          style={{marginTop: '2em'}}
+        >
+          <Grid
+            container
+            direction={'column'}
+          >
+            <Grid
+              item
+              xs={12}
+            >
+              <Toolbar>
+                <Typography
+                  className={classes.tableTitle}
+                  variant="h6"
+                  id="tableTitle"
+                  component="div"
+                >
+                  Cobranza
+                </Typography>
+                <Tooltip title="Filter list">
+                  <IconButton
+                    aria-label="filter list"
+                    onClick={() => {
+                      handleAddOrderSalePayment()
+                    }}
+                  >
+                    <AddIcon/>
+                  </IconButton>
+                </Tooltip>
+              </Toolbar>
+              <TableContainer component={Paper}>
+                <Table
+                  aria-label="credit notes table"
+                  className={classes.table}
+                >
+                  <TableHead>
+                    <TableRow>
+                      <TableCell style={{display: 'none'}}>Id</TableCell>
+                      <TableCell>Fecha</TableCell>
+                      <TableCell>Cantidad</TableCell>
+                      <TableCell>&nbsp;</TableCell>
+                    </TableRow>
+                  </TableHead>
+                  <TableBody>
+                    {salePayments.fields.map((salePayment, index) => (
+                      <TableRow key={index}>
+                        <TableCell style={{display: 'none'}}>
+                          <TextField
+                            id="standard-number"
+                            label="Number"
+                            type="number"
+                            name={`order_sale_payments[${index}].id`}
+                            defaultValue={`${salePayment.id}`}
+                            inputRef={register()}
+                          />
+                        </TableCell>
+                        <TableCell>
+                          <MauDatePicker
+                            error={!!errors.order_sale_payments && !!errors.order_sale_payments[index] && !!errors.order_sale_payments[index].date_paid}
+                            name={`order_sale_payments[${index}].date_paid`}
+                            control={control}
+                            rules={{required: true}}
+                            defaultValue={`${salePayment.date_paid}`}
+                            label="Fecha de pago"
+                          />
+                        </TableCell>
+                        <TableCell align="right">
+                          <FormControl fullWidth>
+                            <TextField
+                              id="standard-number"
+                              label="Cantidad"
+                              type="number"
+                              error={!!errors.order_sale_payments && !!errors.order_sale_payments[index] && !!errors.order_sale_payments[index].amount}
+                              name={`order_sale_payments[${index}].amount`}
+                              defaultValue={`${salePayment.amount}`}
+                              inputRef={register({required: true})}
+                            />
+                          </FormControl>
+                        </TableCell>
+                        <TableCell>
+                          <MauAutocomplete
+                            error={errors[`order_sale_products`] && errors[`order_sale_products`][index] && errors[`order_sale_products`][index].order_sale_collection_status_id}
+                            label={'Estado'}
+                            options={props.collectionStatuses}
+                            displayName={'name'}
+                            name={`order_sale_payments[${index}].order_sale_collection_status_id`}
+                            rules={
+                              {
+                                required: true,
+                              }
+                            }
+                            control={control}
+                            defaultValue={`${salePayment.order_sale_collection_status_id}`}
+                          />
+                        </TableCell>
+                        <TableCell align={'right'}>
+                          <IconButton
+                            onClick={() => {
+                              handleRemoveOrderSalePayment(index)
+                            }}
+                          >
+                            <DeleteIcon/>
+                          </IconButton>
+                        </TableCell>
+                      </TableRow>
+
+                    ))}
+                  </TableBody>
+                </Table>
+              </TableContainer>
+            </Grid>
+          </Grid>
+        </Grid>
+
+
         <Grid
           item
           container
@@ -657,7 +824,9 @@ const mapStateToProps = (state) => {
   return {
     clients: state.sales.clients,
     products: state.production.products,
-    saleStatuses: state.sales.saleStatuses
+    saleStatuses: state.sales.saleStatuses,
+    collectionStatuses: state.sales.collectionStatuses,
+    saleReceiptTypes: state.sales.saleReceiptTypes
   }
 }
 

@@ -111,6 +111,13 @@ function OrderSalesDataTable(props) {
       type: 'date'
     },
     {
+      title: 'Tipo',
+      field: 'order_sale_receipt_type_id',
+      type: 'options',
+      options: props.saleReceiptTypes,
+      optionLabel: 'name'
+    },
+    {
       title: 'Productos',
       type: 'entity',
       field: 'product_id',
@@ -191,6 +198,11 @@ function OrderSalesDataTable(props) {
             initialSubEntities: orderSale.defaultValues.order_sale_products,
             subEntities: orderSale.order_sale_products,
             path: 'orderSaleProduct'
+          },
+          {
+            initialSubEntities: orderSale.defaultValues.order_sale_payments,
+            subEntities: orderSale.order_sale_payments,
+            path: 'orderSalePayment'
           }
         ]
         const mainEntityConf = {
@@ -317,7 +329,8 @@ const mapStateToProps = (state, ownProps) => {
   return {
     products: state.production.products,
     clients: state.sales.clients,
-    saleStatuses: state.sales.saleStatuses
+    saleStatuses: state.sales.saleStatuses,
+    saleReceiptTypes: state.sales.saleReceiptTypes
   }
 }
 

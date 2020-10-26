@@ -7,7 +7,8 @@ const sales = (state = {
   requestsProducts: [],
   requestStatuses: [],
   otherIncomes: [],
-  collectionStatuses: []
+  collectionStatuses: [],
+  saleReceiptTypes: []
 }, action) => {
   switch (action.type) {
     case 'SET_SALES':
@@ -26,6 +27,8 @@ const sales = (state = {
       return {...state, saleStatuses: action.saleStatuses}
     case 'SET_ORDER_SALE_COLLECTION_STATUSES':
       return {...state, collectionStatuses: action.collectionStatuses}
+    case 'SET_ORDER_SALE_RECEIPT_TYPES':
+      return {...state, saleReceiptTypes: action.saleReceiptTypes}
     case 'SET_CLIENTS':
       return {...state, clients: action.clients}
     default:

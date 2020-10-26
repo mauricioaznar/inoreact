@@ -42,6 +42,14 @@ export const setOtherIncomes = (otherIncomes) => {
   }
 }
 
+export const setSaleReceiptTypes = (saleReceiptTypes) => {
+  return {
+    type: 'SET_ORDER_SALE_RECEIPT_TYPES',
+    saleReceiptTypes: saleReceiptTypes
+  }
+}
+
+
 export const setOrderSaleCollectionStatuses = (collectionStatuses) => {
   return {
     type: 'SET_ORDER_SALE_COLLECTION_STATUSES',
