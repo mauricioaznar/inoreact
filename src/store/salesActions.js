@@ -20,6 +20,14 @@ export const setSales = (sales) => {
   }
 }
 
+export const setSaleStatuses = (saleStatuses) => {
+  return {
+    type: 'SET_ORDER_SALE_STATUSES',
+    saleStatuses: saleStatuses
+  }
+}
+
+
 export const setSalesProducts = (salesProducts) => {
   return {
     type: 'SET_SALES_PRODUCTS',

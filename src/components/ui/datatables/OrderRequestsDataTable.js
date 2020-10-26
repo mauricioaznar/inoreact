@@ -48,6 +48,13 @@ function OrderRequestsDataTable(props) {
       type: 'date'
     },
     {
+      title: 'Estado',
+      field: 'order_request_status_id',
+      type: 'options',
+      options: props.requestStatuses,
+      optionLabel: 'name'
+    },
+    {
       title: 'Cliente',
       field: 'client_id',
       type: 'options',
@@ -193,7 +200,8 @@ function OrderRequestsDataTable(props) {
 const mapStateToProps = (state, ownProps) => {
   return {
     products: state.production.products,
-    clients: state.sales.clients
+    clients: state.sales.clients,
+    requestStatuses: state.sales.requestStatuses
   }
 }
 

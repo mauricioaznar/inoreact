@@ -108,6 +108,7 @@ const OrderRequestForm = (props) => {
     date: props.orderRequest ? props.orderRequest.date : '',
     priority: props.orderRequest ? props.orderRequest.priority : '',
     client_id: props.orderRequest ? props.orderRequest.client_id : '',
+    order_request_status_id: props.orderRequest ? props.orderRequest.order_request_status_id : '',
     order_request_products: props.orderRequest ? props.orderRequest.order_request_products
       .map(requestProduct => {
         return {
@@ -308,6 +309,28 @@ const OrderRequestForm = (props) => {
               label="Fecha de entrega estimada"
             />
           </Grid>
+        </Grid>
+
+        <Grid
+          item
+          xs={12}
+          className={classes.rowContainer}
+          style={{marginTop: '2em'}}
+        >
+          <MauAutocomplete
+            error={!!errors.order_request_status_id}
+            label={'Estado'}
+            options={props.requestStatuses}
+            name={'order_request_status_id'}
+            displayName={'name'}
+            rules={
+              {
+                required: true
+              }
+            }
+            control={control}
+            defaultValue={`${defaultValues.order_request_status_id}`}
+          />
         </Grid>
 
         <Grid
@@ -598,7 +621,8 @@ const OrderRequestForm = (props) => {
 const mapStateToProps = (state) => {
   return {
     clients: state.sales.clients,
-    products: state.production.products
+    products: state.production.products,
+    requestStatuses: state.sales.requestStatuses
   }
 }
 

@@ -17,7 +17,7 @@ import apiUrl from '../helpers/apiUrl'
 import {
   setClients,
   setOrderRequestStatuses,
-  setOrderSaleCollectionStatuses
+  setOrderSaleCollectionStatuses, setSaleStatuses
 } from './salesActions'
 import {setProductionEventTypes} from './maintenanceActions'
 
@@ -84,7 +84,8 @@ export const getApiEntities = () => {
         roles,
         order_production_type: orderProductionTypes,
         production_event_type: productionEventTypes,
-        packings
+        packings,
+        order_sale_statuses: saleStatuses
       } = result[0].data.data
       // dispatch(setOrderProductions(orderProductions))
       dispatch(setBranches(branches))
@@ -108,6 +109,7 @@ export const getApiEntities = () => {
       dispatch(setOrderProductionTypes(orderProductionTypes))
       dispatch(setProductionEventTypes(productionEventTypes))
       dispatch(setPackings(packings))
+      dispatch(setSaleStatuses(saleStatuses))
     }).finally(() => {
       dispatch(unsetAreEntitiesLoading())
     })

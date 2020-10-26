@@ -120,6 +120,13 @@ function OrderSalesDataTable(props) {
       optionLabel: 'description'
     },
     {
+      title: 'Estado',
+      field: 'order_sale_status_id',
+      type: 'options',
+      options: props.saleStatuses,
+      optionLabel: 'name'
+    },
+    {
       title: 'Kilos',
       render: (rowData) => {
         return (
@@ -309,7 +316,8 @@ function OrderSalesDataTable(props) {
 const mapStateToProps = (state, ownProps) => {
   return {
     products: state.production.products,
-    clients: state.sales.clients
+    clients: state.sales.clients,
+    saleStatuses: state.sales.saleStatuses
   }
 }
 

@@ -2,6 +2,7 @@ const sales = (state = {
   sales: [],
   clients: [],
   salesProducts: [],
+  saleStatuses: [],
   requests: [],
   requestsProducts: [],
   requestStatuses: [],
@@ -21,6 +22,8 @@ const sales = (state = {
       return {...state, otherIncomes: action.otherIncomes}
     case 'SET_ORDER_REQUEST_STATUSES':
       return {...state, requestStatuses: action.requestStatuses}
+    case 'SET_ORDER_SALE_STATUSES':
+      return {...state, saleStatuses: action.saleStatuses}
     case 'SET_ORDER_SALE_COLLECTION_STATUSES':
       return {...state, collectionStatuses: action.collectionStatuses}
     case 'SET_CLIENTS':

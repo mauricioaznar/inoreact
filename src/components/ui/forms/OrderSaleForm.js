@@ -138,6 +138,7 @@ const OrderSaleForm = (props) => {
     order_code: props.orderSale ? props.orderSale.order_code : '',
     date: props.orderSale ? props.orderSale.date : '',
     client_id: props.orderSale ? props.orderSale.order_request.client_id : props.orderRequest ? props.orderRequest.client_id : '',
+    order_sale_status_id: props.orderSale ? props.orderSale.order_sale_status_id : '',
     order_sale_products: props.orderSale ? props.orderSale.order_sale_products
         .map(saleProduct => {
           return {
@@ -354,6 +355,28 @@ const OrderSaleForm = (props) => {
             }
             control={control}
             defaultValue={`${defaultValues.client_id}`}
+          />
+        </Grid>
+
+        <Grid
+          item
+          xs={12}
+          className={classes.rowContainer}
+          style={{marginTop: '2em'}}
+        >
+          <MauAutocomplete
+            error={!!errors.order_sale_status_id}
+            label={'Estado'}
+            options={props.saleStatuses}
+            name={'order_sale_status_id'}
+            displayName={'name'}
+            rules={
+              {
+                required: true
+              }
+            }
+            control={control}
+            defaultValue={`${defaultValues.order_sale_status_id}`}
           />
         </Grid>
 
@@ -633,7 +656,8 @@ const OrderSaleForm = (props) => {
 const mapStateToProps = (state) => {
   return {
     clients: state.sales.clients,
-    products: state.production.products
+    products: state.production.products,
+    saleStatuses: state.sales.saleStatuses
   }
 }
 
