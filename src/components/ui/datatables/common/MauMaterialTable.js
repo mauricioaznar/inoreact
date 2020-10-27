@@ -35,9 +35,9 @@ export default function MauMaterialTable (props) {
           return (
             <>
               <MaterialTableDate
-                value={filters[newColumn.field].value}
+                value={filters[newColumn.field + newColumn.title] ? filters[newColumn.field + newColumn.title].value : null}
                 onChange={(momentDate) => {
-                  handleFilters( newColumn.field, momentDate)
+                  handleFilters( newColumn.field + newColumn.title, momentDate)
                 }}
               />
             </>
@@ -55,10 +55,19 @@ export default function MauMaterialTable (props) {
         ...newColumn,
         lookup,
         filterComponent: (filterProps) => {
+
+          let selectedOption = ''
+
+          if (filters[newColumn.field + newColumn.title] && filters[newColumn.field + newColumn.title].value) {
+            selectedOption = newColumn.options.find(option => {
+              return option.id === filters[newColumn.field + newColumn.title].value
+            })
+          }
+
           return (
             <Autocomplete
               options={newColumn.options}
-              value={filters[newColumn.field].value}
+              value={selectedOption}
               getOptionLabel={option => {
                 return option[newColumn.optionLabel]
               }}
@@ -68,23 +77,32 @@ export default function MauMaterialTable (props) {
                 />
               )}
               onChange={(e, data) => {
-                handleFilters( newColumn.field, data)
+                handleFilters( newColumn.field + newColumn.title, data ? data.id : null)
               }}
             />
           )
         }
       }
 
-    } else if (newColumn.type === 'entity') {
+    } else if (newColumn.type === 'entity' && newColumn.options) {
 
     return {
       ...newColumn,
       customFilterAndSearch: () => { return true },
       filterComponent: (filterProps) => {
+
+        let selectedOption = ''
+
+        if (filters[newColumn.field + newColumn.title] && filters[newColumn.field + newColumn.title].value) {
+          selectedOption = newColumn.options.find(option => {
+            return option.id === filters[newColumn.field + newColumn.title].value
+          })
+        }
+
         return (
           <Autocomplete
             options={newColumn.options}
-            value={filters[newColumn.field].value}
+            value={selectedOption}
             getOptionLabel={option => {
               return option[newColumn.optionLabel]
             }}
@@ -94,7 +112,7 @@ export default function MauMaterialTable (props) {
               />
             )}
             onChange={(e, data) => {
-              handleFilters( newColumn.field, data)
+              handleFilters( newColumn.field + newColumn.title, data ? data.id : null)
             }}
           />
         )
@@ -117,17 +135,37 @@ export default function MauMaterialTable (props) {
       }
     }
 
-  } else if (newColumn.type === 'text') {
+    } else if (newColumn.type === 'entity' && !newColumn.options) {
 
       return {
         ...newColumn,
         filterComponent: (filterProps) => {
           return (
             <MaterialTableText
-              focus={filters[newColumn.field].focus}
-              value={filters[newColumn.field].value}
+              focus={filters[newColumn.field + newColumn.title] ? filters[newColumn.field + newColumn.title].focus : false}
+              value={filters[newColumn.field + newColumn.title] ? filters[newColumn.field + newColumn.title].value : null}
               onChange={(text) => {
-                handleFilters( newColumn.field, text)
+                handleFilters( newColumn.field + newColumn.title, text)
+              }}
+            />
+          )
+        },
+        render: (rowData) => {
+          return rowData[newColumn.table][newColumn.field]
+        }
+      }
+
+    } else if (newColumn.type === 'text') {
+
+      return {
+        ...newColumn,
+        filterComponent: (filterProps) => {
+          return (
+            <MaterialTableText
+              focus={filters[newColumn.field + newColumn.title] ? filters[newColumn.field + newColumn.title].focus : null}
+              value={filters[newColumn.field + newColumn.title] ? filters[newColumn.field + newColumn.title].value : null}
+              onChange={(text) => {
+                handleFilters( newColumn.field + newColumn.title, text)
               }}
             />
           )
@@ -136,9 +174,9 @@ export default function MauMaterialTable (props) {
 
     } else {
 
-      return {
-        ...newColumn
-      }
+        return {
+          ...newColumn
+        }
 
     }
 
@@ -149,18 +187,27 @@ export default function MauMaterialTable (props) {
     JSON.parse(localStorage.getItem(localStorageFiltersName)) : {}
 
   const [filters, setFilters] = React.useState(columns.reduce((acc, column) => {
-    return {...acc, [column.field]: {
-        value: storageFilters[column.field] ? storageFilters[column.field].value
+
+    let filter = {}
+
+    if (column.field && column.title) {
+      filter[column.field + column.title] =  {
+        value: storageFilters[column.field + column.title] ? storageFilters[column.field + column.title].value
           : (
-              column.type === 'date'
-              || column.type === 'date_time'
-              || column.type === 'options'
-              || column.type === 'entity'
-            ) ? null : '',
-        type: column.type ? column.type : 'text',
-        entity: column.type === 'entity' ? column.entity : '',
-        focus: false
-      }}
+            column.type === 'date'
+            || column.type === 'date_time'
+            || column.type === 'options'
+            || column.type === 'entity'
+          ) ? null : '',
+          type: column.type,
+          field: column.field,
+          entity: column.type === 'entity' ? column.entity : '',
+          focus: false,
+          exact: column.exact ? true : false
+      }
+    }
+
+    return {...acc, ...filter}
   }, {}));
 
   let editable = {}
@@ -189,13 +236,20 @@ export default function MauMaterialTable (props) {
     })
   }
 
-  const handleFilters = (field, value) => {
+  const handleFilters = (name, value) => {
     const newFilters = {...filters}
-    const foundFilter = newFilters[field]
-    foundFilter.value = value
-    foundFilter.focus = true
-    setFilters(newFilters)
-    tableRef.current && tableRef.current.onQueryChange()
+    for (let name in newFilters) {
+      if (newFilters.hasOwnProperty(name)) {
+        newFilters[name].focus = false
+      }
+    }
+    const foundFilter = newFilters[name]
+    if (foundFilter) {
+      foundFilter.value = value
+      foundFilter.focus = true
+      setFilters(newFilters)
+      tableRef.current && tableRef.current.onQueryChange()
+    }
   }
 
 
@@ -227,9 +281,11 @@ export default function MauMaterialTable (props) {
           let exacts = 1
           let entities = 1
           let index = 1
-          for (let field in filters) {
-            if (filters.hasOwnProperty(field)) {
-              let filter = filters[field]
+          console.log(filters)
+          for (let name in filters) {
+            if (filters.hasOwnProperty(name)) {
+              let filter = filters[name]
+              let field = filter.field
               if ((filter.type === 'date' || filter.type === 'date_time') && filter.value !== null) {
                 let startDate = moment(filter.value).startOf('month').format(dateFormat)
                 url += `&start_date_${index + 1}=${field}`
@@ -240,17 +296,21 @@ export default function MauMaterialTable (props) {
                 index++
               } else if (filter.type === 'options' && filter.value !== null) {
                 url += `&filter_exact_${exacts}=${field}`
-                url += `&filter_exact_value_${exacts}=${filter.value.id}`
+                url += `&filter_exact_value_${exacts}=${filter.value}`
                 exacts++
               } else if (filter.type === 'entity' && filter.value !== null) {
                 url += `&filter_entity_property_${entities}=${field}`
-                url += `&filter_entity_value_${entities}=${filter.value.id}`
+                url += `&filter_entity_value_${entities}=${filter.value}`
                 url += `&filter_entity_${entities}=${filter.entity}`
                 exacts++
-              } else if (filter.type === 'text' && filter.value !== '') {
+              } else if (filter.type === 'text' && !filter.exact && filter.value !== '') {
                 url += `&filter_like_${likes}=${field}`
                 url += `&filter_like_value_${likes}=${filter.value}`
                 likes++
+              } else if (filter.type === 'text' && filter.exact && filter.value !== '') {
+                url += `&filter_exact_${exacts}=${field}`
+                url += `&filter_exact_value_${exacts}=${filter.value}`
+                exacts++
               }
             }
           }

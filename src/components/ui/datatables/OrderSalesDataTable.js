@@ -103,7 +103,9 @@ function OrderSalesDataTable(props) {
   const columns = [
     {
       title: 'Folio',
-      field: 'order_code'
+      field: 'order_code',
+      type: 'text',
+      exact: true
     },
     {
       title: 'Fecha de la venta',
@@ -125,6 +127,13 @@ function OrderSalesDataTable(props) {
       table: 'order_sale_products',
       options: props.products,
       optionLabel: 'description'
+    },
+    {
+      title: 'Pedido',
+      type: 'entity',
+      field: 'order_code',
+      entity: 'orderRequest',
+      table: 'order_request'
     },
     {
       title: 'Estado',

@@ -145,9 +145,9 @@ const OrderSaleForm = (props) => {
     id: props.orderSale ? props.orderSale.id : '',
     order_code: props.orderSale ? props.orderSale.order_code : '',
     date: props.orderSale ? props.orderSale.date : '',
-    order_sale_receipt_type_id: props.orderSale ? props.orderSale.order_sale_receipt_type_id : '',
-    client_id: props.orderSale ? props.orderSale.order_request.client_id : props.orderRequest ? props.orderRequest.client_id : '',
-    order_sale_status_id: props.orderSale ? props.orderSale.order_sale_status_id : '',
+    order_sale_receipt_type_id: props.orderSale ? String(props.orderSale.order_sale_receipt_type_id) : '',
+    client_id: props.orderSale ? String(props.orderSale.order_request.client_id) : props.orderRequest ? String(props.orderRequest.client_id) : '',
+    order_sale_status_id: props.orderSale ? String(props.orderSale.order_sale_status_id) : '',
     order_sale_payments: props.orderSale ? props.orderSale.order_sale_payments : [],
     order_sale_products: props.orderSale ? props.orderSale.order_sale_products
         .map(saleProduct => {
@@ -158,7 +158,7 @@ const OrderSaleForm = (props) => {
             group_weight: String(saleProduct.group_weight),
             kilo_price: String(saleProduct.kilo_price),
             total: String(saleProduct.kilos * saleProduct.kilo_price),
-            tax: String(saleProduct.kilos * saleProduct.kilo_price * 0.16)
+            tax: String(Math.trunc(saleProduct.kilos * saleProduct.kilo_price * 0.16))
           }
         })
       : props.orderRequest ? props.orderRequest.order_request_products
@@ -173,7 +173,7 @@ const OrderSaleForm = (props) => {
             group_weight: String(requestProduct.group_weight),
             kilo_price: String(requestProduct.kilo_price),
             total: String(requestProduct.kilos * requestProduct.kilo_price),
-            tax: String(requestProduct.kilos * requestProduct.kilo_price * 0.16)
+            tax: String(Math.trunc(requestProduct.kilos * requestProduct.kilo_price * 0.16))
           }
         })
         .filter(requestProduct => {

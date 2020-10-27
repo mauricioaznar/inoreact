@@ -35,7 +35,9 @@ function OrderRequestsDataTable(props) {
   const columns = [
     {
       title: 'Folio',
-      field: 'order_code'
+      field: 'order_code',
+      type: 'text',
+      exact: true
     },
     {
       title: 'Fecha de solicitud',
