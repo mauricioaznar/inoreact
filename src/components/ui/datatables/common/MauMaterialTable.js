@@ -56,7 +56,7 @@ export default function MauMaterialTable (props) {
         lookup,
         filterComponent: (filterProps) => {
 
-          let selectedOption = ''
+          let selectedOption = null
 
           if (filters[newColumn.field + newColumn.title] && filters[newColumn.field + newColumn.title].value) {
             selectedOption = newColumn.options.find(option => {
@@ -91,7 +91,7 @@ export default function MauMaterialTable (props) {
       customFilterAndSearch: () => { return true },
       filterComponent: (filterProps) => {
 
-        let selectedOption = ''
+        let selectedOption = null
 
         if (filters[newColumn.field + newColumn.title] && filters[newColumn.field + newColumn.title].value) {
           selectedOption = newColumn.options.find(option => {
@@ -124,7 +124,7 @@ export default function MauMaterialTable (props) {
               rowData[newColumn.table].map(entity => {
                 let option = newColumn.options.find(option => option.id === entity[newColumn.field])
                 return (
-                  <li style={{whiteSpace: 'nowrap'}}>
+                  <li key={entity.id} style={{whiteSpace: 'nowrap'}}>
                     {option[newColumn.optionLabel]}
                   </li>
                 )
@@ -236,6 +236,10 @@ export default function MauMaterialTable (props) {
     })
   }
 
+  if (props.actions) {
+    actions = actions.concat(props.actions)
+  }
+
   const handleFilters = (name, value) => {
     const newFilters = {...filters}
     for (let name in newFilters) {
@@ -281,7 +285,6 @@ export default function MauMaterialTable (props) {
           let exacts = 1
           let entities = 1
           let index = 1
-          console.log(filters)
           for (let name in filters) {
             if (filters.hasOwnProperty(name)) {
               let filter = filters[name]

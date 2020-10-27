@@ -80,7 +80,7 @@ function OrderRequestsDataTable(props) {
             {
               rowData.order_request_products.map(requestProduct => {
                 return (
-                  <li style={{whiteSpace: 'nowrap', textAlign: 'right'}}>
+                  <li key={requestProduct.id} style={{whiteSpace: 'nowrap', textAlign: 'right'}}>
                     {formatNumber(requestProduct.kilos)} kg
                   </li>
                 )
@@ -98,7 +98,7 @@ function OrderRequestsDataTable(props) {
             {
               rowData.order_request_products.map(requestProduct => {
                 return (
-                  <li style={{whiteSpace: 'nowrap', textAlign: 'right'}}>
+                  <li key={requestProduct.id} style={{whiteSpace: 'nowrap', textAlign: 'right'}}>
                    ${formatNumber(requestProduct.kilos * requestProduct.kilo_price)}
                   </li>
                 )

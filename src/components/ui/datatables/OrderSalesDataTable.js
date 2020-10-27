@@ -17,6 +17,7 @@ import FormControl from '@material-ui/core/FormControl'
 import Autocomplete from '../inputs/Autocomplete'
 import {green} from '@material-ui/core/colors'
 import CircularProgress from '@material-ui/core/CircularProgress'
+import PictureAsPdfIcon from '@material-ui/icons/PictureAsPdf';
 
 const Transition = React.forwardRef(function Transition(props, ref) {
   return <Slide
@@ -150,7 +151,7 @@ function OrderSalesDataTable(props) {
             {
               rowData.order_sale_products.map(saleProduct => {
                 return (
-                  <li style={{whiteSpace: 'nowrap', textAlign: 'right'}}>
+                  <li key={saleProduct.id} style={{whiteSpace: 'nowrap', textAlign: 'right'}}>
                     {formatNumber(saleProduct.kilos)} kg
                   </li>
                 )
@@ -168,7 +169,7 @@ function OrderSalesDataTable(props) {
             {
               rowData.order_sale_products.map(saleProduct => {
                 return (
-                  <li style={{whiteSpace: 'nowrap', textAlign: 'right'}}>
+                  <li key={saleProduct.id} style={{whiteSpace: 'nowrap', textAlign: 'right'}}>
                    ${formatNumber(saleProduct.kilos * saleProduct.kilo_price)}
                   </li>
                 )
@@ -251,6 +252,17 @@ function OrderSalesDataTable(props) {
       })
   }
 
+  const actions = [
+    {
+      icon: (props) => <PictureAsPdfIcon {...props} color={'action'} fontSize={'small'} />,
+      position: 'row',
+      tooltip: 'Exportar',
+      onClick: (e, data) => {
+        window.open(apiUrl + 'downloads/pdf/' + data.id)
+      }
+    }
+  ]
+
 
   return (
     <>
@@ -270,6 +282,7 @@ function OrderSalesDataTable(props) {
           handleRowEdit(rowData)
         }}
         columns={columns}
+        actions={actions}
       />
 
       {
