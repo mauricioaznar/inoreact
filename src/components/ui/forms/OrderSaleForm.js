@@ -95,6 +95,7 @@ const OrderSaleForm = (props) => {
     product_id: '',
     kilos: '0',
     groups: '0',
+    tax: '0',
     total: '0',
     kilo_price: '0',
     group_weight: '0',
@@ -156,7 +157,8 @@ const OrderSaleForm = (props) => {
             groups: String(saleProduct.groups),
             group_weight: String(saleProduct.group_weight),
             kilo_price: String(saleProduct.kilo_price),
-            total: String(saleProduct.kilos * saleProduct.kilo_price)
+            total: String(saleProduct.kilos * saleProduct.kilo_price),
+            tax: String(saleProduct.kilos * saleProduct.kilo_price * 0.16)
           }
         })
       : props.orderRequest ? props.orderRequest.order_request_products
@@ -170,7 +172,8 @@ const OrderSaleForm = (props) => {
             groups:soldSaleProduct ? soldSaleProduct.groups_remaining : String(requestProduct.groups),
             group_weight: String(requestProduct.group_weight),
             kilo_price: String(requestProduct.kilo_price),
-            total: String(requestProduct.kilos * requestProduct.kilo_price)
+            total: String(requestProduct.kilos * requestProduct.kilo_price),
+            tax: String(requestProduct.kilos * requestProduct.kilo_price * 0.16)
           }
         })
         .filter(requestProduct => {
@@ -253,6 +256,8 @@ const OrderSaleForm = (props) => {
 
   const watchSaleProducts = watch('order_sale_products')
 
+  const watchSaleReceiptType = watch('order_sale_receipt_type_id')
+
   const handleProductSelection = (productId, productionProductId, index) => {
     let groupWeight = '0'
     let kilos = "0"
@@ -291,6 +296,7 @@ const OrderSaleForm = (props) => {
     setValue(`order_sale_products[${index}].kilos`, String(kilos))
     let _total = Number(kilos) * Number(watchSaleProducts[index].kilo_price)
     setValue(`order_sale_products[${index}].total`, String(Math.trunc(_total)))
+    setValue(`order_sale_products[${index}].tax`, String(Math.trunc(_total * 0.16)))
   }
 
   const hasGroupWeight = (index) => {
@@ -310,6 +316,7 @@ const OrderSaleForm = (props) => {
   const calculateSaleProduct = (e, index) => {
     let _total = Number(watchSaleProducts[index].kilos) * Number(watchSaleProducts[index].kilo_price)
     setValue(`order_sale_products[${index}].total`, String(Math.trunc(_total)))
+    setValue(`order_sale_products[${index}].tax`, String(Math.trunc(_total * 0.16)))
   }
 
   return (
@@ -506,6 +513,8 @@ const OrderSaleForm = (props) => {
                       <TableCell>Kilos</TableCell>
                       <TableCell>Peso</TableCell>
                       <TableCell>Precio</TableCell>
+                      <TableCell>Total</TableCell>
+                      <TableCell style={{display: watchSaleReceiptType !== '2' ? 'none' : undefined}}>IVA</TableCell>
                     </TableRow>
                   </TableHead>
                   <TableBody>
@@ -657,6 +666,19 @@ const OrderSaleForm = (props) => {
                             type="number"
                             name={`order_sale_products[${index}].total`}
                             defaultValue={`${saleProduct.total}`}
+                            inputRef={register({})}
+                          />
+                        </TableCell>
+                        <TableCell
+                          style={{display: watchSaleReceiptType !== '2' ? 'none' : undefined}}
+                        >
+                          <TextField
+                            error={errors[`order_sale_products`] && errors[`order_sale_products`][index] && errors[`order_sale_products`][index].tax}
+                            label="IVA"
+                            disabled
+                            type="number"
+                            name={`order_sale_products[${index}].tax`}
+                            defaultValue={`${saleProduct.tax}`}
                             inputRef={register({})}
                           />
                         </TableCell>
