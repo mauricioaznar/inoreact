@@ -118,8 +118,13 @@ export default function MauMaterialTable (props) {
         )
       },
       render: (rowData) => {
-        return (
-          <ul>
+
+        if (newColumn.single) {
+          let option = newColumn.options.find(option => option.id === rowData[newColumn.table][newColumn.field])
+          return option[newColumn.optionLabel]
+        } else {
+          return (
+            <ul>
             {
               rowData[newColumn.table].map(entity => {
                 let option = newColumn.options.find(option => option.id === entity[newColumn.field])
@@ -131,7 +136,9 @@ export default function MauMaterialTable (props) {
               })
             }
           </ul>
-        )
+          )
+        }
+
       }
     }
 
@@ -301,11 +308,11 @@ export default function MauMaterialTable (props) {
                 url += `&filter_exact_${exacts}=${field}`
                 url += `&filter_exact_value_${exacts}=${filter.value}`
                 exacts++
-              } else if (filter.type === 'entity' && filter.value !== null) {
+              } else if (filter.type === 'entity' && filter.value !== null && filter.value !== '') {
                 url += `&filter_entity_property_${entities}=${field}`
                 url += `&filter_entity_value_${entities}=${filter.value}`
                 url += `&filter_entity_${entities}=${filter.entity}`
-                exacts++
+                entities++
               } else if (filter.type === 'text' && !filter.exact && filter.value !== '') {
                 url += `&filter_like_${likes}=${field}`
                 url += `&filter_like_value_${likes}=${filter.value}`

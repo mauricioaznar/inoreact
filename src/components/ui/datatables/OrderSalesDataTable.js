@@ -121,6 +121,16 @@ function OrderSalesDataTable(props) {
       optionLabel: 'name'
     },
     {
+      title: 'Cliente',
+      type: 'entity',
+      field: 'client_id',
+      entity: 'orderRequest',
+      table: 'order_request',
+      options: props.clients,
+      optionLabel: 'name',
+      single: true
+    },
+    {
       title: 'Productos',
       type: 'entity',
       field: 'product_id',
