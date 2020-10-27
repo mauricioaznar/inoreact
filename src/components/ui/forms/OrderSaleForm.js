@@ -523,7 +523,7 @@ const OrderSaleForm = (props) => {
                         <TableCell style={{display: 'none'}}>
                           <TextField
                             id="standard-number"
-                            label="Number"
+                            label="Number"wWWW
                             type="number"
                             name={`order_sale_products[${index}].id`}
                             defaultValue={`${saleProduct.id}`}
