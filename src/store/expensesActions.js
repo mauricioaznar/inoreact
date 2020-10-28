@@ -1,3 +1,24 @@
+import {setAreEntitiesLoading, setBranches, setEmployees, setRoles} from './generalActions'
+import axios from 'axios'
+import apiUrl from '../helpers/apiUrl'
+import authHeader from '../helpers/authHeader'
+import {
+  setMachines,
+  setMaterials,
+  setOrderProductionTypes,
+  setPackings,
+  setProducts,
+  setProductTypes
+} from './productionActions'
+import {
+  setClients,
+  setOrderRequestStatuses,
+  setOrderSaleCollectionStatuses,
+  setSaleReceiptTypes,
+  setSaleStatuses
+} from './salesActions'
+import {setProductionEventTypes} from './maintenanceActions'
+
 export const setExpenseCategories = (expenseCategories) => {
   return {
     type: 'SET_EXPENSE_CATEGORIES',
@@ -52,6 +73,18 @@ export const setExpenseInvoiceCdfiUses = (cdfiUses) => {
   return {
     type: 'SET_EXPENSE_INVOICE_CDFI_USES',
     cdfiUses
+  }
+}
+
+
+export const getSuppliers = () => {
+  return (dispatch, getState) => {
+    return axios.get(apiUrl + 'supplier/list?paginate=false', {headers: {...authHeader()}})
+      .then(result => {
+        const suppliers = result.data.data
+        console.log(suppliers)
+        dispatch(setSuppliers(suppliers))
+      })
   }
 }
 

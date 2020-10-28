@@ -12,6 +12,8 @@ import Slide from '@material-ui/core/Slide'
 import {mainEntityPromise} from './common/common'
 import SupplierForm from '../forms/SupplierForm'
 import MauMaterialTable from './common/MauMaterialTable'
+import {getApiEntities} from '../../../store/generalActions'
+import {getSuppliers} from '../../../store/expensesActions'
 
 const Transition = React.forwardRef(function Transition(props, ref) {
   return <Slide direction="up" ref={ref} {...props} />;
@@ -54,6 +56,7 @@ function UserDataTable(props) {
         callback(true)
         tableRef.current && tableRef.current.onQueryChange()
         setOpen(false)
+        props.getSuppliers()
       })
   }
 
@@ -118,4 +121,14 @@ const mapStateToProps = (state, ownProps) => {
   }
 }
 
-export default connect(mapStateToProps, null)(UserDataTable)
+
+
+const mapDispatchToProps = (dispatch, ownProps) => {
+  return {
+    getSuppliers: () => {
+      dispatch(getSuppliers())
+    }
+  }
+}
+
+export default connect(mapStateToProps, mapDispatchToProps)(UserDataTable)
