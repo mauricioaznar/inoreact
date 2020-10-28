@@ -31,6 +31,7 @@ import TableCell from '@material-ui/core/TableCell'
 import TableBody from '@material-ui/core/TableBody'
 import DeleteIcon from '@material-ui/icons/Delete'
 import Autocomplete from '../inputs/Autocomplete'
+import formatNumber from '../../../helpers/formatNumber'
 
 
 const useStyles = makeStyles((theme) => {
@@ -137,8 +138,6 @@ const OrderSaleForm = (props) => {
         })
       }
     })
-
-    console.log(soldSaleProducts)
   }
 
   const defaultValues = {
@@ -148,7 +147,7 @@ const OrderSaleForm = (props) => {
     order_sale_receipt_type_id: props.orderSale ? String(props.orderSale.order_sale_receipt_type_id) : '',
     client_id: props.orderSale ? String(props.orderSale.order_request.client_id) : props.orderRequest ? String(props.orderRequest.client_id) : '',
     order_sale_status_id: props.orderSale ? String(props.orderSale.order_sale_status_id) : '',
-    order_sale_payments: props.orderSale ? props.orderSale.order_sale_payments : [],
+    order_sale_payments: props.orderSale ? props.orderSale.order_sale_payments : [{...defaultOrderSalePayment}],
     order_sale_products: props.orderSale ? props.orderSale.order_sale_products
         .map(saleProduct => {
           return {
@@ -256,7 +255,27 @@ const OrderSaleForm = (props) => {
 
   const watchSaleProducts = watch('order_sale_products')
 
+  const watchSalePayments = watch('order_sale_payments')
+
   const watchSaleReceiptType = watch('order_sale_receipt_type_id')
+
+  let total = 0
+
+  if (watchSaleProducts.length > 0) {
+    watchSaleProducts.forEach(saleProduct => {
+      if(watchSaleReceiptType === '2') {
+        total += Number(saleProduct.total) + Number(saleProduct.tax)
+      } else {
+        total += Number(saleProduct.total)
+      }
+    })
+  }
+
+  React.useEffect(() => {
+    if(watchSalePayments.length === 1) {
+      setValue(`order_sale_payments[0].amount`, String(total))
+    }
+  }, [total])
 
   const handleProductSelection = (productId, productionProductId, index) => {
     let groupWeight = '0'
@@ -286,17 +305,17 @@ const OrderSaleForm = (props) => {
       }
 
     }
-    setValue(`order_sale_products[${index}].group_weight`, String(groupWeight))
-    setValue(`order_sale_products[${index}].kilos`, String(kilos))
-    setValue(`order_sale_products[${index}].groups`, String(groups))
+    setValue(`order_sale_products[${index}].group_weight`, String(groupWeight), { shouldValidate: true })
+    setValue(`order_sale_products[${index}].kilos`, String(kilos), { shouldValidate: true })
+    setValue(`order_sale_products[${index}].groups`, String(groups), { shouldValidate: true })
   }
 
   const calculateProductKilos = (e, index) => {
     let kilos = Number(watchSaleProducts[index].groups) * Number(watchSaleProducts[index].group_weight)
-    setValue(`order_sale_products[${index}].kilos`, String(kilos))
+    setValue(`order_sale_products[${index}].kilos`, String(kilos), { shouldValidate: true })
     let _total = Number(kilos) * Number(watchSaleProducts[index].kilo_price)
-    setValue(`order_sale_products[${index}].total`, String(Math.trunc(_total)))
-    setValue(`order_sale_products[${index}].tax`, String(Math.trunc(_total * 0.16)))
+    setValue(`order_sale_products[${index}].total`, String(Math.trunc(_total)), { shouldValidate: true })
+    setValue(`order_sale_products[${index}].tax`, String(Math.trunc(_total * 0.16)), { shouldValidate: true })
   }
 
   const hasGroupWeight = (index) => {
@@ -315,8 +334,8 @@ const OrderSaleForm = (props) => {
 
   const calculateSaleProduct = (e, index) => {
     let _total = Number(watchSaleProducts[index].kilos) * Number(watchSaleProducts[index].kilo_price)
-    setValue(`order_sale_products[${index}].total`, String(Math.trunc(_total)))
-    setValue(`order_sale_products[${index}].tax`, String(Math.trunc(_total * 0.16)))
+    setValue(`order_sale_products[${index}].total`, String(Math.trunc(_total)), { shouldValidate: true })
+    setValue(`order_sale_products[${index}].tax`, String(Math.trunc(_total * 0.16)), { shouldValidate: true })
   }
 
   return (
@@ -523,7 +542,7 @@ const OrderSaleForm = (props) => {
                         <TableCell style={{display: 'none'}}>
                           <TextField
                             id="standard-number"
-                            label="Number"wWWW
+                            label="Number"
                             type="number"
                             name={`order_sale_products[${index}].id`}
                             defaultValue={`${saleProduct.id}`}
@@ -602,7 +621,7 @@ const OrderSaleForm = (props) => {
                             onChange={(e, value) => {
                               calculateSaleProduct(e, index)
                             }}
-                            disabled={hasGroupWeight(index)}
+                            // disabled={hasGroupWeight(index)}
                             name={`order_sale_products[${index}].kilos`}
                             defaultValue={`${saleProduct.kilos}`}
                             inputRef={register(
@@ -691,6 +710,25 @@ const OrderSaleForm = (props) => {
           </Grid>
         </Grid>
 
+        <Grid
+          item
+          xs={12}
+          className={classes.rowContainer}
+          style={{marginTop: '2em'}}
+        >
+          <Grid container direction={'row'} justify={'flex-end'}>
+            <Grid item style={{marginRight: '2em'}}>
+              <Typography variant={'body1'}>
+
+                Total &nbsp;
+                {
+                  formatNumber(total)
+                }
+              </Typography>
+            </Grid>
+          </Grid>
+        </Grid>
+
 
         <Grid
           item
@@ -771,7 +809,21 @@ const OrderSaleForm = (props) => {
                               error={!!errors.order_sale_payments && !!errors.order_sale_payments[index] && !!errors.order_sale_payments[index].amount}
                               name={`order_sale_payments[${index}].amount`}
                               defaultValue={`${salePayment.amount}`}
-                              inputRef={register({required: true})}
+                              inputRef={register(
+                                {
+                                  required: true,
+                                  validate: (value) => {
+                                    let salePaymentsTotal = 0
+                                    watchSalePayments.forEach((salePayment, salePaymentIndex) => {
+                                      if (index !== salePaymentIndex) {
+                                        salePaymentsTotal += Number(watchSalePayments[salePaymentIndex].amount)
+                                      }
+                                    })
+                                    salePaymentsTotal += Number(value)
+                                    return salePaymentsTotal === total
+                                  }
+                                }
+                              )}
                             />
                           </FormControl>
                         </TableCell>
@@ -792,13 +844,16 @@ const OrderSaleForm = (props) => {
                           />
                         </TableCell>
                         <TableCell align={'right'}>
-                          <IconButton
-                            onClick={() => {
-                              handleRemoveOrderSalePayment(index)
-                            }}
-                          >
-                            <DeleteIcon/>
-                          </IconButton>
+                          {
+                            index !== 0 ?
+                              <IconButton
+                                onClick={() => {
+                                  handleRemoveOrderSalePayment(index)
+                                }}
+                              >
+                                <DeleteIcon/>
+                              </IconButton> : null
+                          }
                         </TableCell>
                       </TableRow>
 

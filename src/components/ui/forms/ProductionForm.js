@@ -203,13 +203,14 @@ const ProductionForm = (props) => {
 
     console.log(data)
 
-    let order_production_employees = data.helper_employees
+    let order_production_employees = data.helper_employees && data.helper_employees.length > 0
+      ? data.helper_employees
       .map(helperEmployee => {
         return {
           ...helperEmployee,
           is_leader: 0
         }
-      })
+      }) : []
 
     if (data.leader_employee_id !== '') {
       let foundInitialLeaderProductionEmployee = props.production ? props.production.order_production_employees

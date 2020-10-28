@@ -40,7 +40,7 @@ function Production(props) {
     {
       name: 'Captura de datos',
       link: '/production/dataCapture',
-      authed: true
+      authed: props.isAdmin || props.isProduction
     },
     {
       name: 'Resumen',
@@ -113,6 +113,7 @@ function Production(props) {
               }}
             />
             <Route
+              authed={props.isAdmin || props.isProduction}
               path={'/production/dataCapture'}
               exact
               component={() => {
