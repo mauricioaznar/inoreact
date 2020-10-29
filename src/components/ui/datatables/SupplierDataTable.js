@@ -38,7 +38,8 @@ function UserDataTable(props) {
   const columns = [
     {
       title: 'Nombre',
-      field: 'name'
+      field: 'name',
+      type: 'text'
     },
   ]
 

@@ -63,8 +63,8 @@ const mapExpenseToInvoice = expense => {
 const dateFormat = 'YYYY-MM-DD'
 
 const sortInvoices = (a, b) => {
-  let aMomentDate = moment(a.date_paid, 'YYYY-MM-DD')
-  let bMomentDate = moment(b.date_paid, 'YYYY-MM-DD')
+  // let aMomentDate = moment(a.date_paid, 'YYYY-MM-DD')
+  // let bMomentDate = moment(b.date_paid, 'YYYY-MM-DD')
   let aExpenseMoneySourceId = a.expense_money_source_id
   let bExpenseMoneySourceId = b.expense_money_source_id
   let aInternalCode = ''
@@ -88,8 +88,8 @@ const sortInvoices = (a, b) => {
   }
   return aExpenseMoneySourceId > bExpenseMoneySourceId ? 1
     : aExpenseMoneySourceId < bExpenseMoneySourceId ? -1
-      : aMomentDate.isAfter(bMomentDate) ? 1
-        : aMomentDate.isBefore(bMomentDate) ? -1
+      // : aMomentDate.isAfter(bMomentDate) ? 1
+      //   : aMomentDate.isBefore(bMomentDate) ? -1
           : aInternalCode === '' && Number(bInternalCode) > 0 ? -1
             : Number(aInternalCode) > 0 && bInternalCode === '' ? 1
               : Number(aInternalCode) > Number(bInternalCode) ? 1
