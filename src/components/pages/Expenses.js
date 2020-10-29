@@ -44,6 +44,7 @@ const mapExpenseToInvoice = expense => {
     'Proveedor': expense.supplier.name,
     'Fecha de pago': expense.date_paid,
     'Fecha de emision': expense.date_emitted,
+    'Fecha de reembolso': expense.date_refunded,
     'Forma de pago': expenseInvoicePaymentForm,
     'Total': total,
     'Isr': +(total - expense.tax).toFixed(2),
@@ -119,8 +120,8 @@ export default function Expenses(props) {
       let workbook = xlsx.utils.book_new()
       let paidInvoicedExcel = xlsx.utils.json_to_sheet(exportedExpenses.paidInvoices)
       xlsx.utils.book_append_sheet(workbook, paidInvoicedExcel, 'Egresos pagadas')
-      let provisionedInvoicedExcel = xlsx.utils.json_to_sheet(exportedExpenses.provisionedInvoices)
-      xlsx.utils.book_append_sheet(workbook, provisionedInvoicedExcel, 'Facturas provisionadas')
+      let refundedInvoicedExcel = xlsx.utils.json_to_sheet(exportedExpenses.refundedInvoices)
+      xlsx.utils.book_append_sheet(workbook, refundedInvoicedExcel, 'Facturas reembolsadas')
       let pendingPaidInvoicesExcel = xlsx.utils.json_to_sheet(exportedExpenses.pendingPaidInvoices)
       xlsx.utils.book_append_sheet(workbook, pendingPaidInvoicesExcel, 'Facturas pendientes de pagar')
       let pendingEmittedInvoicesExcel = xlsx.utils.json_to_sheet(exportedExpenses.pendingEmittedInvoices)
@@ -150,13 +151,15 @@ export default function Expenses(props) {
         '&end_date_1=date_paid' +
         '&end_date_value_1=' + endDate,
         {headers: {...authHeader()}})
-      const provisionedInvoicesResponse = await axios.get(apiUrl + 'expense/list?' +
+      const refundedInvoicesResponse = await axios.get(apiUrl + 'expense/list?' +
         'paginate=false' +
         '&filter_exact_1=expense_type_id' +
         '&filter_exact_value_1=2' +
-        '&start_date_1=invoice_provision_date' +
+        '&filter_exact_1=expense_invoice_payment_form_id' +
+        '&filter_exact_value_1=1' +
+        '&start_date_1=date_refunded' +
         '&start_date_value_1=' + startDate +
-        '&end_date_1=invoice_provision_date' +
+        '&end_date_1=date_refunded' +
         '&end_date_value_1=' + endDate,
         {headers: {...authHeader()}})
       const pendingPaidInvoicesResponse = await axios.get(apiUrl + 'expense/list?' +
@@ -175,8 +178,16 @@ export default function Expenses(props) {
         {headers: {...authHeader()}})
       if (active) {
         setExportedExpenses({
-          paidInvoices: paidInvoicesResponse.data.data.sort(sortInvoices).map(mapExpenseToInvoice),
-          provisionedInvoices: provisionedInvoicesResponse.data.data.sort(sortInvoices).map(mapExpenseToInvoice),
+          paidInvoices: paidInvoicesResponse.data.data
+            .filter(expense => {
+              return expense.expense_invoice_payment_form_id !== 1
+            })
+            .concat(refundedInvoicesResponse.data.data)
+            .sort(sortInvoices)
+            .map(mapExpenseToInvoice),
+          refundedInvoices: refundedInvoicesResponse.data.data
+          .sort(sortInvoices)
+          .map(mapExpenseToInvoice),
           pendingPaidInvoices: pendingPaidInvoicesResponse.data.data.sort(sortInvoices).map(mapExpenseToInvoice),
           pendingEmittedInvoices: pendingEmittedInvoicesResponse.data.data.sort(sortInvoices).map(mapExpenseToInvoice)
         })

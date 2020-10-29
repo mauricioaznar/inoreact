@@ -99,6 +99,9 @@ const ExpenseForm = (props) => {
   const [isDateEmittedRequired, setIsDateEmittedRequired] = React.useState(
     props.expense ? moment(props.expense.date_emitted).isValid() : true
   );
+  const [isDateRefundedRequired, setIsDateRefundedRequired] = React.useState(
+    props.expense ? moment(props.expense.date_refunded).isValid() : true
+  );
   // const [isProvisionDateRequired, setIsProvisionDateRequired] = React.useState(
   //   props.expense ? moment(props.expense.invoice_provision_date).isValid() : false
   // );
@@ -129,6 +132,16 @@ const ExpenseForm = (props) => {
     description: ''
   }
 
+  const defaultExpenseProduct = {
+    product_id: "null",
+    kilos: "0",
+    groups: "0",
+    group_weight: "0",
+    kilo_price: "0",
+    _tax: "0",
+    _total: "0"
+  }
+
   const defaultValues = {
     id: props.expense ? props.expense.id : '',
     expense_items: props.expense ? props.expense.expense_items : [defaultExpenseItem],
@@ -143,6 +156,7 @@ const ExpenseForm = (props) => {
     // invoice_provision_date: props.expense ? props.expense.invoice_provision_date : '',
     date_emitted: props.expense ? props.expense.date_emitted : '',
     date_paid: props.expense ? props.expense.date_paid : '',
+    date_refunded: props.expense ? props.expense.date_refunded: '',
     invoice_code: props.expense ? props.expense.invoice_code : '',
     internal_code: props.expense ? props.expense.internal_code : '',
     expense_type_id: props.expense ? String(props.expense.expense_type_id) : '',
@@ -157,7 +171,7 @@ const ExpenseForm = (props) => {
         _total: expenseProduct ? (expenseProduct.kilos * expenseProduct.kilo_price * 1.16) : 0,
         _tax: expenseProduct ? (expenseProduct.kilos * expenseProduct.kilo_price * 0.16) : 0
       }
-    }) : [],
+    }) : [{...defaultExpenseProduct}],
     expense_credit_notes: props.expense ? props.expense.expense_credit_notes : []
     // expense_subcategories: initialExpenseSubcategories
   }
@@ -199,6 +213,7 @@ const ExpenseForm = (props) => {
   const watchExpenseItems = watch('expense_items')
   const watchExpenseType = watch('expense_type_id')
   const watchPaymentMethod = watch('expense_invoice_payment_method_id')
+  const watchPaymentForm = watch('expense_invoice_payment_form_id')
   const watchExpenseProducts = watch('expense_products')
   const watchSupplierId = watch('supplier_id')
 
@@ -230,6 +245,12 @@ const ExpenseForm = (props) => {
     isInvoice = true
   }
 
+  let isCash = false
+
+  if (watchPaymentForm === '1') {
+    isCash = true
+  }
+
   const onSubmit = data => {
     setSuccess(false);
     setLoading(true);
@@ -239,7 +260,7 @@ const ExpenseForm = (props) => {
         return {...complement, delivered: (complement.delivered ? '1' : '-1')}
       }) : []
 
-    console.log(errors)
+    console.log(data.date_refunded)
 
     let finalSubmitted = {
       ...data,
@@ -251,8 +272,10 @@ const ExpenseForm = (props) => {
       date_paid: isDatePaidRequired ? data.date_paid : '0000-00-00',
       // invoice_provision_date: isProvisionDateRequired && isInvoice ? data.invoice_provision_date : '0000-00-00',
       date_emitted: isDateEmittedRequired && isInvoice ? data.date_emitted : '0000-00-00',
+      date_refunded: isDateRefundedRequired && isInvoice && isCash ? data.date_refunded : '0000-00-00',
       expense_invoice_complements: complements,
-      expense_products: isExpenseProductsRequired() ? data.expense_products : [],
+      expense_products: isExpenseProductsRequired() && data.expense_products && data.expense_products.length > 0
+        ? data.expense_products : [],
       expense_credit_notes: isInvoice && data.expense_credit_notes ? data.expense_credit_notes : [],
       expense_invoice_payment_method_id: isInvoice ? String(data.expense_invoice_payment_method_id) : 'null',
       expense_invoice_payment_form_id: isInvoice ? String(data.expense_invoice_payment_form_id) : 'null',
@@ -858,6 +881,57 @@ const ExpenseForm = (props) => {
             control={control}
             defaultValue={`${defaultValues.expense_invoice_payment_form_id}`}
           />
+        </Grid>
+
+        <Grid
+          item
+          container
+          xs={12}
+          className={classes.rowContainer}
+          direction={'column'}
+          style={{marginTop: '2em', display: isInvoice && isCash? 'inherit' : 'none'}}
+        >
+          <Grid
+            item
+            xs
+          >
+            <FormControl>
+              <FormLabel component="legend">
+                ¿Ya se reembolso?
+              </FormLabel>
+              <FormControlLabel
+                control={
+                  <Switch
+                    checked={isDateRefundedRequired}
+                    onChange={() => {
+                      setIsDateRefundedRequired(!isDateRefundedRequired)
+                    }}
+                    name="dateRefundedRequired"
+                    color="primary"
+                  />
+                }
+                label={isDateRefundedRequired ? 'Rembolsada' : 'Pendiente'}
+              />
+            </FormControl>
+          </Grid>
+          <Grid
+            item
+            xs
+            style={{
+              marginTop: '0.5em',
+              display: !isDateRefundedRequired ? 'none' : 'inherit'
+            }}
+          >
+            <MauDatePicker
+              name="date_refunded"
+              control={control}
+              rules={{required: isDateRefundedRequired && isInvoice && isCash}}
+              error={!!errors.date_refunded}
+              helperText={errors.date_refunded && errors.date_refunded.message}
+              defaultValue={defaultValues.date_refunded}
+              label="Fecha de reembolso"
+            />
+          </Grid>
         </Grid>
 
         <Grid

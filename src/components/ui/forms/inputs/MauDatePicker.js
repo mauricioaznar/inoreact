@@ -46,6 +46,8 @@ function MauDatePicker(props) {
           ...props.rules,
           validate: (value) => {
             let isValid = props.rules && props.rules.required ? value !== '0000-00-00' : true
+            console.log(props.label)
+            console.log(isValid)
             return isValid || `La ${props.label.toLowerCase()} es requerida`
           }
         }}
