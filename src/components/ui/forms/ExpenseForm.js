@@ -41,6 +41,7 @@ import MauAutocomplete from './inputs/MauAutocomplete'
 import useFetch from '../../../helpers/useFetch'
 import apiUrl from '../../../helpers/apiUrl'
 import formatNumber from '../../../helpers/formatNumber'
+import MauNumber from './inputs/MauNumber'
 
 
 const useStyles = makeStyles((theme) => {
@@ -246,9 +247,12 @@ const ExpenseForm = (props) => {
   }
 
   let isCash = false
+  let isTransfer = false
 
   if (watchPaymentForm === '1') {
     isCash = true
+  } else if (watchPaymentForm === '3') {
+    isTransfer = true
   }
 
   const onSubmit = data => {
@@ -262,6 +266,8 @@ const ExpenseForm = (props) => {
 
     console.log(data.date_refunded)
 
+    let datePaid =  isDatePaidRequired ? data.date_paid : '0000-00-00'
+
     let finalSubmitted = {
       ...data,
       tax: isInvoice ? data.tax : '0',
@@ -269,9 +275,9 @@ const ExpenseForm = (props) => {
       invoice_isr_retained: isInvoice ? data.invoice_isr_retained : '0',
       invoice_code: isInvoice ? data.invoice_code : '',
       internal_code: isInvoice ? data.internal_code : '',
-      date_paid: isDatePaidRequired ? data.date_paid : '0000-00-00',
+      date_paid: datePaid,
       // invoice_provision_date: isProvisionDateRequired && isInvoice ? data.invoice_provision_date : '0000-00-00',
-      date_emitted: isDateEmittedRequired && isInvoice ? data.date_emitted : '0000-00-00',
+      date_emitted: isDateEmittedRequired && isInvoice && isTransfer ? data.date_emitted : datePaid,
       date_refunded: isDateRefundedRequired && isInvoice && isCash ? data.date_refunded : '0000-00-00',
       expense_invoice_complements: complements,
       expense_products: isExpenseProductsRequired() && data.expense_products && data.expense_products.length > 0
@@ -403,8 +409,18 @@ const ExpenseForm = (props) => {
     return expenseProduct && expenseProduct.group_weight !== "0"
   }
 
-  const handleSubtotalChange = (e) => {
-    setValue('tax', total * 0.16)
+  const handleSubtotalChange = (subtotal, index) => {
+    let _total = 0
+    if (watchExpenseItems && watchExpenseItems.length > 0) {
+      watchExpenseItems.forEach((item, itemIndex) => {
+        if (itemIndex === index) {
+          _total += Number(subtotal)
+        } else {
+          _total += Number(watchExpenseItems[itemIndex].subtotal)
+        }
+      })
+    }
+    setValue('tax', _total * 0.16)
   }
 
   const isQuantityRequired = (index) => {
@@ -555,57 +571,6 @@ const ExpenseForm = (props) => {
           </Grid>
         </Grid>
 
-        <Grid
-          item
-          container
-          xs={12}
-          className={classes.rowContainer}
-          direction={'column'}
-          style={{marginTop: '2em', display: isInvoice ? 'inherit' : 'none'}}
-        >
-          <Grid
-            item
-            xs
-          >
-            <FormControl>
-              <FormLabel component="legend">
-                ¿Ya se emitió?
-              </FormLabel>
-              <FormControlLabel
-                control={
-                  <Switch
-                    checked={isDateEmittedRequired}
-                    onChange={() => {
-                      setIsDateEmittedRequired(!isDateEmittedRequired)
-                    }}
-                    name="dateEmittedRequired"
-                    color="primary"
-                  />
-                }
-                label={isDateEmittedRequired ? 'Emitida' : 'Pendiente'}
-              />
-            </FormControl>
-          </Grid>
-          <Grid
-            item
-            xs
-            style={{
-              marginTop: '0.5em',
-              display: !isDateEmittedRequired ? 'none' : 'inherit'
-            }}
-          >
-            <MauDatePicker
-              name="date_emitted"
-              control={control}
-              rules={{required: isDateEmittedRequired && isInvoice}}
-              error={!!errors.date_emitted}
-              helperText={errors.date_emitted && errors.date_emitted.message}
-              defaultValue={defaultValues.date_emitted}
-              label="Fecha de emisión"
-            />
-          </Grid>
-        </Grid>
-
         {/*<Grid*/}
         {/*  item*/}
         {/*  container*/}
@@ -666,15 +631,14 @@ const ExpenseForm = (props) => {
           <FormControl
             fullWidth
           >
-            <TextField
-              inputRef={register()}
-              type="number"
+            <MauNumber
               name="internal_code"
               label="Codigo interno"
+              decimal={false}
+              thousand={false}
+              defaultValue={defaultValues.internal_code}
               placeholder="14 o 35A o 15 y 16 "
-              InputLabelProps={{
-                shrink: true
-              }}
+              control={control}
             />
           </FormControl>
         </Grid>
@@ -882,6 +846,58 @@ const ExpenseForm = (props) => {
             defaultValue={`${defaultValues.expense_invoice_payment_form_id}`}
           />
         </Grid>
+
+        <Grid
+          item
+          container
+          xs={12}
+          className={classes.rowContainer}
+          direction={'column'}
+          style={{marginTop: '2em', display: isInvoice ? 'inherit' : 'none'}}
+        >
+          <Grid
+            item
+            xs
+          >
+            <FormControl>
+              <FormLabel component="legend">
+                ¿Ya se emitió?
+              </FormLabel>
+              <FormControlLabel
+                control={
+                  <Switch
+                    checked={isDateEmittedRequired}
+                    onChange={() => {
+                      setIsDateEmittedRequired(!isDateEmittedRequired)
+                    }}
+                    name="dateEmittedRequired"
+                    color="primary"
+                  />
+                }
+                label={isDateEmittedRequired ? 'Emitida' : 'Pendiente'}
+              />
+            </FormControl>
+          </Grid>
+          <Grid
+            item
+            xs
+            style={{
+              marginTop: '0.5em',
+              display: !isDateEmittedRequired ? 'none' : 'inherit'
+            }}
+          >
+            <MauDatePicker
+              name="date_emitted"
+              control={control}
+              rules={{required: isDateEmittedRequired && isInvoice}}
+              error={!!errors.date_emitted}
+              helperText={errors.date_emitted && errors.date_emitted.message}
+              defaultValue={defaultValues.date_emitted}
+              label="Fecha de emisión"
+            />
+          </Grid>
+        </Grid>
+
 
         <Grid
           item
@@ -1106,31 +1122,37 @@ const ExpenseForm = (props) => {
                         </TableCell>
 
                         <TableCell>
-                          <TextField
-                            id="standard-number"
+                          <MauNumber
                             label="Importe"
-                            type="number"
+                            error={errors.expense_items
+                            && errors.expense_items[index]
+                            && errors.expense_items[index].subtotal}
                             name={`expense_items[${index}].subtotal`}
+                            control={control}
                             defaultValue={`${expenseItem.subtotal}`}
-                            inputRef={register({required: true, max: 10000000})}
-                            onChange={(e) => {
-                              handleSubtotalChange(e)
+                            rules={{required: true, max: 10000000}}
+                            onChange={(subtotal) => {
+                              handleSubtotalChange(subtotal, index)
                             }}
                           />
                         </TableCell>
 
                         <TableCell>
-                          <TextField
+                          <MauNumber
                             style={{display: isQuantityRequired(index) ? 'inherit' : 'none'}}
-                            id="standard-number"
-                            label="Number"
-                            type="number"
+                            label="Cantidad"
+                            error={
+                              errors.expense_items
+                              && errors.expense_items[index]
+                              && errors.expense_items[index].quantity
+                            }
                             name={`expense_items[${index}].quantity`}
+                            control={control}
                             defaultValue={`${expenseItem.quantity}`}
-                            inputRef={register({
+                            rules={{
                               required: isQuantityRequired(index),
                               max: 10000000
-                            })}
+                            }}
                           />
                         </TableCell>
 
@@ -1560,18 +1582,13 @@ const ExpenseForm = (props) => {
           className={classes.rowContainer}
           style={{marginTop: '2em', display: isInvoice ? 'inherit' : 'none'}}
         >
-          <FormControl
-            fullWidth
-          >
-            <TextField
-              inputRef={register({
-                required: isInvoice
-              })}
-              type="number"
-              name="tax"
-              label="IVA"
-            />
-          </FormControl>
+          <MauNumber
+            label="IVA"
+            error={!!errors.tax}
+            name={'tax'}
+            control={control}
+            defaultValue={defaultValues.tax}
+          />
         </Grid>
 
         <Grid
@@ -1580,18 +1597,16 @@ const ExpenseForm = (props) => {
           className={classes.rowContainer}
           style={{marginTop: '2em', display: isInvoice ? 'inherit' : 'none'}}
         >
-          <FormControl
-            fullWidth
-          >
-            <TextField
-              inputRef={register({
-                required: isInvoice
-              })}
-              type="number"
-              name="invoice_tax_retained"
-              label="IVA retenido"
-            />
-          </FormControl>
+          <MauNumber
+            label="IVA"
+            error={!!errors.invoice_tax_retained}
+            name={'invoice_tax_retained'}
+            control={control}
+            defaultValue={defaultValues.invoice_tax_retained}
+            rules={{
+              required: isInvoice
+            }}
+          />
         </Grid>
 
         <Grid
@@ -1600,18 +1615,16 @@ const ExpenseForm = (props) => {
           className={classes.rowContainer}
           style={{marginTop: '2em', display: isInvoice ? 'inherit' : 'none'}}
         >
-          <FormControl
-            fullWidth
-          >
-            <TextField
-              inputRef={register({
-                required: isInvoice
-              })}
-              type="number"
-              name="invoice_isr_retained"
-              label="ISR retenido"
-            />
-          </FormControl>
+          <MauNumber
+            label="IVA"
+            error={!!errors.invoice_isr_retained}
+            name={'invoice_isr_retained'}
+            control={control}
+            defaultValue={defaultValues.invoice_isr_retained}
+            rules={{
+              required: isInvoice
+            }}
+          />
         </Grid>
 
         <Grid

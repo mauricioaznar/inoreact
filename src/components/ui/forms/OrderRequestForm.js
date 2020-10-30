@@ -30,6 +30,7 @@ import TableRow from '@material-ui/core/TableRow'
 import TableCell from '@material-ui/core/TableCell'
 import TableBody from '@material-ui/core/TableBody'
 import DeleteIcon from '@material-ui/icons/Delete'
+import MauNumber from './inputs/MauNumber'
 
 
 const useStyles = makeStyles((theme) => {
@@ -210,16 +211,18 @@ const OrderRequestForm = (props) => {
       }
 
     }
-    setValue(`order_request_products[${index}].group_weight`, String(groupWeight))
-    setValue(`order_request_products[${index}].kilos`, String(kilos))
-    setValue(`order_request_products[${index}].groups`, String(groups))
+    console.log(`order_request_products[${index}].kilos`, String(kilos), {shouldValidate: true, shouldDirty: true})
+    setValue(`order_request_products[${index}].group_weight`, String(groupWeight),{shouldValidate: true, shouldDirty: true})
+    setValue(`order_request_products[${index}].kilos`, String(kilos), {shouldValidate: true, shouldDirty: true})
+    setValue(`order_request_products[${index}].groups`, String(groups), {shouldValidate: true, shouldDirty: true})
   }
 
-  const calculateProductKilos = (e, index) => {
-    let kilos = Number(watchRequestProducts[index].groups) * Number(watchRequestProducts[index].group_weight)
-    setValue(`order_request_products[${index}].kilos`, String(kilos))
+  const calculateProductKilos = (groups, index) => {
+    let kilos = Number(groups) * Number(watchRequestProducts[index].group_weight)
+    console.log(`order_request_products[${index}].kilos`, String(kilos), {shouldValidate: true, shouldDirty: true})
+    setValue(`order_request_products[${index}].kilos`, String(kilos), {shouldValidate: true, shouldDirty: true})
     let _total = Number(kilos) * Number(watchRequestProducts[index].kilo_price)
-    setValue(`order_request_products[${index}].total`, String(Math.trunc(_total)))
+    setValue(`order_request_products[${index}].total`, String(Math.trunc(_total)), {shouldValidate: true, shouldDirty: true})
   }
 
   const hasGroupWeight = (index) => {
@@ -232,9 +235,14 @@ const OrderRequestForm = (props) => {
     return requestProduct && isValid
   }
 
-  const calculateRequestProduct = (e, index) => {
-    let _total = Number(watchRequestProducts[index].kilos) * Number(watchRequestProducts[index].kilo_price)
-    setValue(`order_request_products[${index}].total`, String(Math.trunc(_total)))
+  const calculateRequestProductWithKilos = (kilos, index) => {
+    let _total = Number(kilos) * Number(watchRequestProducts[index].kilo_price)
+    setValue(`order_request_products[${index}].total`, String(Math.trunc(_total)), {shouldValidate: true, shouldDirty: true})
+  }
+
+  const calculateRequestProductWithKiloPrice = (kiloPrice, index) => {
+    let _total = Number(watchRequestProducts[index].kilos) * Number(kiloPrice)
+    setValue(`order_request_products[${index}].total`, String(Math.trunc(_total)), {shouldValidate: true, shouldDirty: true})
   }
 
 
@@ -400,21 +408,16 @@ const OrderRequestForm = (props) => {
           className={classes.rowContainer}
           style={{marginTop: '2em'}}
         >
-          <FormControl
-            fullWidth
-          >
-            <TextField
-              inputRef={register({
-                required: true
-              })}
-              name="priority"
-              label="Prioridad"
-              type="number"
-              InputLabelProps={{
-                shrink: true
-              }}
-            />
-          </FormControl>
+          <MauNumber
+            label="Prioridad"
+            error={errors.priority}
+            name={`priority`}
+            control={control}
+            thousand={false}
+            decimal={false}
+            defaultValue={defaultValues.priority}
+            rules={{required: true, max: 10000000}}
+          />
         </Grid>
 
         <Grid
@@ -485,7 +488,7 @@ const OrderRequestForm = (props) => {
                         </TableCell>
                         <TableCell>
                           <MauAutocomplete
-                            error={!!errors.order_request_products && !!errors.order_request_products[index].product_id}
+                            error={!!errors.order_request_products &&  !!errors.order_request_products[index] && !!errors.order_request_products[index].product_id}
                             label={'Producto'}
                             options={props.products}
                             displayName={'description'}
@@ -504,66 +507,67 @@ const OrderRequestForm = (props) => {
                           />
                         </TableCell>
                         <TableCell>
-                          <TextField
-                            error={!!errors.order_request_products && !!errors.order_request_products[index].groups}
+                          <MauNumber
+                            error={!!errors.order_request_products && !!errors.order_request_products[index] && !!errors.order_request_products[index].groups}
                             label="Bultos"
-                            type="number"
                             name={`order_request_products[${index}].groups`}
-                            onChange={(e) => {
+                            onChange={(groups) => {
                               if (hasGroupWeight(index)) {
-                                calculateProductKilos(e, index)
+                                calculateProductKilos(groups, index)
                               }
                             }}
                             defaultValue={`${requestProduct.groups}`}
-                            inputRef={register({required: true, max: 10000000})}
+                            control={control}
+                            rules={{required: true, max: 10000000}}
                           />
                         </TableCell>
                         <TableCell>
-                          <TextField
-                            error={!!errors.order_request_products && !!errors.order_request_products[index].kilos}
+                          <MauNumber
+                            error={!!errors.order_request_products && !!errors.order_request_products[index] && !!errors.order_request_products[index].kilos}
                             label="Kilos"
-                            type="number"
-                            onChange={(e, value) => {
-                              calculateRequestProduct(e, index)
+                            onChange={(kilos) => {
+                              calculateRequestProductWithKilos(kilos, index)
                             }}
                             disabled={hasGroupWeight(index)}
                             name={`order_request_products[${index}].kilos`}
                             defaultValue={`${requestProduct.kilos}`}
-                            inputRef={register({required: true, max: 10000000, min: 1})}
+                            control={control}
+                            rules={{required: true, max: 10000000, min: 1}}
                           />
                         </TableCell>
                         <TableCell>
-                          <TextField
-                            error={!!errors.order_request_products && !!errors.order_request_products[index].group_weight}
+                          <MauNumber
+                            error={!!errors.order_request_products && !!errors.order_request_products[index] && !!errors.order_request_products[index].group_weight}
                             label="Peso por kilo"
                             disabled
                             type="number"
                             name={`order_request_products[${index}].group_weight`}
                             defaultValue={`${requestProduct.group_weight}`}
-                            inputRef={register({max: 10000000})}
+                            control={control}
+                            rules={{max: 10000000}}
                           />
                         </TableCell>
                         <TableCell>
-                          <TextField
-                            error={!!errors.order_request_products && !!errors.order_request_products[index].kilo_price}
+                          <MauNumber
+                            error={!!errors.order_request_products && !!errors.order_request_products[index] && !!errors.order_request_products[index].kilo_price}
                             label="Precio"
-                            type="number"
-                            onChange={(e, value) => {
-                              calculateRequestProduct(e, index)
+                            onChange={(kiloPrice) => {
+                              calculateRequestProductWithKiloPrice(kiloPrice, index)
                             }}
                             name={`order_request_products[${index}].kilo_price`}
                             defaultValue={`${requestProduct.kilo_price}`}
-                            inputRef={register({required: true, maxValue: 1000000})}
+                            control={control}
+                            rules={{required: true, maxValue: 1000000}}
                           />
                         </TableCell>
                         <TableCell>
-                          <TextField
-                            error={!!errors.order_request_products && !!errors.order_request_products[index].total}
+                          <MauNumber
+                            error={!!errors.order_request_products && !!errors.order_request_products[index] && !!errors.order_request_products[index].total}
                             label="Total"
                             disabled
-                            type="number"
                             name={`order_request_products[${index}].total`}
                             defaultValue={`${requestProduct.total}`}
+                            control={control}
                             inputRef={register({})}
                           />
                         </TableCell>
