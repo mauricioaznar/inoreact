@@ -15,6 +15,7 @@ import {connect} from 'react-redux'
 import FormGroup from '@material-ui/core/FormGroup'
 import FormControlLabel from '@material-ui/core/FormControlLabel'
 import Switch from '@material-ui/core/Switch'
+import MauNumber from './inputs/MauNumber'
 
 
 const useStyles = makeStyles((theme) => {
@@ -68,7 +69,7 @@ function ProductForm(props) {
   const [success, setSuccess] = React.useState(false);
 
   const [isGroupWeight, setIsGroupWeight] = React.useState(props.product ?
-    props.product.current_group_weight !== 0 : false);
+    props.product.current_group_weight !== 0 && props.product.current_group_weight > 0: false);
 
   const classes = useStyles()
 
@@ -290,21 +291,17 @@ function ProductForm(props) {
           className={classes.rowContainer}
           style={{marginTop: '2em', display: (isBag || isRoll || isOthers) ? 'inherit' : 'none'}}
         >
-          <FormControl
-            fullWidth
-          >
-            <TextField
-              inputRef={register({
-                required: (isBag || isRoll || isOthers)
-              })}
-              name="width"
-              label="Ancho"
-              type="number"
-              InputLabelProps={{
-                shrink: true
-              }}
-            />
-          </FormControl>
+          <MauNumber
+            rules={{
+              required: (isBag || isRoll || isOthers)
+            }}
+            name="width"
+            label="Ancho"
+            defaultValue={defaultValues.width}
+            control={control}
+            decimal={false}
+            error={!!errors.width}
+          />
         </Grid>
 
         <Grid
@@ -313,21 +310,17 @@ function ProductForm(props) {
           className={classes.rowContainer}
           style={{marginTop: '2em', display: (isBag || isOthers) ? 'inherit' : 'none'}}
         >
-          <FormControl
-            fullWidth
-          >
-            <TextField
-              inputRef={register({
-                required: (isBag || isOthers)
-              })}
-              name="length"
-              label="Largo"
-              type="number"
-              InputLabelProps={{
-                shrink: true
-              }}
-            />
-          </FormControl>
+          <MauNumber
+            rules={{
+              required: (isBag || isOthers)
+            }}
+            control={control}
+            defaultValue={defaultValues.length}
+            error={!!errors.length}
+            name="length"
+            label="Largo"
+            decimal={false}
+          />
         </Grid>
 
         <Grid
@@ -336,21 +329,17 @@ function ProductForm(props) {
           className={classes.rowContainer}
           style={{marginTop: '2em', display: (isBag || isRoll || isOthers) ? 'inherit' : 'none'}}
         >
-          <FormControl
-            fullWidth
-          >
-            <TextField
-              inputRef={register({
-                required: (isBag || isRoll || isOthers)
-              })}
-              name="calibre"
-              label="Calibre"
-              type="number"
-              InputLabelProps={{
-                shrink: true
-              }}
-            />
-          </FormControl>
+          <MauNumber
+            rules={{
+              required: (isBag || isRoll || isOthers)
+            }}
+            name="calibre"
+            label="Calibre"
+            type="number"
+            control={control}
+            defaultValue={defaultValues.calibre}
+            error={!!errors.calibre}
+          />
         </Grid>
 
         <Grid
@@ -385,16 +374,15 @@ function ProductForm(props) {
           <FormControl
             fullWidth
           >
-            <TextField
-              inputRef={register({
+            <MauNumber
+              rules={{
                 required: isGroupWeight && (isBag || isOthers)
-              })}
+              }}
               name="current_group_weight"
               label="Kilos en grupo"
-              type="number"
-              InputLabelProps={{
-                shrink: true
-              }}
+              control={control}
+              defaultValue={defaultValues.current_group_weight}
+              error={!!errors.current_group_weight}
             />
           </FormControl>
         </Grid>
@@ -405,21 +393,16 @@ function ProductForm(props) {
           className={classes.rowContainer}
           style={{marginTop: '2em'}}
         >
-          <FormControl
-            fullWidth
-          >
-            <TextField
-              inputRef={register({
-                required: true
-              })}
-              name="current_kilo_price"
-              label="Precio"
-              type="number"
-              InputLabelProps={{
-                shrink: true
-              }}
-            />
-          </FormControl>
+          <MauNumber
+            rules={{
+              required: true
+            }}
+            name="current_kilo_price"
+            label="Precio"
+            control={control}
+            defaultValue={defaultValues.current_kilo_price}
+            error={!!errors.current_kilo_price}
+          />
         </Grid>
 
         <Grid

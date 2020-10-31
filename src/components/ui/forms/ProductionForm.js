@@ -35,6 +35,7 @@ import Switch from '@material-ui/core/Switch'
 import MauDatePicker from './inputs/MauDatePicker'
 import MauDateTimePicker from './inputs/MauDateTimePicker'
 import MauMultipleAutocomplete from './inputs/MauMultipleAutocomplete'
+import MauNumber from './inputs/MauNumber'
 
 
 const useStyles = makeStyles((theme) => {
@@ -289,8 +290,8 @@ const ProductionForm = (props) => {
     setValue(`order_production_products[${index}].type`, String(ppType))
   }
 
-  const calculateProductKilos = (e, index) => {
-    let kilos = Number(watchProductionProducts[index].groups) * Number(watchProductionProducts[index].group_weight)
+  const calculateProductKilosWithGroups = (groups, index) => {
+    let kilos = Number(groups) * Number(watchProductionProducts[index].group_weight)
     setValue(`order_production_products[${index}].kilos`, String(kilos))
   }
 
@@ -456,23 +457,17 @@ const ProductionForm = (props) => {
           className={classes.rowContainer}
           style={{marginTop: '2em'}}
         >
-          <FormControl
-            fullWidth
-          >
-            <TextField
-              inputRef={register({
-                required: true
-              })}
-              name="waste"
-              label="Desperdicio"
-              type="number"
-              error={!!errors.waste}
-              placeholder="0"
-              InputLabelProps={{
-                shrink: true
-              }}
-            />
-          </FormControl>
+          <MauNumber
+            rules={{
+              required: true
+            }}
+            name="waste"
+            label="Desperdicio"
+            control={control}
+            error={!!errors.waste}
+            defaultValue={defaultValues.waste}
+            placeholder="0"
+          />
         </Grid>
 
 
@@ -642,10 +637,7 @@ const ProductionForm = (props) => {
                             name={`order_production_products[${index}].machine_id`}
                             rules={
                               {
-                                required: "this is required",
-                                validate: (value) => {
-                                  return value !== 'null'
-                                }
+                                required: true,
                               }
                             }
                             control={control}
@@ -653,23 +645,24 @@ const ProductionForm = (props) => {
                           />
                         </TableCell>
                         <TableCell>
-                          <TextField
+                          <MauNumber
                             error={!!errors.order_production_products && !!errors.order_production_products[index].groups}
                             id="groups"
                             label="Bultos"
                             type="number"
                             name={`order_production_products[${index}].groups`}
-                            onChange={(e) => {
+                            onChange={(groups) => {
                               if (hasGroupWeight(index)) {
-                                calculateProductKilos(e, index)
+                                calculateProductKilosWithGroups(groups, index)
                               }
                             }}
                             defaultValue={`${productionProduct.groups}`}
-                            inputRef={register({required: true, max: 10000000})}
+                            control={control}
+                            rules={{required: true, max: 10000000}}
                           />
                         </TableCell>
                         <TableCell>
-                          <TextField
+                          <MauNumber
                             error={!!errors.order_production_products && !!errors.order_production_products[index].kilos}
                             id="Kilos"
                             label="Kilos"
@@ -677,19 +670,21 @@ const ProductionForm = (props) => {
                             disabled={hasGroupWeight(index)}
                             name={`order_production_products[${index}].kilos`}
                             defaultValue={`${productionProduct.kilos}`}
-                            inputRef={register({required: true, max: 10000000, min: 1})}
+                            control={control}
+                            rules={{required: true, max: 10000000, min: 1}}
                           />
                         </TableCell>
                         <TableCell>
-                          <TextField
+                          <MauNumber
                             error={!!errors.order_production_products && !!errors.order_production_products[index].group_weight}
                             id="group_weight"
                             label="Peso por kilo"
                             disabled
                             type="number"
                             name={`order_production_products[${index}].group_weight`}
+                            control={control}
                             defaultValue={`${productionProduct.group_weight}`}
-                            inputRef={register({max: 10000000})}
+                            rules={{max: 10000000}}
                           />
                         </TableCell>
                         <TableCell align={'right'}>

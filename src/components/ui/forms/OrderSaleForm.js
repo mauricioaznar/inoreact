@@ -32,6 +32,7 @@ import TableBody from '@material-ui/core/TableBody'
 import DeleteIcon from '@material-ui/icons/Delete'
 import Autocomplete from '../inputs/Autocomplete'
 import formatNumber from '../../../helpers/formatNumber'
+import MauNumber from './inputs/MauNumber'
 
 
 const useStyles = makeStyles((theme) => {
@@ -310,8 +311,8 @@ const OrderSaleForm = (props) => {
     setValue(`order_sale_products[${index}].groups`, String(groups), { shouldValidate: true })
   }
 
-  const calculateProductKilos = (e, index) => {
-    let kilos = Number(watchSaleProducts[index].groups) * Number(watchSaleProducts[index].group_weight)
+  const calculateSaleProductWithGroups = (groups, index) => {
+    let kilos = Number(groups) * Number(watchSaleProducts[index].group_weight)
     setValue(`order_sale_products[${index}].kilos`, String(kilos), { shouldValidate: true })
     let _total = Number(kilos) * Number(watchSaleProducts[index].kilo_price)
     setValue(`order_sale_products[${index}].total`, String(Math.trunc(_total)), { shouldValidate: true })
@@ -332,8 +333,14 @@ const OrderSaleForm = (props) => {
     }
   }
 
-  const calculateSaleProduct = (e, index) => {
-    let _total = Number(watchSaleProducts[index].kilos) * Number(watchSaleProducts[index].kilo_price)
+  const calculateSaleProductWithKilos = (kilos, index) => {
+    let _total = Number(kilos) * Number(watchSaleProducts[index].kilo_price)
+    setValue(`order_sale_products[${index}].total`, String(Math.trunc(_total)), { shouldValidate: true })
+    setValue(`order_sale_products[${index}].tax`, String(Math.trunc(_total * 0.16)), { shouldValidate: true })
+  }
+
+  const calculateSaleProductWithKiloPrice = (kiloPrice, index) => {
+    let _total = Number(kiloPrice) * Number(watchSaleProducts[index].kilos)
     setValue(`order_sale_products[${index}].total`, String(Math.trunc(_total)), { shouldValidate: true })
     setValue(`order_sale_products[${index}].tax`, String(Math.trunc(_total * 0.16)), { shouldValidate: true })
   }
@@ -462,9 +469,9 @@ const OrderSaleForm = (props) => {
           <FormControl
             fullWidth
           >
-            <TextField
+            <MauNumber
               error={!!errors.order_code}
-              inputRef={register({
+              rules={{
                 required: true,
                 validate: async (value) => {
                   const filterExact = 'filter_exact_1=order_code'
@@ -482,12 +489,13 @@ const OrderSaleForm = (props) => {
                   }
                   return isSameAsInitial || (result && result.data && result.data.data.length === 0)
                 }
-              })}
+              }}
               name="order_code"
               label="Folio"
-              InputLabelProps={{
-                shrink: true
-              }}
+              control={control}
+              defaultValue={defaultValues.order_code}
+              decimal={false}
+              thousand={false}
             />
           </FormControl>
         </Grid>
@@ -579,19 +587,18 @@ const OrderSaleForm = (props) => {
                           />
                         </TableCell>
                         <TableCell>
-                          <TextField
+                          <MauNumber
                             error={errors[`order_sale_products`] && errors[`order_sale_products`][index] && errors[`order_sale_products`][index].groups}
                             label="Bultos"
-                            type="number"
                             name={`order_sale_products[${index}].groups`}
-                            onChange={(e) => {
+                            onChange={(groups) => {
                               if (hasGroupWeight(index)) {
-                                calculateProductKilos(e, index)
+                                calculateSaleProductWithGroups(groups, index)
                               }
                             }}
                             defaultValue={`${saleProduct.groups}`}
-                            inputRef={register(
-                              {
+                            control={control}
+                            rules={{
                                 required: true,
                                 max: 10000000,
                                 validate: (value) => {
@@ -609,96 +616,93 @@ const OrderSaleForm = (props) => {
                                     return false
                                   }
                                 }
-                              }
-                            )}
+                              }}
                           />
                         </TableCell>
                         <TableCell>
-                          <TextField
+                          <MauNumber
                             error={errors[`order_sale_products`] && errors[`order_sale_products`][index] && errors[`order_sale_products`][index].kilos}
                             label="Kilos"
                             type="number"
-                            onChange={(e, value) => {
-                              calculateSaleProduct(e, index)
+                            onChange={(kilos) => {
+                              calculateSaleProductWithKilos(kilos, index)
                             }}
                             // disabled={hasGroupWeight(index)}
                             name={`order_sale_products[${index}].kilos`}
                             defaultValue={`${saleProduct.kilos}`}
-                            inputRef={register(
-                              {
-                                required: true,
-                                max: 10000000,
-                                min: 1,
-                                validate: (value) => {
-                                  let productId = watchSaleProducts[index].product_id
-                                  if (productId) {
-                                    let soldSaleProduct = soldSaleProducts.find(soldSaleProduct => {
-                                      return String(soldSaleProduct.product_id) === String(productId)
-                                    })
-                                    if (soldSaleProduct && Number(value) >= 0) {
-                                      return Number(value) <= Number(soldSaleProduct.kilos_remaining)
-                                    } else {
-                                      return false
-                                    }
+                            control={control}
+                            rules={{
+                              required: true,
+                              max: 10000000,
+                              min: 1,
+                              validate: (value) => {
+                                let productId = watchSaleProducts[index].product_id
+                                if (productId) {
+                                  let soldSaleProduct = soldSaleProducts.find(soldSaleProduct => {
+                                    return String(soldSaleProduct.product_id) === String(productId)
+                                  })
+                                  if (soldSaleProduct && Number(value) >= 0) {
+                                    return Number(value) <= Number(soldSaleProduct.kilos_remaining)
                                   } else {
                                     return false
                                   }
+                                } else {
+                                  return false
                                 }
-                              })
-                            }
+                              }
+                            }}
                           />
                         </TableCell>
                         <TableCell>
-                          <TextField
+                          <MauNumber
                             error={errors[`order_sale_products`] && errors[`order_sale_products`][index] && errors[`order_sale_products`][index].group_weight}
                             label="Peso por kilo"
                             disabled
                             type="number"
                             name={`order_sale_products[${index}].group_weight`}
                             defaultValue={`${saleProduct.group_weight}`}
-                            inputRef={register({max: 10000000})}
+                            control={control}
                           />
                         </TableCell>
                         <TableCell>
-                          <TextField
+                          <MauNumber
                             error={errors[`order_sale_products`] && errors[`order_sale_products`][index] && errors[`order_sale_products`][index].kilo_price}
                             label="Precio"
                             type="number"
-                            onChange={(e, value) => {
-                              calculateSaleProduct(e, index)
+                            onChange={(kiloPrice) => {
+                              calculateSaleProductWithKiloPrice(kiloPrice, index)
                             }}
                             name={`order_sale_products[${index}].kilo_price`}
                             defaultValue={`${saleProduct.kilo_price}`}
-                            inputRef={register(
-                              {
+                            control={control}
+                            rules={{
                                 required: true,
                                 maxValue: 1000000
-                              })
-                            }
+                              }}
                           />
                         </TableCell>
                         <TableCell>
-                          <TextField
+                          <MauNumber
                             error={errors[`order_sale_products`] && errors[`order_sale_products`][index] && errors[`order_sale_products`][index].total}
                             label="Total"
                             disabled
                             type="number"
                             name={`order_sale_products[${index}].total`}
+                            control={control}
                             defaultValue={`${saleProduct.total}`}
-                            inputRef={register({})}
                           />
                         </TableCell>
                         <TableCell
                           style={{display: watchSaleReceiptType !== '2' ? 'none' : undefined}}
                         >
-                          <TextField
+                          <MauNumber
                             error={errors[`order_sale_products`] && errors[`order_sale_products`][index] && errors[`order_sale_products`][index].tax}
                             label="IVA"
                             disabled
                             type="number"
                             name={`order_sale_products[${index}].tax`}
+                            control={control}
                             defaultValue={`${saleProduct.tax}`}
-                            inputRef={register({})}
                           />
                         </TableCell>
                       </TableRow>
@@ -801,31 +805,28 @@ const OrderSaleForm = (props) => {
                           />
                         </TableCell>
                         <TableCell align="right">
-                          <FormControl fullWidth>
-                            <TextField
-                              id="standard-number"
-                              label="Cantidad"
-                              type="number"
-                              error={!!errors.order_sale_payments && !!errors.order_sale_payments[index] && !!errors.order_sale_payments[index].amount}
-                              name={`order_sale_payments[${index}].amount`}
-                              defaultValue={`${salePayment.amount}`}
-                              inputRef={register(
-                                {
-                                  required: true,
-                                  validate: (value) => {
-                                    let salePaymentsTotal = 0
-                                    watchSalePayments.forEach((salePayment, salePaymentIndex) => {
-                                      if (index !== salePaymentIndex) {
-                                        salePaymentsTotal += Number(watchSalePayments[salePaymentIndex].amount)
-                                      }
-                                    })
-                                    salePaymentsTotal += Number(value)
-                                    return salePaymentsTotal === total
-                                  }
+                          <MauNumber
+                            label="Cantidad"
+                            error={!!errors.order_sale_payments && !!errors.order_sale_payments[index] && !!errors.order_sale_payments[index].amount}
+                            name={`order_sale_payments[${index}].amount`}
+                            defaultValue={`${salePayment.amount}`}
+                            control={control}
+                            rules={
+                              {
+                                required: true,
+                                validate: (value) => {
+                                  let salePaymentsTotal = 0
+                                  watchSalePayments.forEach((salePayment, salePaymentIndex) => {
+                                    if (index !== salePaymentIndex) {
+                                      salePaymentsTotal += Number(watchSalePayments[salePaymentIndex].amount)
+                                    }
+                                  })
+                                  salePaymentsTotal += Number(value)
+                                  return salePaymentsTotal === total
                                 }
-                              )}
-                            />
-                          </FormControl>
+                              }
+                            }
+                          />
                         </TableCell>
                         <TableCell>
                           <MauAutocomplete

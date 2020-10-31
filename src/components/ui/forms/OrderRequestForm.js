@@ -372,9 +372,9 @@ const OrderRequestForm = (props) => {
           <FormControl
             fullWidth
           >
-            <TextField
+            <MauNumber
               error={!!errors.order_code}
-              inputRef={register({
+              rules={{
                 required: true,
                 validate: async (value) => {
                   const filterExact = 'filter_exact_1=order_code'
@@ -392,12 +392,11 @@ const OrderRequestForm = (props) => {
                   }
                   return isSameAsInitial || (result && result.data && result.data.data.length === 0)
                 }
-              })}
-              name="order_code"
-              label="Folio"
-              InputLabelProps={{
-                shrink: true
               }}
+              name="order_code"
+              defaultValue={defaultValues.order_code}
+              label="Folio"
+              control={control}
             />
           </FormControl>
         </Grid>

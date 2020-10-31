@@ -388,20 +388,27 @@ const ExpenseForm = (props) => {
     setValue(`expense_products[${index}]._tax`, String(_tax))
   }
 
-  const calculateExpenseProduct = (e, index) => {
-    if (hasGroupWeight(index)) {
-      let kilos = Number(watchExpenseProducts[index].groups) * Number(watchExpenseProducts[index].group_weight)
-      setValue(`expense_products[${index}].kilos`, String(kilos))
-      let _total = Number(kilos) * Number(watchExpenseProducts[index].kilo_price) * 1.16
-      let _tax = Number(kilos) * Number(watchExpenseProducts[index].kilo_price) * 0.16
-      setValue(`expense_products[${index}]._total`, String(Math.trunc(_total)))
-      setValue(`expense_products[${index}]._tax`, String(Math.trunc(_tax)))
-    } else {
-      let _total = Number(watchExpenseProducts[index].kilos) * Number(watchExpenseProducts[index].kilo_price) * 1.16
-      let _tax = Number(watchExpenseProducts[index].kilos) * Number(watchExpenseProducts[index].kilo_price) * 0.16
-      setValue(`expense_products[${index}]._total`, String(Math.trunc(_total)))
-      setValue(`expense_products[${index}]._tax`, String(Math.trunc(_tax)))
-    }
+  const calculateExpenseProductWithGroups = (groups, index) => {
+    let kilos = Number(groups) * Number(watchExpenseProducts[index].group_weight)
+    setValue(`expense_products[${index}].kilos`, String(kilos))
+    let _total = Number(kilos) * Number(watchExpenseProducts[index].kilo_price) * 1.16
+    let _tax = Number(kilos) * Number(watchExpenseProducts[index].kilo_price) * 0.16
+    setValue(`expense_products[${index}]._total`, String(Math.trunc(_total)))
+    setValue(`expense_products[${index}]._tax`, String(Math.trunc(_tax)))
+  }
+
+  const calculateExpenseProductWithKilos = (kilos, index) => {
+    let _total = Number(kilos) * Number(watchExpenseProducts[index].kilo_price)
+    let _tax = Number(kilos) * Number(watchExpenseProducts[index].kilo_price) * 0.16
+    setValue(`expense_products[${index}]._total`, String(Math.trunc(_total)))
+    setValue(`expense_products[${index}]._tax`, String(Math.trunc(_tax)))
+  }
+
+  const calculateExpenseProductWithKiloPrice = (kiloPrice, index) => {
+    let _total = Number(watchExpenseProducts[index].kilos) * Number(kiloPrice)
+    let _tax = Number(watchExpenseProducts[index].kilos) * Number(kiloPrice) * 0.16
+    setValue(`expense_products[${index}]._total`, String(Math.trunc(_total)))
+    setValue(`expense_products[${index}]._tax`, String(Math.trunc(_tax)))
   }
 
   const hasGroupWeight = (index) => {
@@ -1124,9 +1131,11 @@ const ExpenseForm = (props) => {
                         <TableCell>
                           <MauNumber
                             label="Importe"
-                            error={errors.expense_items
-                            && errors.expense_items[index]
-                            && errors.expense_items[index].subtotal}
+                            error={
+                              errors.expense_items
+                              && errors.expense_items[index]
+                              && errors.expense_items[index].subtotal
+                            }
                             name={`expense_items[${index}].subtotal`}
                             control={control}
                             defaultValue={`${expenseItem.subtotal}`}
@@ -1381,74 +1390,77 @@ const ExpenseForm = (props) => {
                           />
                         </TableCell>
                         <TableCell>
-                          <TextField
-                            error={!!errors.expense_products && !!errors.expense_products[index].groups}
-                            id="groups"
+                          <MauNumber
+                            error={!!errors.expense_products && !!errors.expense_products[index] && !!errors.expense_products[index].groups}
                             label="Bultos"
-                            type="number"
                             name={`expense_products[${index}].groups`}
-                            onChange={(e) => {
-                              calculateExpenseProduct(e, index)
+                            onChange={(groups) => {
+                              if (hasGroupWeight(index)) {
+                                calculateExpenseProductWithGroups(groups, index)
+                              }
                             }}
+                            control={control}
                             defaultValue={`${expenseProduct.groups}`}
-                            inputRef={register({required: true, max: 10000000})}
+                            rules={{required: true, max: 10000000}}
                           />
                         </TableCell>
                         <TableCell>
-                          <TextField
-                            id="Kilos"
+                          <MauNumber
                             label="Kilos"
-                            type="number"
-                            onChange={(e) => {
-                              calculateExpenseProduct(e, index)
+                            onChange={(kilos) => {
+                              calculateExpenseProductWithKilos(kilos, index)
                             }}
                             disabled={hasGroupWeight(index)}
                             name={`expense_products[${index}].kilos`}
+                            control={control}
                             defaultValue={`${expenseProduct.kilos}`}
-                            inputRef={register({required: true, max: 10000000})}
+                            rules={{required: true, max: 10000000}}
                           />
                         </TableCell>
                         <TableCell>
-                          <TextField
-                            id="kilo_price"
+                          <MauNumber
                             label="Precio por kilo"
                             type="number"
                             name={`expense_products[${index}].kilo_price`}
+                            onChange={(kilos) => {
+                              calculateExpenseProductWithKiloPrice(kilos, index)
+                            }}
+                            control={control}
                             defaultValue={`${expenseProduct.kilo_price}`}
-                            inputRef={register({required: true, max: 10000000})}
+                            rules={{required: true, max: 10000000}}
                           />
                         </TableCell>
                         <TableCell>
-                          <TextField
-                            id="group_weight"
+                          <MauNumber
                             label="Peso por kilo"
                             disabled
                             type="number"
                             name={`expense_products[${index}].group_weight`}
+                            control={control}
                             defaultValue={`${expenseProduct.group_weight}`}
-                            inputRef={register({max: 10000000})}
+                            rules={{max: 10000000}}
                           />
                         </TableCell>
                         <TableCell>
-                          <TextField
+                          <MauNumber
                             id="tax"
                             label="IVA"
                             disabled
-                            type="number"
                             name={`expense_products[${index}]._tax`}
+                            control={control}
                             defaultValue={`${expenseProduct._tax}`}
-                            inputRef={register({max: 10000000})}
+                            rules={{max: 10000000}}
                           />
                         </TableCell>
                         <TableCell>
-                          <TextField
-                            id="total"
+                          <MauNumber
                             label="Total"
                             disabled
                             type="number"
                             name={`expense_products[${index}]._total`}
+                            control={control}
                             defaultValue={`${expenseProduct._total}`}
-                            inputRef={register({max: 10000000})}
+                            rules={{max: 10000000}}
                           />
                         </TableCell>
                         <TableCell align={'right'}>
@@ -1545,16 +1557,14 @@ const ExpenseForm = (props) => {
                           />
                         </TableCell>
                         <TableCell align="right">
-                          <FormControl fullWidth>
-                            <TextField
-                              id="standard-number"
-                              label="Number"
-                              error={!!errors.expense_credit_notes && !!errors.expense_credit_notes[index] && !!errors.expense_credit_notes[index].amount}
-                              name={`expense_credit_notes[${index}].amount`}
-                              defaultValue={`${creditNote.amount}`}
-                              inputRef={register({required: true})}
-                            />
-                          </FormControl>
+                          <MauNumber
+                            label="Monto"
+                            error={!!errors.expense_credit_notes && !!errors.expense_credit_notes[index] && !!errors.expense_credit_notes[index].amount}
+                            name={`expense_credit_notes[${index}].amount`}
+                            defaultValue={`${creditNote.amount}`}
+                            control={control}
+                            rules={{required: true}}
+                          />
                         </TableCell>
                         <TableCell align={'right'}>
                           <IconButton
