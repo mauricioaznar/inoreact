@@ -9,11 +9,12 @@ import authHeader from '../../../helpers/authHeader'
 import Dialog from '@material-ui/core/Dialog'
 import useMediaQuery from '@material-ui/core/useMediaQuery'
 import Slide from '@material-ui/core/Slide'
-import {mainEntityPromise} from './common/common'
+import {mainEntityPromise, subEntitiesPromises} from './common/common'
 import SupplierForm from '../forms/SupplierForm'
 import MauMaterialTable from './common/MauMaterialTable'
-import {getApiEntities} from '../../../store/generalActions'
-import {getSuppliers} from '../../../store/expensesActions'
+import MachineForm from '../forms/MachineForm'
+import EquipmentForm from '../forms/EquipmentForm'
+import EquipmentTransactionForm from '../forms/EquipmentTransactionForm'
 
 const Transition = React.forwardRef(function Transition(props, ref) {
   return <Slide direction="up" ref={ref} {...props} />;
@@ -22,7 +23,7 @@ const Transition = React.forwardRef(function Transition(props, ref) {
 
 //Fix call in useEffect that is leaking memory (because is trying to set state in before component mounts?)
 
-function UserDataTable(props) {
+function EquipmentTransactionDataTable(props) {
 
   const tableRef = React.createRef();
 
@@ -33,12 +34,12 @@ function UserDataTable(props) {
   const [open, setOpen] = React.useState(false);
   const [rowData, setRowData] = React.useState(null);
 
-  const entityPath = 'supplier'
+  const entityPath = 'equipmentTransaction'
 
   const columns = [
     {
       title: 'Nombre',
-      field: 'name',
+      field: 'description',
       type: 'text'
     },
   ]
@@ -51,13 +52,26 @@ function UserDataTable(props) {
     setOpen(false);
   };
 
-  const handleOnSubmit = (supplier, callback) => {
-    mainEntityPromise(supplier, entityPath)
+  const handleOnSubmit = (equipment, callback) => {
+    mainEntityPromise(equipment, entityPath)
+      .then(result => {
+        let equipmentId = result.data.data.id
+        const subEntitiesConfs = [
+          {
+            initialSubEntities: equipment.defaultValues.equipment_transaction_items,
+            subEntities: equipment.equipment_transaction_items,
+            path: 'equipmentTransactionItem'
+          }
+        ]
+        const mainEntityConf = {
+          'equipment_transaction_id': equipmentId
+        }
+        return Promise.all(subEntitiesPromises(subEntitiesConfs, mainEntityConf))
+      })
       .then(result => {
         callback(true)
         tableRef.current && tableRef.current.onQueryChange()
         setOpen(false)
-        props.getSuppliers()
       })
   }
 
@@ -85,7 +99,7 @@ function UserDataTable(props) {
         >
           <MauMaterialTable
             tableRef={tableRef}
-            title="Proveedores"
+            title="Transacciones de refacciones"
             entityPath={entityPath}
             onRowAdd={(event, rowData) => {
               setRowData(null)
@@ -111,7 +125,7 @@ function UserDataTable(props) {
         onClose={handleClose}
         aria-labelledby="form-dialog-title"
       >
-         <SupplierForm supplier={rowData} onSubmit={handleOnSubmit} />
+        <EquipmentTransactionForm equipmentTransaction={rowData} onSubmit={handleOnSubmit} />
       </Dialog>
     </>
   )
@@ -126,10 +140,7 @@ const mapStateToProps = (state, ownProps) => {
 
 const mapDispatchToProps = (dispatch, ownProps) => {
   return {
-    getSuppliers: () => {
-      dispatch(getSuppliers())
-    }
   }
 }
 
-export default connect(mapStateToProps, mapDispatchToProps)(UserDataTable)
+export default connect(mapStateToProps, mapDispatchToProps)(EquipmentTransactionDataTable)

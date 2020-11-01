@@ -4,6 +4,10 @@ import useMediaQuery from '@material-ui/core/useMediaQuery'
 import Grid from '@material-ui/core/Grid'
 import Typography from '@material-ui/core/Typography'
 import ProductionEventsDataTable from '../ui/datatables/ProductionEventsDataTable'
+import MachineDataTable from '../ui/datatables/MachineDataTable'
+import EquipmentDataTable from '../ui/datatables/EquipmentDataTable'
+import EquipmentTransactionDataTable
+  from '../ui/datatables/EquipmentTransactionDataTable'
 
 const useStyles = makeStyles((theme) => {
   return {
@@ -49,6 +53,36 @@ export default function Maintenance (props) {
       >
         <Grid item xs>
           <ProductionEventsDataTable />
+        </Grid>
+      </Grid>
+      <Grid
+        item
+        container
+        className={classes.rowContainer}
+        style={{marginTop: '2em', marginBottom: '2em'}}
+      >
+        <Grid item xs>
+          <MachineDataTable />
+        </Grid>
+      </Grid>
+      <Grid
+        item
+        container
+        className={classes.rowContainer}
+        style={{marginTop: '2em', marginBottom: '2em'}}
+      >
+        <Grid item xs>
+          <EquipmentDataTable />
+        </Grid>
+      </Grid>
+      <Grid
+        item
+        container
+        className={classes.rowContainer}
+        style={{marginTop: '2em', marginBottom: '2em'}}
+      >
+        <Grid item xs>
+          <EquipmentTransactionDataTable />
         </Grid>
       </Grid>
     </Grid>

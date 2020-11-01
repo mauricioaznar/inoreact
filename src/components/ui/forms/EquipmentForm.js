@@ -12,6 +12,7 @@ import Fab from '@material-ui/core/Fab';
 import CheckIcon from '@material-ui/icons/Check';
 import SaveIcon from '@material-ui/icons/Save';
 import TextField from '@material-ui/core/TextField'
+import MauAutocomplete from './inputs/MauAutocomplete'
 
 
 const useStyles = makeStyles((theme) => {
@@ -59,7 +60,7 @@ const useStyles = makeStyles((theme) => {
 })
 
 
-const SupplierForm = (props) => {
+const EquipmentForm = (props) => {
 
 
   const [loading, setLoading] = React.useState(false);
@@ -73,8 +74,11 @@ const SupplierForm = (props) => {
 
 
   const defaultValues = {
-    id: props.supplier ? props.supplier.id : '',
-    name: props.supplier ? props.supplier.name : '',
+    id: props.equipment ? props.equipment.id : '',
+    description: props.equipment ? props.equipment.description : '',
+    equipment_subcategory_id: props.equipment ? String(props.equipment.equipment_subcategory_id) : '',
+    equipment_category_id: props.equipment ? String(props.equipment.equipment_category_id) : '',
+    equipment_measurement_unit_id: props.equipment ? String(props.equipment.equipment_measurement_unit_id) : ''
   }
 
   const {register, unregister, handleSubmit, reset, watch, control, setValue, getValues, errors} = useForm({
@@ -143,14 +147,81 @@ const SupplierForm = (props) => {
               inputRef={register({
                 required: true
               })}
-              name="name"
-              label="Nombre"
+              name="description"
+              label="Descripción"
               InputLabelProps={{
                 shrink: true
               }}
             />
           </FormControl>
         </Grid>
+
+        <Grid
+          item
+          xs={12}
+          className={classes.rowContainer}
+          style={{marginTop: '2em'}}
+        >
+          <MauAutocomplete
+            error={!!errors.equipment_subcategory_id}
+            label={'Subcategoria de la refaccion'}
+            options={props.equipmentSubcategories}
+            name={'equipment_subcategory_id'}
+            displayName={'name'}
+            rules={
+              {
+                required: true
+              }
+            }
+            control={control}
+            defaultValue={`${defaultValues.equipment_subcategory_id}`}
+          />
+        </Grid>
+
+        <Grid
+          item
+          xs={12}
+          className={classes.rowContainer}
+          style={{marginTop: '2em'}}
+        >
+          <MauAutocomplete
+            error={!!errors.equipment_category_id}
+            label={'Categoria de la refaccion'}
+            options={props.equipmentCategories}
+            name={'equipment_category_id'}
+            displayName={'name'}
+            rules={
+              {
+                required: true
+              }
+            }
+            control={control}
+            defaultValue={`${defaultValues.equipment_category_id}`}
+          />
+        </Grid>
+
+        <Grid
+          item
+          xs={12}
+          className={classes.rowContainer}
+          style={{marginTop: '2em'}}
+        >
+          <MauAutocomplete
+            error={!!errors.equipment_measurement_unit_id}
+            label={'Unidad de medicion'}
+            options={props.equipmentMeasurementUnits}
+            name={'equipment_measurement_unit_id'}
+            displayName={'name'}
+            rules={
+              {
+                required: true
+              }
+            }
+            control={control}
+            defaultValue={`${defaultValues.equipment_measurement_unit_id}`}
+          />
+        </Grid>
+
 
         <Grid
           item
@@ -184,8 +255,11 @@ const SupplierForm = (props) => {
 
 const mapStateToProps = (state) => {
   return {
+    equipmentSubcategories: state.maintenance.equipmentSubcategories,
+    equipmentCategories: state.maintenance.equipmentCategories,
+    equipmentMeasurementUnits: state.maintenance.equipmentMeasurementUnits
   }
 }
 
-export default connect(mapStateToProps, null)(SupplierForm)
+export default connect(mapStateToProps, null)(EquipmentForm)
 

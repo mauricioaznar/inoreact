@@ -12,8 +12,8 @@ import Slide from '@material-ui/core/Slide'
 import {mainEntityPromise} from './common/common'
 import SupplierForm from '../forms/SupplierForm'
 import MauMaterialTable from './common/MauMaterialTable'
-import {getApiEntities} from '../../../store/generalActions'
-import {getSuppliers} from '../../../store/expensesActions'
+import MachineForm from '../forms/MachineForm'
+import EquipmentForm from '../forms/EquipmentForm'
 
 const Transition = React.forwardRef(function Transition(props, ref) {
   return <Slide direction="up" ref={ref} {...props} />;
@@ -22,7 +22,7 @@ const Transition = React.forwardRef(function Transition(props, ref) {
 
 //Fix call in useEffect that is leaking memory (because is trying to set state in before component mounts?)
 
-function UserDataTable(props) {
+function EquipmentDataTable(props) {
 
   const tableRef = React.createRef();
 
@@ -33,12 +33,12 @@ function UserDataTable(props) {
   const [open, setOpen] = React.useState(false);
   const [rowData, setRowData] = React.useState(null);
 
-  const entityPath = 'supplier'
+  const entityPath = 'equipment'
 
   const columns = [
     {
       title: 'Nombre',
-      field: 'name',
+      field: 'description',
       type: 'text'
     },
   ]
@@ -51,13 +51,12 @@ function UserDataTable(props) {
     setOpen(false);
   };
 
-  const handleOnSubmit = (supplier, callback) => {
-    mainEntityPromise(supplier, entityPath)
+  const handleOnSubmit = (equipment, callback) => {
+    mainEntityPromise(equipment, entityPath)
       .then(result => {
         callback(true)
         tableRef.current && tableRef.current.onQueryChange()
         setOpen(false)
-        props.getSuppliers()
       })
   }
 
@@ -85,7 +84,7 @@ function UserDataTable(props) {
         >
           <MauMaterialTable
             tableRef={tableRef}
-            title="Proveedores"
+            title="Refacciones"
             entityPath={entityPath}
             onRowAdd={(event, rowData) => {
               setRowData(null)
@@ -111,7 +110,7 @@ function UserDataTable(props) {
         onClose={handleClose}
         aria-labelledby="form-dialog-title"
       >
-         <SupplierForm supplier={rowData} onSubmit={handleOnSubmit} />
+        <EquipmentForm equipment={rowData} onSubmit={handleOnSubmit} />
       </Dialog>
     </>
   )
@@ -126,10 +125,7 @@ const mapStateToProps = (state, ownProps) => {
 
 const mapDispatchToProps = (dispatch, ownProps) => {
   return {
-    getSuppliers: () => {
-      dispatch(getSuppliers())
-    }
   }
 }
 
-export default connect(mapStateToProps, mapDispatchToProps)(UserDataTable)
+export default connect(mapStateToProps, mapDispatchToProps)(EquipmentDataTable)

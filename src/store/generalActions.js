@@ -19,7 +19,14 @@ import {
   setOrderRequestStatuses,
   setOrderSaleCollectionStatuses, setSaleReceiptTypes, setSaleStatuses
 } from './salesActions'
-import {setProductionEventTypes} from './maintenanceActions'
+import {
+  setEquipmentCategories,
+  setEquipmentMeasurementUnits, setEquipments,
+  setEquipmentSubcategories,
+  setEquipmentTransactionStatuses,
+  setEquipmentTransactionTypes,
+  setProductionEventTypes
+} from './maintenanceActions'
 
 export const setInventory = (inventory) => {
   return {
@@ -86,7 +93,13 @@ export const getApiEntities = () => {
         production_event_type: productionEventTypes,
         packings,
         order_sale_statuses: saleStatuses,
-        order_sale_receipt_type: saleReceiptTypes
+        order_sale_receipt_type: saleReceiptTypes,
+        equipment_categories,
+        equipment_subcategories,
+        equipment_measurement_units,
+        equipment_transaction_type,
+        equipment_transaction_statuses,
+        equipments
       } = result[0].data.data
       // dispatch(setOrderProductions(orderProductions))
       dispatch(setBranches(branches))
@@ -112,6 +125,12 @@ export const getApiEntities = () => {
       dispatch(setPackings(packings))
       dispatch(setSaleStatuses(saleStatuses))
       dispatch(setSaleReceiptTypes(saleReceiptTypes))
+      dispatch(setEquipmentCategories(equipment_categories))
+      dispatch(setEquipmentSubcategories(equipment_subcategories))
+      dispatch(setEquipmentMeasurementUnits(equipment_measurement_units))
+      dispatch(setEquipmentTransactionTypes(equipment_transaction_type))
+      dispatch(setEquipmentTransactionStatuses(equipment_transaction_statuses))
+      dispatch(setEquipments(equipments))
     }).finally(() => {
       dispatch(unsetAreEntitiesLoading())
     })
