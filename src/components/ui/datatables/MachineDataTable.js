@@ -128,6 +128,9 @@ function MachineDataTable(props) {
         callback(true)
         tableRef.current && tableRef.current.onQueryChange()
         setOpen(false)
+        if (props.setUpdates) {
+          props.setUpdates(props.updates + 1)
+        }
       })
   }
 
