@@ -41,6 +41,20 @@ function EquipmentDataTable(props) {
       field: 'description',
       type: 'text'
     },
+    {
+      title: 'Categoria',
+      field: 'equipment_category_id',
+      type: 'options',
+      options: props.equipmentCategories,
+      optionLabel: 'name'
+    },
+    {
+      title: 'Subcategoria',
+      field: 'equipment_subcategory_id',
+      type: 'options',
+      options: props.equipmentSubcategories,
+      optionLabel: 'name'
+    },
   ]
 
   const handleClickOpen = () => {
@@ -118,6 +132,8 @@ function EquipmentDataTable(props) {
 
 const mapStateToProps = (state, ownProps) => {
   return {
+    equipmentSubcategories: state.maintenance.equipmentSubcategories,
+    equipmentCategories: state.maintenance.equipmentCategories,
   }
 }
 

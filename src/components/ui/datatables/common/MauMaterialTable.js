@@ -130,7 +130,7 @@ export default function MauMaterialTable (props) {
                 let option = newColumn.options.find(option => option.id === entity[newColumn.field])
                 return (
                   <li key={entity.id} style={{whiteSpace: 'nowrap'}}>
-                    {option[newColumn.optionLabel]}
+                    {option ? option[newColumn.optionLabel] : ''}
                   </li>
                 )
               })

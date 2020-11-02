@@ -15,6 +15,7 @@ import MauMaterialTable from './common/MauMaterialTable'
 import MachineForm from '../forms/MachineForm'
 import EquipmentForm from '../forms/EquipmentForm'
 import EquipmentTransactionForm from '../forms/EquipmentTransactionForm'
+import formatNumber from '../../../helpers/formatNumber'
 
 const Transition = React.forwardRef(function Transition(props, ref) {
   return <Slide direction="up" ref={ref} {...props} />;
@@ -38,9 +39,65 @@ function EquipmentTransactionDataTable(props) {
 
   const columns = [
     {
+      title: 'Fecha emision',
+      field: 'date_emitted',
+      type: 'date'
+    },
+    {
       title: 'Nombre',
       field: 'description',
       type: 'text'
+    },
+    {
+      title: 'Tipo de transaccion',
+      field: 'equipment_transaction_type_id',
+      type: 'options',
+      options: props.equipmentTransactionTypes,
+      optionLabel: 'name'
+    },
+    {
+      title: 'Estado de transaccion',
+      field: 'equipment_transaction_status_id',
+      type: 'options',
+      options: props.equipmentTransactionStatuses,
+      optionLabel: 'name'
+    },
+    {
+      title: 'Refacciones',
+      type: 'entity',
+      field: 'equipment_id',
+      entity: 'equipmentTransactionItem',
+      table: 'equipment_transaction_items',
+      options: props.equipments,
+      optionLabel: 'description'
+    },
+    {
+      title: 'Cantidad',
+      sorting: false,
+      render: (rowData) => {
+        return (
+          <ul>
+            {
+              rowData.equipment_transaction_items.map(equipmentTransactionItem => {
+                return (
+                  <li key={`${equipmentTransactionItem.equipment_id}${equipmentTransactionItem.machine_id}`} style={{whiteSpace: 'nowrap', textAlign: 'right'}}>
+                    {formatNumber(equipmentTransactionItem.quantity)}
+                  </li>
+                )
+              })
+            }
+          </ul>
+        )
+      },
+    },
+    {
+      title: 'Maquinas',
+      type: 'entity',
+      field: 'machine_id',
+      entity: 'equipmentTransactionItem',
+      table: 'equipment_transaction_items',
+      options: props.machines,
+      optionLabel: 'name'
     },
   ]
 
@@ -133,6 +190,10 @@ function EquipmentTransactionDataTable(props) {
 
 const mapStateToProps = (state, ownProps) => {
   return {
+    equipmentTransactionTypes: state.maintenance.equipmentTransactionTypes,
+    equipmentTransactionStatuses: state.maintenance.equipmentTransactionStatuses,
+    machines: state.production.machines,
+    equipments: state.maintenance.equipments
   }
 }
 

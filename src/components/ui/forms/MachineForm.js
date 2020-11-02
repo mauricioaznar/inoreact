@@ -92,6 +92,7 @@ const MachineForm = (props) => {
   const defaultValues = {
     id: props.machine ? props.machine.id : '',
     name: props.machine ? props.machine.name : '',
+    machine_type_id: props.machine ? props.machine.machine_type_id : '',
     machine_equipments: props.machine ? props.machine.machine_equipments : []
   }
 
@@ -204,6 +205,29 @@ const MachineForm = (props) => {
           className={classes.rowContainer}
           style={{marginTop: '2em'}}
         >
+          <MauAutocomplete
+            error={!!errors.machine_type_id}
+            label={'Tipo de maquina'}
+            options={props.machineTypes}
+            name={'machine_type_id'}
+            displayName={'name'}
+            disabled={!!props.machine}
+            rules={
+              {
+                required: true
+              }
+            }
+            control={control}
+            defaultValue={`${defaultValues.machine_type_id}`}
+          />
+        </Grid>
+
+        <Grid
+          item
+          xs={12}
+          className={classes.rowContainer}
+          style={{marginTop: '2em'}}
+        >
           <Grid
             container
             direction={'column'}
@@ -299,8 +323,8 @@ const MachineForm = (props) => {
                           <MauNumber
                             label="Cantidad maxima"
                             error={!!errors.machine_equipments
-                            && !!errors.machine_equipments[index]
-                            && !!errors.machine_equipments[index].max_quantity
+                              && !!errors.machine_equipments[index]
+                              && !!errors.machine_equipments[index].max_quantity
                             }
                             name={`machine_equipments[${index}].max_quantity`}
                             defaultValue={`${machineEquipment.max_quantity}`}
@@ -366,7 +390,8 @@ const MachineForm = (props) => {
 
 const mapStateToProps = (state) => {
   return {
-    equipments: state.maintenance.equipments
+    equipments: state.maintenance.equipments,
+    machineTypes: state.production.machineTypes
   }
 }
 
