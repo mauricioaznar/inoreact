@@ -52,7 +52,7 @@ function MachineDataTable(props) {
       title: 'Refacciones',
       type: 'entity',
       field: 'equipment_id',
-      entity: 'machineEquipment',
+      entity: 'machineEquipments',
       table: 'machine_equipments',
       options: props.equipments,
       optionLabel: 'description'

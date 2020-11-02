@@ -66,7 +66,7 @@ function EquipmentTransactionDataTable(props) {
       title: 'Refacciones',
       type: 'entity',
       field: 'equipment_id',
-      entity: 'equipmentTransactionItem',
+      entity: 'equipmentTransactionItems',
       table: 'equipment_transaction_items',
       options: props.equipments,
       optionLabel: 'description'
