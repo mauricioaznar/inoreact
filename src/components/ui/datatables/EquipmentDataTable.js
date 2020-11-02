@@ -14,6 +14,7 @@ import SupplierForm from '../forms/SupplierForm'
 import MauMaterialTable from './common/MauMaterialTable'
 import MachineForm from '../forms/MachineForm'
 import EquipmentForm from '../forms/EquipmentForm'
+import {getEquipments} from '../../../store/maintenanceActions'
 
 const Transition = React.forwardRef(function Transition(props, ref) {
   return <Slide direction="up" ref={ref} {...props} />;
@@ -71,6 +72,10 @@ function EquipmentDataTable(props) {
         callback(true)
         tableRef.current && tableRef.current.onQueryChange()
         setOpen(false)
+        if (props.setUpdates) {
+          props.setUpdates(props.updates + 1)
+        }
+        props.getEquipments()
       })
   }
 
@@ -141,6 +146,9 @@ const mapStateToProps = (state, ownProps) => {
 
 const mapDispatchToProps = (dispatch, ownProps) => {
   return {
+    getEquipments: () => {
+      dispatch(getEquipments())
+    }
   }
 }
 

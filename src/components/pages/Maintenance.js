@@ -33,8 +33,9 @@ export default function Maintenance (props) {
 
   const [transactionUpdates, setTransactionUpdates] = React.useState(0)
   const [machineUpdates, setMachineUpdates] = React.useState(0)
+  const [equipmentUpdates, setEquipmentUpdates] = React.useState(0)
 
-  const equipmentInventory = useFetch(apiUrl + 'stats/equipmentInventory', [transactionUpdates, machineUpdates])
+  const equipmentInventory = useFetch(apiUrl + 'stats/equipmentInventory', [transactionUpdates, machineUpdates, equipmentUpdates])
 
   console.log(equipmentInventory)
 
@@ -82,7 +83,7 @@ export default function Maintenance (props) {
         style={{marginTop: '2em', marginBottom: '2em'}}
       >
         <Grid item xs>
-          <EquipmentDataTable />
+          <EquipmentDataTable updates={equipmentUpdates} setUpdates={setEquipmentUpdates} />
         </Grid>
       </Grid>
       <Grid

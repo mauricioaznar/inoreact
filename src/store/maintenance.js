@@ -17,7 +17,6 @@ const maintenance = (state = {
     case 'SET_EQUIPMENT_MEASUREMENT_UNITS':
       return {...state, equipmentMeasurementUnits: action.equipmentMeasurementUnits}
     case 'SET_EQUIPMENT_TRANSACTION_TYPES':
-      console.log(action)
       return {...state, equipmentTransactionTypes: action.equipmentTransactionTypes}
     case 'SET_EQUIPMENT_TRANSACTION_STATUSES':
       return {...state, equipmentTransactionStatuses: action.equipmentTransactionStatuses}

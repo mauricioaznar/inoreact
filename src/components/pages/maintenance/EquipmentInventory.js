@@ -49,66 +49,88 @@ function EquipmentInventory(props) {
   if (equipmentInventory) {
 
     rows = equipmentInventory
+      .sort((a, b) => {
+        return a.equipment_description > b.equipment_description ? 1 :
+          a.equipment_description < b.equipment_description ? -1 : 0
+      })
 
   }
 
   return (
     <>
-      <Grid
-        item
-        xs={12}
-      >
-          <Typography
-            variant={'h5'}
-            style={{marginBottom: '0.5em'}}
-          >
-            Inventario de refacciones
-          </Typography>
-        </Grid>
-        <Grid
-          item
-          xs={12}
-        >
-          <TableContainer>
-            <Table
-              className={classes.table}
-              aria-label="spanning table"
-              stickyHeader
-            >
-              <TableHead>
-                <TableRow>
-                  <TableCell>Refaccion</TableCell>
-                  <TableCell>Categoria</TableCell>
-                  <TableCell>Subcategoria</TableCell>
-                  <TableCell>Cantidad en pedidos pendientes</TableCell>
-                  <TableCell>Balance</TableCell>
-                  <TableCell>Minimo requerido</TableCell>
-                  <TableCell>Maximo requerido</TableCell>
-                </TableRow>
-              </TableHead>
-              <TableBody>
-                {
-                  rows.map(equipment => {
-                    return (
-                      <TableRow key={equipment.equipment_id}>
-                        <TableCell align={'left'}>{equipment.equipment_description}</TableCell>
-                        <TableCell align={'left'}>{equipment.equipment_category_name}</TableCell>
-                        <TableCell align={'left'}>{equipment.equipment_subcategory_name}</TableCell>
-                        <TableCell align={'left'}>{formatNumber(equipment.requested_equipments, 0)}</TableCell>
-                        <TableCell align={'right'}>{formatNumber(equipment.equipment_balance, 0)}</TableCell>
-                        <TableCell align={'right'}>{formatNumber(equipment.min_quantity, 0)}</TableCell>
-                        <TableCell align={'right'}>{formatNumber(equipment.max_quantity, 0)}</TableCell>
+      {
+        props.equipmentSubcategories.map(equipmentSubcategory => {
+          return (
+            <Grid key={equipmentSubcategory.id} container direction={'column'} style={{marginBottom: '2em'}}>
+              <Grid
+                item
+                xs={12}
+              >
+                <Typography
+                  variant={'h5'}
+                  style={{marginBottom: '0.5em'}}
+                >
+                  Inventario de {equipmentSubcategory.name.toLowerCase()}
+                </Typography>
+              </Grid>
+              <Grid
+                item
+                xs={12}
+              >
+                <TableContainer>
+                  <Table
+                    className={classes.table}
+                    aria-label="spanning table"
+                    stickyHeader
+                  >
+                    <TableHead>
+                      <TableRow>
+                        <TableCell style={{width: '20%'}}>Refaccion</TableCell>
+                        <TableCell style={{width: '20%'}}>Categoria</TableCell>
+                        <TableCell style={{width: '20%'}}>Subcategoria</TableCell>
+                        <TableCell style={{width: '10%'}}>Cantidad en pedidos pendientes</TableCell>
+                        <TableCell style={{width: '10%'}}>Balance</TableCell>
+                        <TableCell style={{width: '10%'}}>Minimo requerido</TableCell>
+                        <TableCell style={{width: '10%'}}>Maximo requerido</TableCell>
                       </TableRow>
-                    )
-                  })
-                }
-              </TableBody>
-            </Table>
-          </TableContainer>
-        </Grid>
+                    </TableHead>
+                    <TableBody>
+                      {
+                        rows
+                          .filter(equipment => {
+                            return equipment.equipment_subcategory_id === equipmentSubcategory.id
+                          })
+                          .map(equipment => {
+                            return (
+                              <TableRow key={equipment.equipment_id}>
+                                <TableCell align={'left'}>{equipment.equipment_description}</TableCell>
+                                <TableCell align={'left'}>{equipment.equipment_category_name}</TableCell>
+                                <TableCell align={'left'}>{equipment.equipment_subcategory_name}</TableCell>
+                                <TableCell align={'right'}>{formatNumber(equipment.requested_equipments, 0)}</TableCell>
+                                <TableCell align={'right'}>{formatNumber(equipment.equipment_balance, 0)}</TableCell>
+                                <TableCell align={'right'}>{formatNumber(equipment.min_quantity, 0)}</TableCell>
+                                <TableCell align={'right'}>{formatNumber(equipment.max_quantity, 0)}</TableCell>
+                              </TableRow>
+                            )
+                          })
+                      }
+                    </TableBody>
+                  </Table>
+                </TableContainer>
+              </Grid>
+            </Grid>
+          )
+        })
+      }
     </>
   );
 }
 
+const mapStateToProps = (state, ownProps) => {
+  return {
+    equipmentSubcategories: state.maintenance.equipmentSubcategories
+  }
+}
 
-export default connect(null, null)(EquipmentInventory)
+
+export default connect(mapStateToProps, null)(EquipmentInventory)
