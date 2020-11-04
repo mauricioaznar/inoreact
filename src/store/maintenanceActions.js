@@ -32,7 +32,6 @@ export const setEquipmentMeasurementUnits = (equipmentMeasurementUnits) => {
 }
 
 export const setEquipmentTransactionTypes = (equipmentTransactionTypes) => {
-  console.log(equipmentTransactionTypes)
   return {
     type: 'SET_EQUIPMENT_TRANSACTION_TYPES',
     equipmentTransactionTypes

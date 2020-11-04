@@ -17,6 +17,10 @@ import Grid from '@material-ui/core/Grid'
 import ImportExport from '@material-ui/icons/ImportExport';
 import IconButton from '@material-ui/core/IconButton'
 import formatNumber from '../../../helpers/formatNumber'
+import useFetch from '../../../helpers/useFetch'
+import apiUrl from '../../../helpers/apiUrl'
+import MauAutocomplete from '../../ui/inputs/Autocomplete'
+import CircularProgress from '@material-ui/core/CircularProgress'
 
 
 const useStyles = makeStyles({
@@ -27,7 +31,7 @@ const useStyles = makeStyles({
 });
 
 
-const formatCompletion= (x, y) => {
+const formatCompletion = (x, y) => {
   if (y === 0) {
     return '0'
   }
@@ -37,45 +41,83 @@ const formatCompletion= (x, y) => {
 // const dateFormat = 'YYYY-MM-DD'
 
 
-
 function EquipmentInventory(props) {
   const classes = useStyles();
 
-  let equipmentInventory =  props.equipmentInventory
+  let equipmentInventory = useFetch(apiUrl + 'stats/equipmentInventory')
 
+  const [equipmentSubcategory, setEquipmentSubcategory] = React.useState(null)
+  const [loading, setLoading] = React.useState(true)
 
   let rows = []
 
   if (equipmentInventory) {
-
+    if (loading) {
+      setLoading(false)
+    }
     rows = equipmentInventory
-      .sort((a, b) => {
-        return a.equipment_description > b.equipment_description ? 1 :
-          a.equipment_description < b.equipment_description ? -1 : 0
+      .filter(equipment => {
+        return equipmentSubcategory ? equipment.equipment_subcategory_id === equipmentSubcategory.id : true
       })
-
+      .sort((a, b) => {
+        return a.equipment_category_name > b.equipment_category_name ? 1
+          : a.equipment_category_name < b.equipment_category_name ? -1
+          : a.equipment_subcategory_name > b.equipment_subcategory_name ? 1
+          : a.equipment_subcategory_name < b.equipment_subcategory_name ? -1
+            : 0
+      })
   }
+
 
   return (
     <>
       {
-        props.equipmentSubcategories.map(equipmentSubcategory => {
-          return (
-            <Grid key={equipmentSubcategory.id} container direction={'column'} style={{marginBottom: '2em'}}>
+        loading ?
+          <CircularProgress
+            size={40}
+            style={{marginLeft: '2em', marginTop: '2em'}}
+          />
+          : <Grid
+            container
+            direction={'column'}
+            style={{marginBottom: '2em'}}
+          >
+            <Grid
+              item
+              xs
+              style={{marginBottom: '2em'}}
+            >
+              <Typography
+                variant={'h5'}
+              >
+                Inventario
+              </Typography>
+            </Grid>
+            <Grid
+              item
+              container
+              direction={'column'}
+            >
               <Grid
                 item
                 xs={12}
+                sm={4}
+                style={{marginBottom: '2em'}}
               >
-                <Typography
-                  variant={'h5'}
-                  style={{marginBottom: '0.5em'}}
-                >
-                  Inventario de {equipmentSubcategory.name.toLowerCase()}
-                </Typography>
+                <MauAutocomplete
+                  options={props.equipmentSubcategories}
+                  value={equipmentSubcategory}
+                  label={'Subcategoria'}
+                  onChange={(e, option) => {
+                    setEquipmentSubcategory(option)
+                  }}
+                />
               </Grid>
               <Grid
                 item
                 xs={12}
+                sm={12}
+                md={8}
               >
                 <TableContainer>
                   <Table
@@ -97,9 +139,6 @@ function EquipmentInventory(props) {
                     <TableBody>
                       {
                         rows
-                          .filter(equipment => {
-                            return equipment.equipment_subcategory_id === equipmentSubcategory.id
-                          })
                           .map(equipment => {
                             return (
                               <TableRow key={equipment.equipment_id}>
@@ -119,8 +158,7 @@ function EquipmentInventory(props) {
                 </TableContainer>
               </Grid>
             </Grid>
-          )
-        })
+         </Grid>
       }
     </>
   );

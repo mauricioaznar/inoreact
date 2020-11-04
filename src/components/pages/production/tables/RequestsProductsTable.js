@@ -48,8 +48,6 @@ function RequestsProductsTable(props) {
 
     let inventoryForCalcs = JSON.parse(JSON.stringify(inventory))
 
-    console.log(inventoryForCalcs)
-
     productsByPriority = requestProducts
       .sort((a, b) => {
         let aRequestDate = moment(a.order_request_date, dateFormat)
