@@ -69,6 +69,12 @@ function EquipmentDataTable(props) {
   const handleOnSubmit = (equipment, callback) => {
     mainEntityPromise(equipment, entityPath)
       .then(result => {
+        const bodyFormData = new FormData()
+        bodyFormData.append('photo', equipment.photo[0])
+        bodyFormData.append('id', result.data.data.id)
+        return axios.post(apiUrl + entityPath + '/image', bodyFormData, {headers: {...authHeader(), 'Content-Type': 'multipart/form-data'}})
+      })
+      .then(result => {
         callback(true)
         tableRef.current && tableRef.current.onQueryChange()
         setOpen(false)

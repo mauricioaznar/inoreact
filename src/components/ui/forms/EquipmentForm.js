@@ -13,6 +13,7 @@ import CheckIcon from '@material-ui/icons/Check';
 import SaveIcon from '@material-ui/icons/Save';
 import TextField from '@material-ui/core/TextField'
 import MauAutocomplete from './inputs/MauAutocomplete'
+import ImageUploader from 'react-images-upload';
 
 
 const useStyles = makeStyles((theme) => {
@@ -75,6 +76,7 @@ const EquipmentForm = (props) => {
 
   const defaultValues = {
     id: props.equipment ? props.equipment.id : '',
+    photo: '',
     description: props.equipment ? props.equipment.description : '',
     equipment_subcategory_id: props.equipment ? String(props.equipment.equipment_subcategory_id) : '',
     equipment_category_id: props.equipment ? String(props.equipment.equipment_category_id) : '',
@@ -89,7 +91,6 @@ const EquipmentForm = (props) => {
   const onSubmit = data => {
     setSuccess(false);
     setLoading(true);
-
 
     let finalSubmitted = {
       ...data,
@@ -107,7 +108,6 @@ const EquipmentForm = (props) => {
     setSuccess(true);
     setLoading(false);
   }
-
 
   return (
     <form>
@@ -220,6 +220,29 @@ const EquipmentForm = (props) => {
             control={control}
             defaultValue={`${defaultValues.equipment_measurement_unit_id}`}
           />
+        </Grid>
+
+        <Grid
+          item
+          xs={12}
+          className={classes.rowContainer}
+          style={{marginTop: '2em'}}
+        >
+          <FormControl
+            fullWidth
+          >
+            <TextField
+              inputRef={register({
+                validate: (files) => {
+                  return !files[0] || (files[0].size < 30000000 && files[0].type === "image/jpeg")
+                }
+              })}
+              type="file"
+              name="photo"
+              label="Foto"
+              helperText="La imagen debe de ser '.jpg' y menor a 3MB "
+            />
+          </FormControl>
         </Grid>
 
 
