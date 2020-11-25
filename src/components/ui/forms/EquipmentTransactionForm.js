@@ -92,6 +92,7 @@ const EquipmentForm = (props) => {
     id: props.equipmentTransaction ? props.equipmentTransaction.id : '',
     description: props.equipmentTransaction ? props.equipmentTransaction.description : '',
     date_emitted: props.equipmentTransaction ? props.equipmentTransaction.date_emitted : '',
+    date_estimated_delivery: props.equipmentTransaction ? props.equipmentTransaction.date_estimated_delivery : '',
     equipment_transaction_type_id: props.equipmentTransaction ? props.equipmentTransaction.equipment_transaction_type_id : '',
     equipment_transaction_status_id: props.equipmentTransaction ? props.equipmentTransaction.equipment_transaction_status_id : '',
     equipment_transaction_items: props.equipmentTransaction && props.equipmentTransaction.equipment_transaction_items.length > 0 ?
@@ -212,6 +213,23 @@ const EquipmentForm = (props) => {
             helperText={errors.date_emitted && errors.date_emitted.message}
             defaultValue={defaultValues.date_emitted}
             label="Fecha de emision"
+          />
+        </Grid>
+
+        <Grid
+          item
+          xs={12}
+          className={classes.rowContainer}
+          style={{marginTop: '2em'}}
+        >
+          <MauDatePicker
+            name="date_estimated_delivery"
+            control={control}
+            rules={{required: true}}
+            error={!!errors.date_estimated_delivery}
+            helperText={errors.date_estimated_delivery && errors.date_estimated_delivery}
+            defaultValue={defaultValues.date_estimated_delivery}
+            label="Fecha estimada de entrega"
           />
         </Grid>
 

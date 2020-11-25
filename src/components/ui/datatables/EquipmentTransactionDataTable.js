@@ -44,6 +44,11 @@ function EquipmentTransactionDataTable(props) {
       type: 'date'
     },
     {
+      title: 'Fecha estimada de entrega',
+      field: 'date_estimated_delivery',
+      type: 'date'
+    },
+    {
       title: 'Nombre',
       field: 'description',
       type: 'text'
