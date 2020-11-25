@@ -16,6 +16,7 @@ import MachineForm from '../forms/MachineForm'
 import EquipmentForm from '../forms/EquipmentForm'
 import {getEquipments} from '../../../store/maintenanceActions'
 import formatNumber from '../../../helpers/formatNumber'
+import imageUrl from '../../../helpers/imageUrl'
 
 const Transition = React.forwardRef(function Transition(props, ref) {
   return <Slide direction="up" ref={ref} {...props} />;
