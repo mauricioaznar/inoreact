@@ -138,6 +138,9 @@ function EquipmentTransactionDataTable(props) {
   const handleRowDelete = (oldData) => {
     let promises = []
     promises.push(axios.put(apiUrl + entityPath + '/' + oldData.id, {active: -1}, {headers: {...authHeader()}}))
+    oldData.equipment_transaction_items.forEach(equipmentTransactionItem => {
+      promises.push(axios.put(apiUrl + 'equipmentTransactionItem/' + equipmentTransactionItem.id, {active: -1}, {headers: {...authHeader()}}))
+    })
     return Promise.all(promises).then(results => {
       return new Promise((resolve, reject) => {
         resolve()
@@ -169,6 +172,9 @@ function EquipmentTransactionDataTable(props) {
               setRowData(rowData)
               setOpen(true)
             }}
+            onRowDelete={(oldData) => {
+              return handleRowDelete(oldData)
+            }}
             columns={columns}
 
 
@@ -177,10 +183,10 @@ function EquipmentTransactionDataTable(props) {
         </Grid>
       </Grid>
       <Dialog
-        maxWidth={!matchesXS ? 'lg' : null}
-        fullWidth={!matchesXS || null}
+        maxWidth
+        fullWidth
         open={open}
-        fullScreen={matchesXS}
+        fullScreen
         TransitionComponent={Transition}
         onClose={handleClose}
         aria-labelledby="form-dialog-title"
