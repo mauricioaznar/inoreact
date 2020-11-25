@@ -1,4 +1,4 @@
 [context.production.environment]
-  REACT_APP_BASE_URL = 'https://inoserver.grupoinopack.com/api/'
+  REACT_APP_BASE_URL = 'https://inoserver.grupoinopack.com/'
 [context.development.environment]
-  REACT_APP_BASE_URL = 'https://babytester.grupoinopack.com/api/'
+  REACT_APP_BASE_URL = 'https://babytester.grupoinopack.com/'
