@@ -15,6 +15,7 @@ import MauMaterialTable from './common/MauMaterialTable'
 import MachineForm from '../forms/MachineForm'
 import EquipmentForm from '../forms/EquipmentForm'
 import {getEquipments} from '../../../store/maintenanceActions'
+import formatNumber from '../../../helpers/formatNumber'
 
 const Transition = React.forwardRef(function Transition(props, ref) {
   return <Slide direction="up" ref={ref} {...props} />;
@@ -56,6 +57,15 @@ function EquipmentDataTable(props) {
       options: props.equipmentSubcategories,
       optionLabel: 'name'
     },
+    {
+      title: 'Kilos',
+      sorting: false,
+      render: (rowData) => {
+        return (
+          <img  src={imageUrl + 'equipments/' + rowData.id + '.jpg'}/>
+        )
+      }
+    }
   ]
 
   const handleClickOpen = () => {
