@@ -63,7 +63,7 @@ function EquipmentDataTable(props) {
       sorting: false,
       render: (rowData) => {
         return (
-          <img  src={imageUrl + 'equipments/' + rowData.id + '.jpg'}/>
+          <img style={{height: '50px', width: '50px'}} src={imageUrl + 'equipments/' + rowData.id + '.jpg'} alt={'Imagen no disponible'}/>
         )
       }
     }
