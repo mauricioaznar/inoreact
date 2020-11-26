@@ -19,7 +19,9 @@ import formatNumber from '../../../helpers/formatNumber'
 import imageUrl from '../../../helpers/imageUrl'
 
 const Transition = React.forwardRef(function Transition(props, ref) {
-  return <Slide direction="up" ref={ref} {...props} />;
+  return <Slide
+    direction="up"
+    ref={ref} {...props} />;
 });
 
 
@@ -59,11 +61,19 @@ function EquipmentDataTable(props) {
       optionLabel: 'name'
     },
     {
-      title: 'Kilos',
+      title: 'Imagen',
       sorting: false,
       render: (rowData) => {
         return (
-          <img style={{height: '50px', width: '50px'}} src={imageUrl + 'equipments/' + rowData.id + '.jpg'} alt={'Imagen no disponible'}/>
+
+            rowData.image_name
+              ? <img
+                style={{height: '50px', width: '50px'}}
+                src={imageUrl + rowData.image_name}
+                alt={'Imagen no disponible'}
+              />
+              : null
+
         )
       }
     }
@@ -83,7 +93,12 @@ function EquipmentDataTable(props) {
         const bodyFormData = new FormData()
         bodyFormData.append('photo', equipment.photo[0])
         bodyFormData.append('id', result.data.data.id)
-        return axios.post(apiUrl + entityPath + '/image', bodyFormData, {headers: {...authHeader(), 'Content-Type': 'multipart/form-data'}})
+        return axios.post(apiUrl + entityPath + '/image', bodyFormData, {
+          headers: {
+            ...authHeader(),
+            'Content-Type': 'multipart/form-data'
+          }
+        })
       })
       .then(result => {
         callback(true)
@@ -94,16 +109,6 @@ function EquipmentDataTable(props) {
         }
         props.getEquipments()
       })
-  }
-
-  const handleRowDelete = (oldData) => {
-    let promises = []
-    promises.push(axios.put(apiUrl + entityPath + '/' + oldData.id, {active: -1}, {headers: {...authHeader()}}))
-    return Promise.all(promises).then(results => {
-      return new Promise((resolve, reject) => {
-        resolve()
-      })
-    })
   }
 
 
@@ -132,21 +137,22 @@ function EquipmentDataTable(props) {
             }}
             columns={columns}
 
-
-
           />
         </Grid>
       </Grid>
       <Dialog
-        maxWidth={!matchesXS ? 'lg' : null}
-        fullWidth={!matchesXS || null}
+        maxWidth
+        fullWidth
         open={open}
-        fullScreen={matchesXS}
+        fullScreen
         TransitionComponent={Transition}
         onClose={handleClose}
         aria-labelledby="form-dialog-title"
       >
-        <EquipmentForm equipment={rowData} onSubmit={handleOnSubmit} />
+        <EquipmentForm
+          equipment={rowData}
+          onSubmit={handleOnSubmit}
+        />
       </Dialog>
     </>
   )
@@ -158,7 +164,6 @@ const mapStateToProps = (state, ownProps) => {
     equipmentCategories: state.maintenance.equipmentCategories,
   }
 }
-
 
 
 const mapDispatchToProps = (dispatch, ownProps) => {
