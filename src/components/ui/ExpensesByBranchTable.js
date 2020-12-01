@@ -26,8 +26,6 @@ function ExpensesByBranchTable (props) {
 
   if (props.expenses && props.sales) {
 
-    console.log(props.expenseSubcategories)
-
     let sales = props.sales.sales
 
     let defaultRowObject = props.expenseSubcategories
@@ -72,8 +70,6 @@ function ExpensesByBranchTable (props) {
       }
     })
 
-    console.log(sales)
-
     sales.map(sale => {
         let foundRows = rows
           .filter(row => {
@@ -84,12 +80,12 @@ function ExpensesByBranchTable (props) {
         })
       })
 
-    rows.forEach(row => {
-      props.expenseSubcategories.forEach(expenseSubcategory => {
-        row[expenseSubcategory.id] = row.sales_total !== 0 ?
-          (row[expenseSubcategory.id] / row.sales_total) : 0
-      })
-    })
+    // rows.forEach(row => {
+    //   props.expenseSubcategories.forEach(expenseSubcategory => {
+    //     row[expenseSubcategory.id] = row.sales_total !== 0 ?
+    //       (row[expenseSubcategory.id] / row.sales_total) : 0
+    //   })
+    // })
 
   }
 
