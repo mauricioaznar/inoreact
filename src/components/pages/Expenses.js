@@ -109,9 +109,8 @@ export default function Expenses(props) {
 
   const classes = useStyles()
 
-
-  const expensesNoEstimatesByCatSubBra = useFetch(apiUrl + 'analytics/expenses?dateGroup=month&entityGroup=branch|expenseCategory|expenseSubcategory&noEstimates')
-  const sales = useFetch(apiUrl + 'analytics/sales?dateGroup=month')
+  // const expensesNoEstimatesByCatSubBra = useFetch(apiUrl + 'analytics/expenses?dateGroup=month&entityGroup=branch|expenseCategory|expenseSubcategory&noEstimates')
+  // const sales = useFetch(apiUrl + 'analytics/sales?dateGroup=month')
 
   const exportExcel = () => {
     if (!loading) {
@@ -276,17 +275,17 @@ export default function Expenses(props) {
           }
         </Grid>
       </Grid>
-      <Grid
-        item
-        xs
-        className={classes.rowContainer}
-        style={{marginBottom: '2em'}}
-      >
-        <ExpensesByBranchTable
-          expenses={expensesNoEstimatesByCatSubBra}
-          sales={sales}
-        />
-      </Grid>
+      {/*<Grid*/}
+      {/*  item*/}
+      {/*  xs*/}
+      {/*  className={classes.rowContainer}*/}
+      {/*  style={{marginBottom: '2em'}}*/}
+      {/*>*/}
+      {/*  <ExpensesByBranchTable*/}
+      {/*    expenses={expensesNoEstimatesByCatSubBra}*/}
+      {/*    sales={sales}*/}
+      {/*  />*/}
+      {/*</Grid>*/}
       <Grid
         item
         xs
