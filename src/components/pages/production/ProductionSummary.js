@@ -40,6 +40,9 @@ export default function ProductionSummary(props) {
       >
          <Grid
           item
+          xs
+          sm={8}
+          md={6}
           style={{marginBottom: '1em'}}
          >
            <MauAutocomplete
