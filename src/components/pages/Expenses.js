@@ -109,7 +109,6 @@ export default function Expenses(props) {
 
   const classes = useStyles()
 
-
   // const expensesNoEstimatesByCatSubBra = useFetch(apiUrl + 'analytics/expenses?dateGroup=month&entityGroup=branch|expenseCategory|expenseSubcategory&noEstimates')
   // const sales = useFetch(apiUrl + 'analytics/sales?dateGroup=month')
 

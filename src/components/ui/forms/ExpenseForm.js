@@ -638,14 +638,16 @@ const ExpenseForm = (props) => {
           <FormControl
             fullWidth
           >
-            <MauNumber
+            <TextField
+              inputRef={register({
+                required: isInvoice
+              })}
               name="internal_code"
               label="Codigo interno"
-              decimal={false}
-              thousand={false}
-              defaultValue={defaultValues.internal_code}
+              InputLabelProps={{
+                shrink: true
+              }}
               placeholder="14 o 35A o 15 y 16 "
-              control={control}
             />
           </FormControl>
         </Grid>

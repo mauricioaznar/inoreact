@@ -27,6 +27,7 @@ import TableCell from '@material-ui/core/TableCell'
 import TableBody from '@material-ui/core/TableBody'
 import MauNumber from './inputs/MauNumber'
 import DeleteIcon from '@material-ui/icons/Delete'
+import MauDatePicker from './inputs/MauDatePicker'
 
 
 const useStyles = makeStyles((theme) => {
@@ -90,6 +91,8 @@ const EquipmentForm = (props) => {
   const defaultValues = {
     id: props.equipmentTransaction ? props.equipmentTransaction.id : '',
     description: props.equipmentTransaction ? props.equipmentTransaction.description : '',
+    date_emitted: props.equipmentTransaction ? props.equipmentTransaction.date_emitted : '',
+    date_estimated_delivery: props.equipmentTransaction ? props.equipmentTransaction.date_estimated_delivery : '',
     equipment_transaction_type_id: props.equipmentTransaction ? props.equipmentTransaction.equipment_transaction_type_id : '',
     equipment_transaction_status_id: props.equipmentTransaction ? props.equipmentTransaction.equipment_transaction_status_id : '',
     equipment_transaction_items: props.equipmentTransaction && props.equipmentTransaction.equipment_transaction_items.length > 0 ?
@@ -194,6 +197,40 @@ const EquipmentForm = (props) => {
               }}
             />
           </FormControl>
+        </Grid>
+
+        <Grid
+          item
+          xs={12}
+          className={classes.rowContainer}
+          style={{marginTop: '2em'}}
+        >
+          <MauDatePicker
+            name="date_emitted"
+            control={control}
+            rules={{required: true}}
+            error={!!errors.date_emitted}
+            helperText={errors.date_emitted && errors.date_emitted.message}
+            defaultValue={defaultValues.date_emitted}
+            label="Fecha de emision"
+          />
+        </Grid>
+
+        <Grid
+          item
+          xs={12}
+          className={classes.rowContainer}
+          style={{marginTop: '2em'}}
+        >
+          <MauDatePicker
+            name="date_estimated_delivery"
+            control={control}
+            rules={{required: true}}
+            error={!!errors.date_estimated_delivery}
+            helperText={errors.date_estimated_delivery && errors.date_estimated_delivery}
+            defaultValue={defaultValues.date_estimated_delivery}
+            label="Fecha estimada de entrega"
+          />
         </Grid>
 
         <Grid
@@ -331,11 +368,6 @@ const EquipmentForm = (props) => {
                             options={props.machines}
                             displayName={'name'}
                             name={`equipment_transaction_items[${index}].machine_id`}
-                            rules={
-                              {
-                                required: true,
-                              }
-                            }
                             control={control}
                             defaultValue={`${equipmentTransactionItem.machine_id}`}
                           />

@@ -10,6 +10,13 @@ import TableContainer from '@material-ui/core/TableContainer';
 import TableHead from '@material-ui/core/TableHead';
 import TableRow from '@material-ui/core/TableRow';
 import PropTypes from 'prop-types'
+import IconButton from '@material-ui/core/IconButton'
+import KeyboardArrowUpIcon from '@material-ui/icons/KeyboardArrowUp'
+import KeyboardArrowDownIcon from '@material-ui/icons/KeyboardArrowDown'
+import Collapse from '@material-ui/core/Collapse'
+import Box from '@material-ui/core/Box'
+import Grid from '@material-ui/core/Grid'
+import Typography from '@material-ui/core/Typography'
 
 
 const useStyles = makeStyles({
@@ -40,20 +47,18 @@ function RequestsProductsTable(props) {
 
   let products = []
 
-  let type = props.type || 'all'
+  let type = props.type
+
+  console.log(props.requestProducts)
 
   if (props.requestProducts) {
 
     let {requestProducts, inventory} = props
 
-    let inventoryForCalcs = JSON.parse(JSON.stringify(inventory))
-
-    console.log(inventoryForCalcs)
-
     productsByPriority = requestProducts
       .sort((a, b) => {
-        let aRequestDate = moment(a.order_request_date, dateFormat)
-        let bRequestDate = moment(b.order_request_date, dateFormat)
+        let aRequestDate = moment(a.order_request_estimated_delivery_date, dateFormat)
+        let bRequestDate = moment(b.order_request_estimated_delivery_date, dateFormat)
         return a.order_request_status_id > b.order_request_status_id ? -1
           : a.order_request_status_id < b.order_request_status_id ? 1
             : a.priority > b.priority ? -1
@@ -62,53 +67,27 @@ function RequestsProductsTable(props) {
                   : aRequestDate.isAfter(bRequestDate) ? 1
                     : 0
       })
-      .map((requestProduct) => {
-        let inventoryProduct = inventoryForCalcs.find(product => {
-          return product.product_id === requestProduct.product_id
-        })
-        let requestKilos = requestProduct.order_request_kilos
-        let saleDeliveredKilos = requestProduct.order_sale_delivered_kilos
-        let requestNetKilos = (requestKilos < saleDeliveredKilos) ?
-          0 : (requestKilos - saleDeliveredKilos)
-        let inventoryKilos = inventoryProduct && inventoryProduct.kilos_balance ? inventoryProduct.kilos_balance : 0
-        let givenInventoryKilos
-        if (requestNetKilos > 0 && inventoryKilos > 0) {
-          if (requestNetKilos > inventoryKilos) {
-            givenInventoryKilos = inventoryKilos
-            inventoryProduct.kilos_balance = 0
-          } else {
-            givenInventoryKilos = requestNetKilos
-            inventoryProduct.kilos_balance =  inventoryKilos - requestNetKilos
-          }
-        } else {
-          givenInventoryKilos = 0
-        }
-        let pendingToProduceKilos = requestNetKilos - givenInventoryKilos
-        return {
-          ...requestProduct,
-          pending_to_produce: pendingToProduceKilos,
-          given_inventory_kilos: givenInventoryKilos
-        }
-      })
 
     props.products.forEach(product => {
       if (product.product_type_id === 1 || product.product_type_id === 2) {
-        let material= props.materials.find(material => {
+        let material = props.materials.find(material => {
           return material.id === product.material_id
         })
         let isAlreadyInGroup = widthAndCaliberGroups.find(item => {
           return item.width === product.width
-            && item.calibre === product.calibre
-            && item.material_name === material ? material.name : ''
+          && item.calibre === product.calibre
+          && item.material_name === material ? material.name : ''
         })
         if (!isAlreadyInGroup) {
           widthAndCaliberGroups.push({
             width: product.width,
             calibre: product.calibre,
             material_name: material.name,
-            kilos: 0,
+            kilos_balance: 0,
+            kilos_requested: 0,
             kilos_in_prod: 0,
-            kilos_pending: 0
+            kilos_pending: 0,
+            request_products: []
           })
         }
       }
@@ -121,9 +100,11 @@ function RequestsProductsTable(props) {
       .map(material => {
         return {
           ...material,
-          kilos: 0,
+          kilos_balance: 0,
+          kilos_requested: 0,
           kilos_in_prod: 0,
-          kilos_pending: 0
+          kilos_pending: 0,
+          request_products: []
         }
       })
 
@@ -134,16 +115,18 @@ function RequestsProductsTable(props) {
       .map(product => {
         return {
           ...product,
-          kilos: 0,
+          kilos_balance: 0,
+          kilos_requested: 0,
           kilos_in_prod: 0,
-          kilos_pending: 0
+          kilos_pending: 0,
+          request_products: []
         }
       })
 
 
     productsByPriority.forEach(productByPriority => {
       if (productByPriority.product_type_id === 1 || productByPriority.product_type_id === 2) {
-        let wcGroup =  widthAndCaliberGroups.find(item => {
+        let wcGroup = widthAndCaliberGroups.find(item => {
           return item.width === productByPriority.product_width
             && item.calibre === productByPriority.product_calibre
             && item.material_name === productByPriority.material_name
@@ -155,28 +138,56 @@ function RequestsProductsTable(props) {
           return product.id === productByPriority.product_id
         })
         if (wcGroup) {
-          wcGroup.kilos += productByPriority.pending_to_produce
+          wcGroup.kilos_requested += productByPriority.order_request_kilos
           if (productByPriority.order_request_status_id === 1) {
-            wcGroup.kilos_pending += productByPriority.pending_to_produce
+            wcGroup.kilos_pending += productByPriority.order_request_kilos
           } else if (productByPriority.order_request_status_id === 2) {
-            wcGroup.kilos_in_prod += productByPriority.pending_to_produce
+            wcGroup.kilos_in_prod += productByPriority.order_request_kilos
           }
+          wcGroup.request_products.push(productByPriority)
         }
         if (material) {
-          material.kilos += productByPriority.pending_to_produce
+          material.kilos_requested += productByPriority.order_request_kilos
           if (productByPriority.order_request_status_id === 1) {
-            material.kilos_pending += productByPriority.pending_to_produce
+            material.kilos_pending += productByPriority.order_request_kilos
           } else if (productByPriority.order_request_status_id === 2) {
-            material.kilos_in_prod += productByPriority.pending_to_produce
+            material.kilos_in_prod += productByPriority.order_request_kilos
           }
+          material.request_products.push(productByPriority)
         }
         if (product) {
-          product.kilos += productByPriority.pending_to_produce
+          product.kilos_requested += productByPriority.order_request_kilos
           if (productByPriority.order_request_status_id === 1) {
-            product.kilos_pending += productByPriority.pending_to_produce
+            product.kilos_pending += productByPriority.order_request_kilos
           } else if (productByPriority.order_request_status_id === 2) {
-            product.kilos_in_prod += productByPriority.pending_to_produce
+            product.kilos_in_prod += productByPriority.order_request_kilos
           }
+          product.request_products.push(productByPriority)
+        }
+      }
+    })
+
+    props.inventory.forEach((inventoryProduct) => {
+      if (inventoryProduct.product_type_id === 1 || inventoryProduct.product_type_id === 2) {
+        let wcGroup = widthAndCaliberGroups.find(item => {
+          return item.width === inventoryProduct.product_width
+            && item.calibre === inventoryProduct.product_calibre
+            && item.material_name === inventoryProduct.material_name
+        })
+        let material = materials.find(mat => {
+          return mat.id === inventoryProduct.material_id
+        })
+        let product = products.find(product => {
+          return product.id === inventoryProduct.product_id
+        })
+        if (wcGroup) {
+          wcGroup.kilos_balance += inventoryProduct.kilos_balance
+        }
+        if (material) {
+          material.kilos_balance += inventoryProduct.kilos_balance
+        }
+        if (product) {
+          product.kilos_balance += inventoryProduct.kilos_balance
         }
       }
     })
@@ -184,179 +195,334 @@ function RequestsProductsTable(props) {
     widthAndCaliberGroups = widthAndCaliberGroups
       .sort((a, b) => {
         return a.width > b.width ? -1 : a.width < b.width ? 1
-        : a.calibre > b.calibre ? -1 : a.calibre < b.calibre ? 1
-          : a.material_name > b.material_name ? -1 : a.material_name < b.material_name ? 1
-            : a.kilos > b.kilos ? -1 : a.kilos < b.kilos ? 1 : 0
+          : a.calibre > b.calibre ? -1 : a.calibre < b.calibre ? 1
+            : a.material_name > b.material_name ? -1 : a.material_name < b.material_name ? 1
+              : a.kilos_requested > b.kilos_requested ? -1 : a.kilos_requested < b.kilos_requested ? 1 : 0
       })
-      .filter(item => item.kilos !== 0)
+      .filter(item => item.kilos_requested !== 0)
 
     materials = materials
       .sort((a, b) => {
-        return a.kilos > b.kilos ? -1 : a.kilos < b.kilos ? 1 : 0
+        return a.kilos_requested > b.kilos_requested ? -1 : a.kilos_requested < b.kilos_requested ? 1 : 0
       })
-      .filter(material => material.kilos !== 0)
+      .filter(material => material.kilos_requested !== 0)
 
     products = products
       .sort((a, b) => {
-         return a.material_id > b.material_id ? -1 : a.material_id < b.material_id ? 1
-          : a.kilos > b.kilos ? -1 : a.kilos < b.kilos ? 1 : 0
+        return a.material_id > b.material_id ? -1 : a.material_id < b.material_id ? 1
+          : a.kilos_requested > b.kilos_requested ? -1 : a.kilos_requested < b.kilos_requested ? 1 : 0
       })
-      .filter(product => product.kilos !== 0)
-
-    productsByPriority = productsByPriority
-      .filter(product => product.pending_to_produce !== 0)
+      .filter(product => product.kilos_requested !== 0)
   }
 
 
+  const RequestProductRow = (props) => {
 
-  const MaterialTable = (
-    <TableContainer className={classes.table}>
-      <Table aria-label="simple table" stickyHeader>
-        <TableHead>
-          <TableRow>
-            <TableCell style={{width: '5%'}}>&nbsp;</TableCell>
-            <TableCell>Subtipo</TableCell>
-            <TableCell>Kilos en prod</TableCell>
-            <TableCell>Kilos pendientes</TableCell>
-            <TableCell>Kilos por producir</TableCell>
+    const {requestProducts, open, setOpen} = props
+
+    return (
+      <TableRow>
+        <TableCell
+          style={{paddingBottom: 0, paddingTop: 0, paddingLeft: 0, paddingRight: 0}}
+          colSpan={10}
+        >
+          <Collapse
+            in={open}
+            timeout="auto"
+            unmountOnExit
+          >
+            <Box>
+              <Table
+                aria-label="purchases"
+              >
+                <TableHead>
+                  <TableRow>
+                    <TableCell style={{width: '5%'}}>&nbsp;</TableCell>
+                    <TableCell># Pedido</TableCell>
+                    <TableCell>Cliente</TableCell>
+                    <TableCell>Status</TableCell>
+                    <TableCell>Fecha estimada de entrega</TableCell>
+                    <TableCell>Kilos solicitados</TableCell>
+                    <TableCell>Kilos vendidos</TableCell>
+                  </TableRow>
+                </TableHead>
+                <TableBody>
+                  {requestProducts.map((requestProduct, index) => (
+                    <TableRow key={requestProduct.expense_subcategory_id}>
+                      <TableCell style={{width: '5%'}}>&nbsp;</TableCell>
+                      <TableCell>{requestProduct.order_code}</TableCell>
+                      <TableCell>{requestProduct.client_name}</TableCell>
+                      <TableCell>{requestProduct.order_request_status_name}</TableCell>
+                      <TableCell>{requestProduct.order_request_estimated_delivery_date}</TableCell>
+                      <TableCell align={'right'}>{formatNumber(requestProduct.order_request_kilos)}</TableCell>
+                      <TableCell align={'right'}>{formatNumber(requestProduct.order_sale_delivered_kilos)}</TableCell>
+                    </TableRow>
+                  ))}
+                </TableBody>
+              </Table>
+            </Box>
+          </Collapse>
+        </TableCell>
+      </TableRow>
+    )
+  }
+
+
+  const MaterialTable = (props) => {
+
+    const MaterialTableRow = (props) => {
+
+      const material = props.material
+
+      const [open, setOpen] = React.useState(false);
+
+      return (
+        <React.Fragment>
+          <TableRow key={material.id}>
+            <TableCell style={{width: '5%'}}>
+              <IconButton
+                aria-label="expand row"
+                size="small"
+                onClick={() => setOpen(!open)}
+              >
+              {open ? <KeyboardArrowUpIcon /> : <KeyboardArrowDownIcon />}
+              </IconButton>
+            </TableCell>
+            <TableCell>{material.name}</TableCell>
+            <TableCell align={'right'}>{formatNumber(material.kilos_balance)}</TableCell>
+            <TableCell align={'right'}>{formatNumber(material.kilos_in_prod)}</TableCell>
+            <TableCell align={'right'}>{formatNumber(material.kilos_pending)}</TableCell>
+            <TableCell align={'right'}>{formatNumber(material.kilos_requested)}</TableCell>
           </TableRow>
-        </TableHead>
-        <TableBody>
-          {
-            materials.map(material => {
-              return (
-                <TableRow key={material.id}>
-                  <TableCell>&nbsp;</TableCell>
-                  <TableCell>{material.name}</TableCell>
-                  <TableCell align={'right'}>{formatNumber(material.kilos_in_prod)}</TableCell>
-                  <TableCell align={'right'}>{formatNumber(material.kilos_pending)}</TableCell>
-                  <TableCell align={'right'}>{formatNumber(material.kilos)}</TableCell>
-                </TableRow>
-              )
-            })
-          }
-        </TableBody>
-      </Table>
-    </TableContainer>
-  )
+          <RequestProductRow
+            open={open}
+            requestProducts={material.request_products}
+          />
+        </React.Fragment>
+      )
+    }
 
-  const ProductsTable = (
-    <TableContainer className={classes.table}>
-      <Table aria-label="simple table" stickyHeader>
-        <TableHead>
-          <TableRow>
-            <TableCell style={{width: '5%'}}>&nbsp;</TableCell>
-            <TableCell>Producto</TableCell>
-            <TableCell>Kilos en prod</TableCell>
-            <TableCell>Kilos pendientes</TableCell>
-            <TableCell>Kilos por producir</TableCell>
+    return (
+      <Grid
+        container
+        direction={'column'}
+      >
+       <Grid
+         item
+         xs
+         style={{marginBottom: '2em'}}
+       >
+         <Typography variant={'h4'}>
+           Inventario por subtipos
+         </Typography>
+       </Grid>
+       <Grid
+         item
+         xs
+       >
+        <TableContainer className={classes.table}>
+          <Table
+            aria-label="simple table"
+            stickyHeader
+          >
+            <TableHead>
+              <TableRow>
+                <TableCell style={{width: '5%'}}>&nbsp;</TableCell>
+                <TableCell>Subtipo</TableCell>
+                <TableCell>Kilos en inventario</TableCell>
+                <TableCell>Kilos en producción</TableCell>
+                <TableCell>Kilos pendientes</TableCell>
+                <TableCell>Kilos solicitados</TableCell>
+              </TableRow>
+            </TableHead>
+            <TableBody>
+              {
+                materials.map(material => {
+                  return (
+                    <MaterialTableRow
+                      key={material.id}
+                      material={material}
+                    />
+                  )
+                })
+              }
+            </TableBody>
+          </Table>
+        </TableContainer>
+       </Grid>
+     </Grid>
+    )
+  }
+
+  const ProductsTable = (props) => {
+
+    const ProductTableRow = (props) => {
+
+      const product = props.product
+
+      const [open, setOpen] = React.useState(false);
+
+      return (
+        <React.Fragment>
+          <TableRow key={product.id}>
+            <TableCell style={{width: '5%'}}>
+              <IconButton
+                aria-label="expand row"
+                size="small"
+                onClick={() => setOpen(!open)}
+              >
+              {open ? <KeyboardArrowUpIcon /> : <KeyboardArrowDownIcon />}
+              </IconButton>
+            </TableCell>
+            <TableCell>{product.description}</TableCell>
+            <TableCell align={'right'}>{formatNumber(product.kilos_balance)}</TableCell>
+            <TableCell align={'right'}>{formatNumber(product.kilos_in_prod)}</TableCell>
+            <TableCell align={'right'}>{formatNumber(product.kilos_pending)}</TableCell>
+            <TableCell align={'right'}>{formatNumber(product.kilos_requested)}</TableCell>
           </TableRow>
-        </TableHead>
-        <TableBody>
-          {
-            products.map(product => {
-              return (
-                <TableRow key={product.id}>
-                  <TableCell>&nbsp;</TableCell>
-                  <TableCell>{product.description}</TableCell>
-                  <TableCell align={'right'}>{formatNumber(product.kilos_in_prod)}</TableCell>
-                  <TableCell align={'right'}>{formatNumber(product.kilos_pending)}</TableCell>
-                  <TableCell align={'right'}>{formatNumber(product.kilos)}</TableCell>
-                </TableRow>
-              )
-            })
-          }
-        </TableBody>
-      </Table>
-    </TableContainer>
-  )
+          <RequestProductRow
+            open={open}
+            requestProducts={product.request_products}
+          />
+        </React.Fragment>
+      )
+    }
 
-  const WidthAndCaliberTable = (
-    <TableContainer className={classes.table}>
-      <Table aria-label="simple table" stickyHeader>
-        <TableHead>
-          <TableRow>
-            <TableCell style={{width: '5%'}}>&nbsp;</TableCell>
-            <TableCell>Ancho</TableCell>
-            <TableCell>Calibre</TableCell>
-            <TableCell>Material</TableCell>
-            <TableCell>Kilos en prod</TableCell>
-            <TableCell>Kilos pendientes</TableCell>
-            <TableCell>Kilos por extruir</TableCell>
+    return (
+      <Grid
+        container
+        direction={'column'}
+      >
+       <Grid
+         item
+         xs
+         style={{marginBottom: '2em'}}
+       >
+         <Typography variant={'h4'}>
+           Inventario por productos
+         </Typography>
+       </Grid>
+        <Grid item xs>
+          <TableContainer className={classes.table}>
+            <Table
+              aria-label="simple table"
+              stickyHeader
+            >
+              <TableHead>
+                <TableRow>
+                  <TableCell style={{width: '5%'}}>&nbsp;</TableCell>
+                  <TableCell>Producto</TableCell>
+                  <TableCell>Kilos en inventario</TableCell>
+                  <TableCell>Kilos en producción</TableCell>
+                  <TableCell>Kilos pendientes</TableCell>
+                  <TableCell>Kilos solicitados</TableCell>
+                </TableRow>
+              </TableHead>
+              <TableBody>
+                {
+                  products.map(product => {
+                    return <ProductTableRow
+                      key={product.id}
+                      product={product}
+                    />
+                  })
+                }
+              </TableBody>
+            </Table>
+          </TableContainer>
+        </Grid>
+      </Grid>
+    )
+  }
+
+  const WidthAndCaliberTable = (props) => {
+
+    const WidthAndCaliberTableRow = (props) => {
+
+      const wcGroup = props.wcGroup
+
+      const [open, setOpen] = React.useState(false);
+
+      return (
+        <React.Fragment>
+          <TableRow key={`${wcGroup.width}${wcGroup.calibre}${wcGroup.material_name}`}>
+            <TableCell style={{width: '5%'}}>
+              <IconButton
+                aria-label="expand row"
+                size="small"
+                onClick={() => setOpen(!open)}
+              >
+              {open ? <KeyboardArrowUpIcon /> : <KeyboardArrowDownIcon />}
+              </IconButton>
+            </TableCell>
+            <TableCell>{wcGroup.width}</TableCell>
+            <TableCell>{wcGroup.calibre}</TableCell>
+            <TableCell>{wcGroup.material_name}</TableCell>
+            <TableCell align={'right'}>{formatNumber(wcGroup.kilos_balance)}</TableCell>
+            <TableCell align={'right'}>{formatNumber(wcGroup.kilos_in_prod)}</TableCell>
+            <TableCell align={'right'}>{formatNumber(wcGroup.kilos_pending)}</TableCell>
+            <TableCell align={'right'}>{formatNumber(wcGroup.kilos_requested)}</TableCell>
           </TableRow>
-        </TableHead>
-        <TableBody>
-          {
-            widthAndCaliberGroups.map(item => {
-              return (
-                <TableRow key={item.width}>
-                  <TableCell>&nbsp;</TableCell>
-                  <TableCell>{item.width}</TableCell>
-                  <TableCell>{item.calibre}</TableCell>
-                  <TableCell>{item.material_name}</TableCell>
-                  <TableCell align={'right'}>{formatNumber(item.kilos_in_prod)}</TableCell>
-                  <TableCell align={'right'}>{formatNumber(item.kilos_pending)}</TableCell>
-                  <TableCell align={'right'}>{formatNumber(item.kilos)}</TableCell>
+          <RequestProductRow
+            open={open}
+            requestProducts={wcGroup.request_products}
+          />
+        </React.Fragment>
+      )
+    }
+
+    return (
+      <Grid
+        container
+        direction={'column'}
+      >
+        <Grid
+          item
+          xs
+          style={{marginBottom: '2em'}}
+        >
+         <Typography variant={'h4'}>
+           Inventario por ancho, calibre y subtipo
+         </Typography>
+        </Grid>
+        <Grid item xs>
+          <TableContainer className={classes.table}>
+            <Table
+              aria-label="simple table"
+              stickyHeader
+            >
+              <TableHead>
+                <TableRow>
+                  <TableCell style={{width: '5%'}}>&nbsp;</TableCell>
+                  <TableCell>Ancho</TableCell>
+                  <TableCell>Calibre</TableCell>
+                  <TableCell>Subtipo</TableCell>
+                  <TableCell>Kilos en inventario</TableCell>
+                  <TableCell>Kilos en producción</TableCell>
+                  <TableCell>Kilos pendientes</TableCell>
+                  <TableCell>Kilos solicitados</TableCell>
                 </TableRow>
-              )
-            })
-          }
-        </TableBody>
-      </Table>
-    </TableContainer>
-  )
+              </TableHead>
+              <TableBody>
+                {
+                  widthAndCaliberGroups.map(item => {
+                    return (
+                      <WidthAndCaliberTableRow wcGroup={item} />
+                    )
+                  })
+                }
+              </TableBody>
+            </Table>
+          </TableContainer>
+        </Grid>
+      </Grid>
+    )
+  }
 
-
-  const ProductsOrderByPriorityTable = (
-    <TableContainer className={classes.table}>
-      <Table aria-label="simple table" stickyHeader>
-        <TableHead>
-          <TableRow>
-            <TableCell style={{width: '5%'}}>&nbsp;</TableCell>
-            <TableCell>Folio</TableCell>
-            <TableCell>Cliente</TableCell>
-            <TableCell>Status</TableCell>
-            <TableCell>Prioridad</TableCell>
-            <TableCell>Producto</TableCell>
-            <TableCell>Material</TableCell>
-            <TableCell>Fecha de solicitud</TableCell>
-            <TableCell>Kilos solicitados</TableCell>
-            <TableCell>Kilos vendidos</TableCell>
-            <TableCell>Kilos asignados del inventario</TableCell>
-            <TableCell>Kilos pendientes por producir</TableCell>
-          </TableRow>
-        </TableHead>
-        <TableBody>
-          {
-            productsByPriority.map(product => {
-              return (
-                <TableRow key={product.order_request_product_id}>
-                  <TableCell>&nbsp;</TableCell>
-                  <TableCell>{product.order_code}</TableCell>
-                  <TableCell>{product.client_name}</TableCell>
-                  <TableCell>{product.order_request_status_name}</TableCell>
-                  <TableCell>{product.priority}</TableCell>
-                  <TableCell>{product.product_description}</TableCell>
-                  <TableCell>{product.material_name}</TableCell>
-                  <TableCell>{product.order_request_date}</TableCell>
-                  <TableCell>{product.order_request_kilos}</TableCell>
-                  <TableCell>{product.order_sale_delivered_kilos}</TableCell>
-                  <TableCell>{product.given_inventory_kilos}</TableCell>
-                  <TableCell>{product.pending_to_produce}</TableCell>
-                </TableRow>
-              )
-            })
-          }
-        </TableBody>
-      </Table>
-    </TableContainer>
-  )
-
-  return type === 'all' ? ProductsOrderByPriorityTable
-    : type === 'extrusion' ? WidthAndCaliberTable
-    : type === 'materials' ? MaterialTable
-    : type === 'products' ? ProductsTable
-    : null;
+  return type === 'extrusion' ? <WidthAndCaliberTable />
+    : type === 'materials' ? <MaterialTable />
+      : type === 'products' ? <ProductsTable />
+        : null;
 }
 
 RequestsProductsTable.propTypes = {

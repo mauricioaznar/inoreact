@@ -8,7 +8,7 @@ export const loginUser = (email, password) => {
       const token = result.data.data.token
       dispatch(setToken(token))
     }).catch(e => {
-      console.log(e)
+
     }).finally((token) => {
       dispatch(unsetIsTokenLoading())
     })
@@ -47,7 +47,6 @@ export const unsetUserBranch = () => {
 }
 
 export const setUserBranch = (user) => {
-  console.log(user)
   return {
     type: 'SET_USER_BRANCH',
     userBranchId: user.branch_id

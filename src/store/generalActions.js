@@ -8,7 +8,7 @@ import {
   setExpenseInvoicePaymentMethods, setExpenseInvoicePaymentForms, setExpenseInvoiceCdfiUses, setExpenseMoneySources
 } from './expensesActions'
 import {
-  setMachines,
+  setMachines, setMachineTypes,
   setMaterials, setOrderProductionTypes, setPackings,
   setProducts,
   setProductTypes
@@ -99,7 +99,8 @@ export const getApiEntities = () => {
         equipment_measurement_units,
         equipment_transaction_type,
         equipment_transaction_statuses,
-        equipments
+        equipments,
+        machine_type: machineTypes
       } = result[0].data.data
       // dispatch(setOrderProductions(orderProductions))
       dispatch(setBranches(branches))
@@ -131,6 +132,7 @@ export const getApiEntities = () => {
       dispatch(setEquipmentTransactionTypes(equipment_transaction_type))
       dispatch(setEquipmentTransactionStatuses(equipment_transaction_statuses))
       dispatch(setEquipments(equipments))
+      dispatch(setMachineTypes(machineTypes))
     }).finally(() => {
       dispatch(unsetAreEntitiesLoading())
     })

@@ -27,6 +27,7 @@ const useStyles = makeStyles((theme) => ({
 }));
 
 function Production(props) {
+
   const classes = useStyles();
 
   const location = useLocation()

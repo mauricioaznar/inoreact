@@ -14,9 +14,14 @@ import SupplierForm from '../forms/SupplierForm'
 import MauMaterialTable from './common/MauMaterialTable'
 import MachineForm from '../forms/MachineForm'
 import EquipmentForm from '../forms/EquipmentForm'
+import {getEquipments} from '../../../store/maintenanceActions'
+import formatNumber from '../../../helpers/formatNumber'
+import imageUrl from '../../../helpers/imageUrl'
 
 const Transition = React.forwardRef(function Transition(props, ref) {
-  return <Slide direction="up" ref={ref} {...props} />;
+  return <Slide
+    direction="up"
+    ref={ref} {...props} />;
 });
 
 
@@ -41,6 +46,37 @@ function EquipmentDataTable(props) {
       field: 'description',
       type: 'text'
     },
+    {
+      title: 'Categoria',
+      field: 'equipment_category_id',
+      type: 'options',
+      options: props.equipmentCategories,
+      optionLabel: 'name'
+    },
+    {
+      title: 'Subcategoria',
+      field: 'equipment_subcategory_id',
+      type: 'options',
+      options: props.equipmentSubcategories,
+      optionLabel: 'name'
+    },
+    {
+      title: 'Imagen',
+      sorting: false,
+      render: (rowData) => {
+        return (
+
+            rowData.image_name
+              ? <img
+                style={{height: '50px', width: '50px'}}
+                src={imageUrl + rowData.image_name}
+                alt={'Imagen no disponible'}
+              />
+              : null
+
+        )
+      }
+    }
   ]
 
   const handleClickOpen = () => {
@@ -54,20 +90,25 @@ function EquipmentDataTable(props) {
   const handleOnSubmit = (equipment, callback) => {
     mainEntityPromise(equipment, entityPath)
       .then(result => {
+        const bodyFormData = new FormData()
+        bodyFormData.append('photo', equipment.photo[0])
+        bodyFormData.append('id', result.data.data.id)
+        return axios.post(apiUrl + entityPath + '/image', bodyFormData, {
+          headers: {
+            ...authHeader(),
+            'Content-Type': 'multipart/form-data'
+          }
+        })
+      })
+      .then(result => {
         callback(true)
         tableRef.current && tableRef.current.onQueryChange()
         setOpen(false)
+        if (props.setUpdates) {
+          props.setUpdates(props.updates + 1)
+        }
+        props.getEquipments()
       })
-  }
-
-  const handleRowDelete = (oldData) => {
-    let promises = []
-    promises.push(axios.put(apiUrl + entityPath + '/' + oldData.id, {active: -1}, {headers: {...authHeader()}}))
-    return Promise.all(promises).then(results => {
-      return new Promise((resolve, reject) => {
-        resolve()
-      })
-    })
   }
 
 
@@ -96,21 +137,22 @@ function EquipmentDataTable(props) {
             }}
             columns={columns}
 
-
-
           />
         </Grid>
       </Grid>
       <Dialog
-        maxWidth={!matchesXS ? 'lg' : null}
-        fullWidth={!matchesXS || null}
+        maxWidth
+        fullWidth
         open={open}
-        fullScreen={matchesXS}
+        fullScreen
         TransitionComponent={Transition}
         onClose={handleClose}
         aria-labelledby="form-dialog-title"
       >
-        <EquipmentForm equipment={rowData} onSubmit={handleOnSubmit} />
+        <EquipmentForm
+          equipment={rowData}
+          onSubmit={handleOnSubmit}
+        />
       </Dialog>
     </>
   )
@@ -118,13 +160,17 @@ function EquipmentDataTable(props) {
 
 const mapStateToProps = (state, ownProps) => {
   return {
+    equipmentSubcategories: state.maintenance.equipmentSubcategories,
+    equipmentCategories: state.maintenance.equipmentCategories,
   }
 }
 
 
-
 const mapDispatchToProps = (dispatch, ownProps) => {
   return {
+    getEquipments: () => {
+      dispatch(getEquipments())
+    }
   }
 }
 

@@ -31,3 +31,20 @@ export const getDayRange = (day = 0, content) => {
   }
   return days
 }
+
+export const getMonthRange = (month = 0, content) => {
+  let currentStart = moment().subtract(month, 'months').startOf('months');
+  let endDay = moment()
+  let months = []
+
+  while (currentStart.isBefore(endDay, '[]')) {
+    months.push({
+      month: currentStart.format('MM'),
+      year: currentStart.format('YYYY'),
+      date: currentStart.format(dateFormat),
+      ...content
+    })
+    currentStart = currentStart.add(1, 'month')
+  }
+  return months
+}

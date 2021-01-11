@@ -13,6 +13,7 @@ import {mainEntityPromise, subEntitiesPromises} from './common/common'
 import SupplierForm from '../forms/SupplierForm'
 import MauMaterialTable from './common/MauMaterialTable'
 import MachineForm from '../forms/MachineForm'
+import formatNumber from '../../../helpers/formatNumber'
 
 const Transition = React.forwardRef(function Transition(props, ref) {
   return <Slide direction="up" ref={ref} {...props} />;
@@ -40,6 +41,63 @@ function MachineDataTable(props) {
       field: 'name',
       type: 'text'
     },
+    {
+      title: 'Tipo de maquina',
+      field: 'machine_type_id',
+      type: 'options',
+      options: props.machineTypes,
+      optionLabel: 'name'
+    },
+    {
+      title: 'Refacciones',
+      type: 'entity',
+      field: 'equipment_id',
+      entity: 'machineEquipments',
+      table: 'machine_equipments',
+      options: props.equipments,
+      optionLabel: 'description'
+    },
+    {
+      title: 'Cantidad minima',
+      sorting: false,
+      render: (rowData) => {
+        return (
+          <ul>
+            {
+              rowData.machine_equipments.map(machineEquipment => {
+                return (
+                  <li key={`${machineEquipment.equipment_id}${machineEquipment.machine_id}`} style={{whiteSpace: 'nowrap', textAlign: 'right'}}>
+                    {formatNumber(machineEquipment.min_quantity)}
+                  </li>
+                )
+              })
+            }
+          </ul>
+        )
+      },
+    },
+    {
+      title: 'Cantidad maxima',
+      sorting: false,
+      render: (rowData) => {
+        return (
+          <ul>
+            {
+              rowData.machine_equipments.map(machineEquipment => {
+                return (
+                  <li
+                    key={`${machineEquipment.equipment_id}${machineEquipment.machine_id}`}
+                    style={{whiteSpace: 'nowrap', textAlign: 'right'}}
+                  >
+                    {formatNumber(machineEquipment.max_quantity)}
+                  </li>
+                )
+              })
+            }
+          </ul>
+        )
+      },
+    }
   ]
 
   const handleClickOpen = () => {
@@ -70,6 +128,9 @@ function MachineDataTable(props) {
         callback(true)
         tableRef.current && tableRef.current.onQueryChange()
         setOpen(false)
+        if (props.setUpdates) {
+          props.setUpdates(props.updates + 1)
+        }
       })
   }
 
@@ -131,6 +192,8 @@ function MachineDataTable(props) {
 
 const mapStateToProps = (state, ownProps) => {
   return {
+    equipments: state.maintenance.equipments,
+    machineTypes: state.production.machineTypes
   }
 }
 

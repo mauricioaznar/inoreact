@@ -15,6 +15,7 @@ import MauMaterialTable from './common/MauMaterialTable'
 import MachineForm from '../forms/MachineForm'
 import EquipmentForm from '../forms/EquipmentForm'
 import EquipmentTransactionForm from '../forms/EquipmentTransactionForm'
+import formatNumber from '../../../helpers/formatNumber'
 
 const Transition = React.forwardRef(function Transition(props, ref) {
   return <Slide direction="up" ref={ref} {...props} />;
@@ -38,9 +39,70 @@ function EquipmentTransactionDataTable(props) {
 
   const columns = [
     {
+      title: 'Fecha emision',
+      field: 'date_emitted',
+      type: 'date'
+    },
+    {
+      title: 'Fecha estimada de entrega',
+      field: 'date_estimated_delivery',
+      type: 'date'
+    },
+    {
       title: 'Nombre',
       field: 'description',
       type: 'text'
+    },
+    {
+      title: 'Tipo de transaccion',
+      field: 'equipment_transaction_type_id',
+      type: 'options',
+      options: props.equipmentTransactionTypes,
+      optionLabel: 'name'
+    },
+    {
+      title: 'Estado de transaccion',
+      field: 'equipment_transaction_status_id',
+      type: 'options',
+      options: props.equipmentTransactionStatuses,
+      optionLabel: 'name'
+    },
+    {
+      title: 'Refacciones',
+      type: 'entity',
+      field: 'equipment_id',
+      entity: 'equipmentTransactionItems',
+      table: 'equipment_transaction_items',
+      options: props.equipments,
+      optionLabel: 'description'
+    },
+    {
+      title: 'Cantidad',
+      sorting: false,
+      render: (rowData) => {
+        return (
+          <ul>
+            {
+              rowData.equipment_transaction_items.map(equipmentTransactionItem => {
+                return (
+                  <li key={`${equipmentTransactionItem.equipment_id}${equipmentTransactionItem.machine_id}`} style={{whiteSpace: 'nowrap', textAlign: 'right'}}>
+                    {formatNumber(equipmentTransactionItem.quantity)}
+                  </li>
+                )
+              })
+            }
+          </ul>
+        )
+      },
+    },
+    {
+      title: 'Maquinas',
+      type: 'entity',
+      field: 'machine_id',
+      entity: 'equipmentTransactionItem',
+      table: 'equipment_transaction_items',
+      options: props.machines,
+      optionLabel: 'name'
     },
   ]
 
@@ -72,12 +134,18 @@ function EquipmentTransactionDataTable(props) {
         callback(true)
         tableRef.current && tableRef.current.onQueryChange()
         setOpen(false)
+        if (props.setUpdates) {
+          props.setUpdates(props.updates + 1)
+        }
       })
   }
 
   const handleRowDelete = (oldData) => {
     let promises = []
     promises.push(axios.put(apiUrl + entityPath + '/' + oldData.id, {active: -1}, {headers: {...authHeader()}}))
+    oldData.equipment_transaction_items.forEach(equipmentTransactionItem => {
+      promises.push(axios.put(apiUrl + 'equipmentTransactionItem/' + equipmentTransactionItem.id, {active: -1}, {headers: {...authHeader()}}))
+    })
     return Promise.all(promises).then(results => {
       return new Promise((resolve, reject) => {
         resolve()
@@ -109,6 +177,9 @@ function EquipmentTransactionDataTable(props) {
               setRowData(rowData)
               setOpen(true)
             }}
+            onRowDelete={(oldData) => {
+              return handleRowDelete(oldData)
+            }}
             columns={columns}
 
 
@@ -117,10 +188,10 @@ function EquipmentTransactionDataTable(props) {
         </Grid>
       </Grid>
       <Dialog
-        maxWidth={!matchesXS ? 'lg' : null}
-        fullWidth={!matchesXS || null}
+        maxWidth
+        fullWidth
         open={open}
-        fullScreen={matchesXS}
+        fullScreen
         TransitionComponent={Transition}
         onClose={handleClose}
         aria-labelledby="form-dialog-title"
@@ -133,6 +204,10 @@ function EquipmentTransactionDataTable(props) {
 
 const mapStateToProps = (state, ownProps) => {
   return {
+    equipmentTransactionTypes: state.maintenance.equipmentTransactionTypes,
+    equipmentTransactionStatuses: state.maintenance.equipmentTransactionStatuses,
+    machines: state.production.machines,
+    equipments: state.maintenance.equipments
   }
 }
 

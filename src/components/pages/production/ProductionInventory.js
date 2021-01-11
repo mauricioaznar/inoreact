@@ -2,9 +2,7 @@ import React from 'react'
 import Grid from '@material-ui/core/Grid'
 import InventoryTable from './tables/InventoryTable'
 import useFetch from '../../../helpers/useFetch'
-import axios from 'axios'
 import apiUrl from '../../../helpers/apiUrl'
-import authHeader from '../../../helpers/authHeader'
 import CircularProgress from '@material-ui/core/CircularProgress'
 
 export default function ProductionInventory (props) {
@@ -35,7 +33,7 @@ export default function ProductionInventory (props) {
             sm={8}
             md={6}
           >
-            <InventoryTable type={'product'} inventory={inventory}/>
+            <InventoryTable type={'product'} inventory={inventory} />
           </Grid>
         </Grid>
   )

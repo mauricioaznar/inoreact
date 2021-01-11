@@ -26,6 +26,13 @@ export const setMachines = (machines) => {
   }
 }
 
+export const setMachineTypes = (machineTypes) => {
+  return {
+    type: 'SET_MACHINE_TYPES',
+    machineTypes: machineTypes
+  }
+}
+
 export const setProducts = (products) => {
   return {
     type: 'SET_PRODUCTS',

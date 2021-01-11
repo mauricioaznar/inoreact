@@ -10,7 +10,7 @@ import TableContainer from '@material-ui/core/TableContainer';
 import TableHead from '@material-ui/core/TableHead';
 import TableRow from '@material-ui/core/TableRow';
 import Grid from '@material-ui/core/Grid'
-import {getDayRange} from '../../../../helpers/dateObjects'
+import {getDayRange, getMonthRange} from '../../../../helpers/dateObjects'
 import {dateFormat} from '../../../../helpers/dateFormat'
 
 
@@ -37,6 +37,10 @@ function ProductionByProductTypeTable(props) {
 
   let productions = props.productions
 
+  if (!props.monthsBack && !props.daysBack) {
+    return null
+  }
+
   let productTypeLookup = props.materials
     .reduce((acc, productType) => {
       return {
@@ -45,8 +49,19 @@ function ProductionByProductTypeTable(props) {
       }
     }, {total: 0})
 
-  let productTypeWeekRange = getDayRange(props.daysBack, productTypeLookup)
-    .reverse()
+  let weekProperty
+  let productTypeWeekRange
+
+  if (props.monthsBack) {
+    weekProperty = 'month'
+    productTypeWeekRange = getMonthRange(props.monthsBack, productTypeLookup)
+      .reverse()
+    console.log(productTypeWeekRange)
+  } else if (props.daysBack) {
+    weekProperty = 'date'
+    productTypeWeekRange = getDayRange(props.daysBack, productTypeLookup)
+      .reverse()
+  }
 
   if (productions) {
     productions
@@ -56,7 +71,11 @@ function ProductionByProductTypeTable(props) {
       .forEach(production => {
         let productTypeWRItem = productTypeWeekRange
           .find(item => {
-            return moment(item.date, dateFormat).isSame(moment(production.start_date, dateFormat))
+            if (props.daysBack) {
+              return moment(item.date, dateFormat).isSame(moment(production.start_date, dateFormat))
+            } else if (props.monthsBack) {
+              return Number(item.month) === production.month && Number(item.year) === production.year
+            }
           })
         if (productTypeWRItem && production.product_type_id === props.productTypeId) {
           productTypeWRItem[production.material_id] += production.kilos
@@ -103,7 +122,7 @@ function ProductionByProductTypeTable(props) {
                   productTypeWeekRange.map(item => {
                     return (
                       <TableRow key={item.date}>
-                        <TableCell>{item.date}</TableCell>
+                        <TableCell>{props.daysBack ? item.date : item.month + '-' +  item.year}</TableCell>
                         <TableCell>{formatNumber(item.total)}</TableCell>
                         {
                           props.materials.map(productType => {

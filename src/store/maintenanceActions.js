@@ -1,3 +1,8 @@
+import axios from 'axios'
+import apiUrl from '../helpers/apiUrl'
+import authHeader from '../helpers/authHeader'
+import {setSuppliers} from './expensesActions'
+
 export const setProductionEventTypes = (productionEventTypes) => {
   return {
     type: 'SET_PRODUCTION_EVENT_TYPES',
@@ -27,7 +32,6 @@ export const setEquipmentMeasurementUnits = (equipmentMeasurementUnits) => {
 }
 
 export const setEquipmentTransactionTypes = (equipmentTransactionTypes) => {
-  console.log(equipmentTransactionTypes)
   return {
     type: 'SET_EQUIPMENT_TRANSACTION_TYPES',
     equipmentTransactionTypes
@@ -45,5 +49,15 @@ export const setEquipments = (equipments) => {
   return {
     type: 'SET_EQUIPMENTS',
     equipments
+  }
+}
+
+export const getEquipments = () => {
+  return (dispatch, getState) => {
+    return axios.get(apiUrl + 'equipment/list?paginate=false&simple=true', {headers: {...authHeader()}})
+      .then(result => {
+        const equipments = result.data.data
+        dispatch(setEquipments(equipments))
+      })
   }
 }

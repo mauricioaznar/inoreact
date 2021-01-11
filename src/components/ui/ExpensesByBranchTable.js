@@ -26,8 +26,6 @@ function ExpensesByBranchTable (props) {
 
   if (props.expenses && props.sales) {
 
-    console.log(props.expenseSubcategories)
-
     let sales = props.sales.sales
 
     let defaultRowObject = props.expenseSubcategories
@@ -70,9 +68,25 @@ function ExpensesByBranchTable (props) {
       if (rowFoundTotal && rowFoundTotal[expense.expense_subcategory_id] !== undefined) {
         rowFoundTotal[expense.expense_subcategory_id] += expense.total
       }
+      if (expense.branch_id === 3) {
+        let caucelRowFound = rows.find(row => {
+          return row.branch_id === 2
+            && expense.month === row.month
+            && expense.year === row.year
+        })
+        if (caucelRowFound && caucelRowFound[expense.expense_subcategory_id] !== undefined) {
+          caucelRowFound[expense.expense_subcategory_id] += (expense.total / 2)
+        }
+        let bacaRowFound = rows.find(row => {
+          return row.branch_id === 1
+            && expense.month === row.month
+            && expense.year === row.year
+        })
+        if (bacaRowFound && bacaRowFound[expense.expense_subcategory_id] !== undefined) {
+          bacaRowFound[expense.expense_subcategory_id] += (expense.total / 2)
+        }
+      }
     })
-
-    console.log(sales)
 
     sales.map(sale => {
         let foundRows = rows
@@ -180,7 +194,7 @@ const mapStateToProps = (state, ownProps) => {
   return {
     expenseSubcategories: state.expenses.expenseSubcategories
       .filter(expenseSubcategory => {
-        return expenseSubcategory.expense_subcategory_frequency_id === 1
+        return expenseSubcategory.expense_subcategory_frequency_id === 2
       }),
     branches: state.general.branches
   }
