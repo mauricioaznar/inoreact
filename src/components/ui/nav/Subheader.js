@@ -92,7 +92,7 @@ Subheader.propTypes = {
     authed: PropTypes.bool.isRequired,
     path: PropTypes.string.isRequired,
     name: PropTypes.string.isRequired,
-    component: PropTypes.element.isRequired,
+    component: PropTypes.func.isRequired,
   })).isRequired,
 }
 

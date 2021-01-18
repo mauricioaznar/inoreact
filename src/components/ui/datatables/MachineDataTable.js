@@ -168,9 +168,6 @@ function MachineDataTable(props) {
               setOpen(true)
             }}
             columns={columns}
-
-
-
           />
         </Grid>
       </Grid>

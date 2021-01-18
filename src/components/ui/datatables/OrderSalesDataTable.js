@@ -147,10 +147,19 @@ function OrderSalesDataTable(props) {
       table: 'order_request'
     },
     {
-      title: 'Estado',
+      title: 'Estado de entrega',
       field: 'order_sale_status_id',
       type: 'options',
       options: props.saleStatuses,
+      optionLabel: 'name'
+    },
+    {
+      title: 'Estado de cobranza',
+      type: 'entity',
+      field: 'order_sale_collection_status_id',
+      entity: 'orderSalePayments',
+      table: 'order_sale_payments',
+      options: props.collectionStatuses,
       optionLabel: 'name'
     },
     {
@@ -362,7 +371,8 @@ const mapStateToProps = (state, ownProps) => {
     products: state.production.products,
     clients: state.sales.clients,
     saleStatuses: state.sales.saleStatuses,
-    saleReceiptTypes: state.sales.saleReceiptTypes
+    saleReceiptTypes: state.sales.saleReceiptTypes,
+    collectionStatuses: state.sales.collectionStatuses
   }
 }
 
