@@ -30,7 +30,6 @@ import TableRow from '@material-ui/core/TableRow'
 import TableCell from '@material-ui/core/TableCell'
 import TableBody from '@material-ui/core/TableBody'
 import DeleteIcon from '@material-ui/icons/Delete'
-import Autocomplete from '../inputs/Autocomplete'
 import formatNumber from '../../../helpers/formatNumber'
 import MauNumber from './inputs/MauNumber'
 

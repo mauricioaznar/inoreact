@@ -1,31 +1,40 @@
 import axios from 'axios'
 import authHeader from '../helpers/authHeader'
 import {
-  setExpenseCategories,
-  setExpenseSubcategories,
-  setSuppliers,
-  setExpenseTypes,
-  setExpenseInvoicePaymentMethods, setExpenseInvoicePaymentForms, setExpenseInvoiceCdfiUses, setExpenseMoneySources
+    setExpenseCategories,
+    setExpenseInvoiceCdfiUses,
+    setExpenseInvoicePaymentForms,
+    setExpenseInvoicePaymentMethods,
+    setExpenseMoneySources,
+    setExpenseSubcategories,
+    setExpenseTypes,
+    setSuppliers
 } from './expensesActions'
 import {
-  setMachines, setMachineTypes,
-  setMaterials, setOrderProductionTypes, setPackings,
-  setProducts,
-  setProductTypes
+    setMachines,
+    setMachineTypes,
+    setMaterials,
+    setOrderProductionTypes,
+    setPackings,
+    setProducts,
+    setProductTypes
 } from './productionActions'
 import apiUrl from '../helpers/apiUrl'
 import {
-  setClients,
-  setOrderRequestStatuses,
-  setOrderSaleCollectionStatuses, setSaleReceiptTypes, setSaleStatuses
+    setClients,
+    setOrderRequestStatuses,
+    setOrderSaleCollectionStatuses,
+    setSaleReceiptTypes,
+    setSaleStatuses
 } from './salesActions'
 import {
-  setEquipmentCategories,
-  setEquipmentMeasurementUnits, setEquipments,
-  setEquipmentSubcategories,
-  setEquipmentTransactionStatuses,
-  setEquipmentTransactionTypes,
-  setProductionEventTypes
+    setEquipmentCategories,
+    setEquipmentMeasurementUnits,
+    setEquipments,
+    setEquipmentSubcategories,
+    setEquipmentTransactionStatuses,
+    setEquipmentTransactionTypes,
+    setProductionEventTypes
 } from './maintenanceActions'
 
 export const setInventory = (inventory) => {

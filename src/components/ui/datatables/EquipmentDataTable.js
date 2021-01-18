@@ -10,12 +10,9 @@ import Dialog from '@material-ui/core/Dialog'
 import useMediaQuery from '@material-ui/core/useMediaQuery'
 import Slide from '@material-ui/core/Slide'
 import {mainEntityPromise} from './common/common'
-import SupplierForm from '../forms/SupplierForm'
 import MauMaterialTable from './common/MauMaterialTable'
-import MachineForm from '../forms/MachineForm'
 import EquipmentForm from '../forms/EquipmentForm'
 import {getEquipments} from '../../../store/maintenanceActions'
-import formatNumber from '../../../helpers/formatNumber'
 import imageUrl from '../../../helpers/imageUrl'
 
 const Transition = React.forwardRef(function Transition(props, ref) {

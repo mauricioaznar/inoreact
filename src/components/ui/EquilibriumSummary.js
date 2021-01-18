@@ -1,11 +1,7 @@
 import React from 'react'
 import {connect} from 'react-redux'
-import moment from 'moment'
 
 import {makeStyles} from '@material-ui/core/styles'
-
-import Grid from '@material-ui/core/Grid'
-import Typography from '@material-ui/core/Typography'
 
 import Table from '@material-ui/core/Table';
 import TableBody from '@material-ui/core/TableBody';

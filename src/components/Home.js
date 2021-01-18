@@ -1,7 +1,7 @@
 import React from 'react'
 import {connect} from 'react-redux'
 import {getApiEntities} from '../store/generalActions'
-import {Switch, Route} from 'react-router-dom'
+import {Route, Switch} from 'react-router-dom'
 import Navbar from './ui/Navbar'
 import Equilibrium from './pages/Equilibrium'
 import Production from './pages/Production'

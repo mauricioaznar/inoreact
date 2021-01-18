@@ -3,7 +3,7 @@ import ReactDOM from 'react-dom';
 import './index.css';
 import App from './App';
 import * as serviceWorker from './serviceWorker';
-import {createStore, applyMiddleware} from 'redux'
+import {applyMiddleware, createStore} from 'redux'
 import thunk from 'redux-thunk'
 import {Provider} from 'react-redux'
 import combinedReducers from './store/index'
@@ -11,7 +11,7 @@ import {composeWithDevTools} from 'redux-devtools-extension/developmentOnly'
 import {BrowserRouter as Router} from 'react-router-dom'
 import createMuiTheme from '@material-ui/core/styles/createMuiTheme'
 import CssBaseline from '@material-ui/core/CssBaseline'
-import { ThemeProvider } from '@material-ui/styles';
+import {ThemeProvider} from '@material-ui/styles';
 import DateFnsUtils from '@material-ui/pickers/adapter/moment';
 import LocalizationProvider from '@material-ui/pickers/LocalizationProvider'
 

@@ -3,15 +3,9 @@ import './App.css';
 import LoginForm from './components/LoginForm'
 import Home from './components/Home'
 import {connect} from 'react-redux'
-import {
-  loginUser,
-  setRole,
-  setUserBranch,
-  unsetToken
-} from './store/authActions'
+import {loginUser, setRole, setUserBranch, unsetToken} from './store/authActions'
 import useFetch from './helpers/useFetch'
 import apiUrl from './helpers/apiUrl'
-
 
 
 function App(props) {

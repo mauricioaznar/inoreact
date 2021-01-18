@@ -1,7 +1,6 @@
 import React from 'react'
 import {Controller} from 'react-hook-form'
 import FormControl from '@material-ui/core/FormControl'
-import {DatePicker} from '@material-ui/pickers'
 import TextField from '@material-ui/core/TextField'
 import NumberFormat from 'react-number-format';
 

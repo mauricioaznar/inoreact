@@ -180,9 +180,6 @@ function OrderRequestsDataTable(props) {
           setOpen(true)
         }}
         columns={columns}
-
-
-
       />
       <Dialog
         maxWidth={!matchesXS ? 'lg' : null}

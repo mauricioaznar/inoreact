@@ -3,7 +3,7 @@ import './LoginForm.css'
 import validateFormElement from '../utility/validateFormElement'
 import {connect} from 'react-redux'
 import {loginUser} from '../store/authActions'
-import {Grid, FormControl, Paper, FormControlLabel, Checkbox, TextField, Button, Typography} from '@material-ui/core'
+import {Button, Checkbox, FormControl, FormControlLabel, Grid, Paper, TextField, Typography} from '@material-ui/core'
 import Box from '@material-ui/core/Box'
 
 const LoginForm = (props) => {

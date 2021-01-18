@@ -1,23 +1,6 @@
-import {setAreEntitiesLoading, setBranches, setEmployees, setRoles} from './generalActions'
 import axios from 'axios'
 import apiUrl from '../helpers/apiUrl'
 import authHeader from '../helpers/authHeader'
-import {
-  setMachines,
-  setMaterials,
-  setOrderProductionTypes,
-  setPackings,
-  setProducts,
-  setProductTypes
-} from './productionActions'
-import {
-  setClients,
-  setOrderRequestStatuses,
-  setOrderSaleCollectionStatuses,
-  setSaleReceiptTypes,
-  setSaleStatuses
-} from './salesActions'
-import {setProductionEventTypes} from './maintenanceActions'
 
 export const setExpenseCategories = (expenseCategories) => {
   return {

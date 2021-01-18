@@ -1,9 +1,6 @@
 import React from "react";
 import TextField from "@material-ui/core/TextField";
-import {
-  DateRangePicker,
-  DateRangeDelimiter
-} from "@material-ui/pickers";
+import {DateRangeDelimiter, DateRangePicker} from "@material-ui/pickers";
 import Grid from '@material-ui/core/Grid'
 import {connect} from 'react-redux'
 import {dateFormat} from '../../../../helpers/dateFormat'
@@ -14,7 +11,6 @@ import TableHead from '@material-ui/core/TableHead'
 import TableRow from '@material-ui/core/TableRow'
 import TableCell from '@material-ui/core/TableCell'
 import TableBody from '@material-ui/core/TableBody'
-import CircularProgress from '@material-ui/core/CircularProgress'
 
 function EmployeePerformanceTable(props) {
   const [selectedDate, handleDateChange] = React.useState([null, null]);

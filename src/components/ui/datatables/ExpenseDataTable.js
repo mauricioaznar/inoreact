@@ -18,7 +18,7 @@ import useMediaQuery from '@material-ui/core/useMediaQuery'
 import Slide from '@material-ui/core/Slide'
 import TextField from '@material-ui/core/TextField'
 import Autocomplete from '@material-ui/lab/Autocomplete'
-import {localization, tableIcons, mainEntityPromise, subEntitiesPromises} from './common/common'
+import {localization, mainEntityPromise, subEntitiesPromises, tableIcons} from './common/common'
 import MaterialTableDate from './common/MaterialTableDate'
 import MaterialTableText from './common/MaterialTableText'
 

@@ -1,7 +1,5 @@
 import React from 'react'
 import {connect} from 'react-redux'
-
-import Grid from '@material-ui/core/Grid'
 import {useTheme} from '@material-ui/core/styles'
 import axios from 'axios'
 import apiUrl from '../../../helpers/apiUrl'

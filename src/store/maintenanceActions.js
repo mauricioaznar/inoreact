@@ -1,7 +1,6 @@
 import axios from 'axios'
 import apiUrl from '../helpers/apiUrl'
 import authHeader from '../helpers/authHeader'
-import {setSuppliers} from './expensesActions'
 
 export const setProductionEventTypes = (productionEventTypes) => {
   return {

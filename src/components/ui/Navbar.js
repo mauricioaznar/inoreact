@@ -1,5 +1,5 @@
 import React, {useState} from 'react'
-import {AppBar, Button, Grid, Toolbar, Tab, Tabs} from '@material-ui/core'
+import {AppBar, Grid, Tab, Tabs, Toolbar} from '@material-ui/core'
 import {Link, useLocation} from 'react-router-dom'
 import {connect} from 'react-redux'
 import {unsetRole, unsetToken, unsetUserBranch} from '../../store/authActions'

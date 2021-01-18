@@ -1,47 +1,49 @@
 import React from 'react'
 import {connect} from 'react-redux'
-import Grid from '@material-ui/core/Grid'
 import OrderRequestsDataTable from '../ui/datatables/OrderRequestsDataTable'
-import {makeStyles} from '@material-ui/core/styles'
-import OrderSaleDataTable from '../ui/datatables/OrderSalesDataTable'
+import Subheader from "../ui/nav/Subheader";
+import OrderSalesTable from "./sales/OrderSalesTable";
+import OrderRequestsTable from "./sales/OrderRequestsTable";
 
 
-const useStyles = makeStyles((theme) => ({
-  rowContainer: {
-    paddingLeft: '2em',
-    paddingRight: '2em'
-  }
-}));
 
 const Sales = (props) => {
 
-  const classes = useStyles()
+  const routes = [
+    {
+      name: 'Ventas',
+      path: '/sales',
+      authed: props.isAdmin || props.isSales,
+      component: () => {
+        return (<OrderSalesTable />)
+      }
+    },
+    {
+      name: 'Pedidos',
+      path: '/sales/requests',
+      authed: props.isAdmin || props.isSales,
+      component: () => {
+        return (<OrderRequestsTable/>)
+      }
+    }
+  ]
+
 
   return (
-    <Grid
-      container
-      direction={'column'}
-    >
-      <Grid
-        item
-        className={classes.rowContainer}
-        style={{marginBottom: '2em', marginTop: '2em'}}
-      >
-        <OrderRequestsDataTable />
-      </Grid>
-      <Grid
-        item
-        className={classes.rowContainer}
-        style={{marginBottom: '2em'}}
-      >
-        <OrderSaleDataTable />
-      </Grid>
-    </Grid>
+    <Subheader
+      routes={routes}
+    />
   )
 }
 
 const mapStateToProps = (state, ownProps) => {
-  return {}
+  return {
+    isAdmin: state.auth.isAdmin,
+    isSuperAdmin: state.auth.isSuperAdmin,
+    isProduction: state.auth.isProduction,
+    isExpenses: state.auth.isExpenses,
+    isSales: state.auth.isSales
+  }
 }
 
 export default connect(mapStateToProps, null)(Sales)

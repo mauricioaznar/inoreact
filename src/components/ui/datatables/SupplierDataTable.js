@@ -12,7 +12,6 @@ import Slide from '@material-ui/core/Slide'
 import {mainEntityPromise} from './common/common'
 import SupplierForm from '../forms/SupplierForm'
 import MauMaterialTable from './common/MauMaterialTable'
-import {getApiEntities} from '../../../store/generalActions'
 import {getSuppliers} from '../../../store/expensesActions'
 
 const Transition = React.forwardRef(function Transition(props, ref) {
