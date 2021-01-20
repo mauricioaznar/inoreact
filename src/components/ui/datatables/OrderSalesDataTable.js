@@ -90,7 +90,7 @@ function OrderSalesDataTable(props) {
   const entityPath = 'orderSale'
 
   const orderRequestsInProductions = useFetch(apiUrl +
-    'orderRequest/list?filter_exact_1=order_request_status_id&filter_exact_value_1=2', [updates])
+    'orderRequest/list?filter_exact_1=order_request_status_id&filter_exact_value_1=2&paginate=false', [updates])
 
   React.useEffect(() => {
     if (orderRequestsInProductions && !rowData) {
