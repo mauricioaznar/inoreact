@@ -227,7 +227,8 @@ const OrderRequestForm = (props) => {
 
   const hasGroupWeight = (index) => {
     let requestProduct = watchRequestProducts[index]
-    let isValid = requestProduct.group_weight !== "0" &&
+    let isValid = requestProduct &&
+      requestProduct.group_weight !== "0" &&
       requestProduct.group_weight !== "null" &&
       requestProduct.group_weight !== "" &&
       !isNaN(requestProduct.group_weight) &&
