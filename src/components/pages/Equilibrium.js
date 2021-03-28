@@ -7,16 +7,12 @@ import 'moment/locale/es';
 import {makeStyles, useTheme} from '@material-ui/core/styles'
 import Grid from '@material-ui/core/Grid'
 import Typography from '@material-ui/core/Typography'
-import EstimatedExpensesTable from '../ui/EstimatedExpensesTable'
 import SalesByMaterialTable from '../ui/SalesByMaterialTable'
-import ExpensesByCatSubBraTable from '../ui/ExpensesByCatSubBraTable'
-import ExpensesBySupSubTable from '../ui/ExpensesBySubSupTable'
-import InvoicesBySupTable from '../ui/InvoicesBySupTable'
-import ExpensesVsSalesChart from '../ui/ExpensesVsSalesChart'
-import EquilibriumSummary from '../ui/EquilibriumSummary'
 import useMediaQuery from '@material-ui/core/useMediaQuery'
 import useFetch from '../../helpers/useFetch'
 import MauMonthYear from '../ui/inputs/MauMonthYear'
+import SalePieKilos from "./equilibrium/SalesPieKilos";
+import {connect} from "react-redux";
 
 
 const useStyles = makeStyles((theme) => {
@@ -32,7 +28,7 @@ const useStyles = makeStyles((theme) => {
 })
 
 
-export default function Equilibrium(props) {
+function Equilibrium(props) {
 
   const [year, setYear] = React.useState(moment().year())
   const [month, setMonth] = React.useState(moment().month())
@@ -42,12 +38,8 @@ export default function Equilibrium(props) {
 
   const matchesXS = useMediaQuery(theme.breakpoints.down('xs'))
 
-  const expensesEstimation = useFetch(apiUrl + 'analytics/expensesEstimation?dateGroup=month')
-  const sales = useFetch(apiUrl + 'analytics/sales?dateGroup=month&entityGroup=material')
-  const expensesNoEstimatesByCatSubBra = useFetch(apiUrl + 'analytics/expenses?dateGroup=month&entityGroup=branch|expenseCategory|expenseSubcategory&noEstimates')
-  const expensesBySupSub = useFetch(apiUrl + 'analytics/expenses?dateGroup=month&entityGroup=supplier|expenseCategory|expenseSubcategory')
-  const invoicesBySup = useFetch(apiUrl + 'analytics/invoices?dateGroup=day&entityGroup=supplier')
-  const otherIncomes = useFetch(apiUrl + 'analytics/otherIncomes')
+  const salesByMaterial = useFetch(apiUrl + 'analytics/sales?dateGroup=month&entityGroup=material')
+  const salesByClient = useFetch(apiUrl + 'analytics/sales?dateGroup=month&entityGroup=client')
 
 
   return (
@@ -85,93 +77,72 @@ export default function Equilibrium(props) {
       <Grid
         item
         container
+        direction={'row'}
         className={classes.rowContainer}
-        style={{marginTop: '2em'}}
+        style={{marginTop: '4em'}}
       >
-
         <Grid
           item
           container
-          direction={matchesXS ? 'column' : 'row'}
-          alignItems={'flex-start'}
+          direction={'row'}
+          md={6}
         >
           <Grid
             item
             xs={12}
-            md={12}
-            lg={4}
           >
-            <Grid
-              item
-              container
-              direction={'column'}
+            <Typography
+              variant={'h5'}
+              style={{marginBottom: '0.5em'}}
             >
-              <Grid
-                item
-                xs={12}
-              >
-                <Typography
-                  variant={'h6'}
-                  style={{marginBottom: '1.5em'}}
-                >
-                  Resumen
-                </Typography>
-              </Grid>
-              <Grid
-                item
-                xs={12}
-              >
-                <EquilibriumSummary
-                  expensesEstimates={expensesEstimation}
-                  expensesNoEstimates={expensesNoEstimatesByCatSubBra}
-                  sales={sales}
-                  otherIncomes={otherIncomes}
-                  invoices={invoicesBySup}
-                  month={month}
-                  year={year}
-                />
-              </Grid>
-            </Grid>
+              Ventas por clientes por kilos
+            </Typography>
           </Grid>
-
           <Grid
             item
             xs={12}
-            md={12}
-            lg={8}
           >
-            <Grid
-              item
-              container
-              direction={'column'}
+            <SalePieKilos
+              sales={salesByClient}
+              clients={props.clients}
+              propertySummed={'kilos_sold'}
+              month={month}
+              year={year}
+            />
+          </Grid>
+        </Grid>
+        <Grid
+          item
+          container
+          direction={'row'}
+          md={6}
+        >
+          <Grid
+            item
+            xs={12}
+          >
+            <Typography
+              variant={'h5'}
+              style={{marginBottom: '0.5em'}}
             >
-              <Grid
-                item
-                xs={12}
-              >
-                <Typography
-                  variant={'h6'}
-                  align={'center'}
-                  style={{marginBottom: '0.5em'}}
-                >
-                  Ventas vs gastos del año {moment().year(year).format('YYYY')}
-                </Typography>
-              </Grid>
-              <Grid
-                item
-                xs={12}
-              >
-                <ExpensesVsSalesChart
-                  year={year}
-                  sales={sales}
-                  expensesNoEstimates={expensesNoEstimatesByCatSubBra}
-                  expensesEstimates={expensesEstimation}
-                />
-              </Grid>
-            </Grid>
+              Ventas por clientes
+            </Typography>
+          </Grid>
+          <Grid
+            item
+            xs={12}
+          >
+            <SalePieKilos
+              sales={salesByClient}
+              clients={props.clients}
+              propertySummed={'total_with_tax'}
+              month={month}
+              year={year}
+            />
           </Grid>
         </Grid>
       </Grid>
+
       <Grid
         item
         container
@@ -196,137 +167,21 @@ export default function Equilibrium(props) {
           xs={12}
         >
           <SalesByMaterialTable
-            sales={sales}
+            sales={salesByMaterial}
             month={month}
             year={year}
           />
         </Grid>
-      </Grid>
-      <Grid
-        item
-        container
-        className={classes.rowContainer}
-        style={{marginTop: '4em'}}
-
-      >
-        <Grid
-          item
-          container
-          direction={matchesXS ? 'column' : 'row'}
-        >
-          <Grid
-            item
-            xs={12}
-            sm={6}
-            style={{
-              paddingRight: '1em',
-              paddingLeft: '1em'
-            }}
-          >
-            <Grid container>
-              <Grid
-                item
-                xs={12}
-              >
-                <Typography
-                  variant={'h5'}
-                  style={{marginBottom: '0.5em'}}
-                >
-                  Gastos reales
-                </Typography>
-              </Grid>
-              <Grid
-                item
-                xs={12}
-              >
-                <ExpensesByCatSubBraTable
-                  expenses={expensesNoEstimatesByCatSubBra}
-                  sales={sales}
-                  month={month}
-                  year={year}
-                />
-              </Grid>
-            </Grid>
-          </Grid>
-          <Grid
-            item
-            xs={12}
-            sm={6}
-            style={{
-              paddingRight: '1em',
-              paddingLeft: '1em'
-            }}
-          >
-            <Grid container>
-              <Grid
-                item
-                xs={12}
-              >
-                <Typography
-                  variant={'h5'}
-                  style={{marginBottom: '0.5em'}}
-                >
-                  Gastos estimados
-                </Typography>
-              </Grid>
-              <Grid
-                item
-                xs={12}
-              >
-                <EstimatedExpensesTable
-                  expensesEstimation={expensesEstimation}
-                  month={month}
-                  year={year}
-
-                />
-              </Grid>
-            </Grid>
-          </Grid>
-        </Grid>
-      </Grid>
-      <Grid
-        item
-        container
-        direction={'column'}
-        className={classes.rowContainer}
-        style={{marginTop: '4em'}}
-      >
-
-        <Grid
-          item
-          xs={12}
-        >
-          <Typography
-            variant={'h5'}
-            style={{marginBottom: '0.5em'}}
-          >
-            Gastos por proveedor
-          </Typography>
-        </Grid>
-        <Grid
-          item
-          xs={12}
-        >
-          <ExpensesBySupSubTable
-            expenses={expensesBySupSub}
-            month={month}
-            year={year}
-          />
-        </Grid>
-      </Grid>
-      <Grid
-        item
-        container
-        direction={'column'}
-        className={classes.rowContainer}
-        style={{marginTop: '4em', marginBottom: '2em'}}
-      >
-        <InvoicesBySupTable
-          invoices={invoicesBySup}
-          month={month}
-          year={year}
-        />
       </Grid>
     </Grid>
   )
 }
+
+const mapStateToProps = (state, ownProps) => {
+  return {
+    clients: state.sales.clients
+  }
+}
+
+
+export default connect(mapStateToProps, null)(Equilibrium)

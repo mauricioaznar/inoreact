@@ -260,7 +260,6 @@ const mdColors = [
   '#757575',
   '#616161',
   '#424242',
-  '#212121',
   '#607D8B',
   '#ECEFF1',
   '#CFD8DC',
@@ -272,8 +271,6 @@ const mdColors = [
   '#455A64',
   '#37474F',
   '#263238',
-  '#000000',
-  '#FFFFFF',
 ];
 
 export default mdColors

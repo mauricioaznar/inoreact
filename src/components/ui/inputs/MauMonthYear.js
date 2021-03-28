@@ -99,7 +99,6 @@ export default function MauMonthYear (props) {
               handleYearChange(e)
             }}
           >
-            <MenuItem value={2019}>2019</MenuItem>
             <MenuItem value={2020}>2020</MenuItem>
             <MenuItem value={2021}>2021</MenuItem>
           </Select>
